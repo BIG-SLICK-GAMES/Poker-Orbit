@@ -912,95 +912,6 @@ h2 {
     0 0 28px rgba(85, 201, 189, 0.44);
 }
 
-.table-center {
-  position: relative;
-  z-index: 5;
-  width: 28%;
-  aspect-ratio: 1;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.18), transparent 32%),
-    linear-gradient(145deg, var(--diner-red), #551512);
-  color: var(--diner-cream);
-  font-weight: 900;
-  border: 2px solid rgba(255, 243, 207, 0.72);
-  transform:
-    translate(var(--control-x), var(--control-y))
-    translateZ(18px)
-    rotate(var(--control-rotation))
-    scale(var(--control-scale));
-  transform-origin: center;
-}
-
-.poker-orbit-logo {
-  overflow: hidden;
-  grid-template-rows: 0.86fr 1fr;
-  gap: 0;
-  padding: 5%;
-  text-align: center;
-  text-transform: uppercase;
-  box-shadow:
-    0 0 0 4px rgba(85, 201, 189, 0.24),
-    0 0 20px rgba(255, 243, 207, 0.22),
-    inset 0 2px 0 rgba(255, 255, 255, 0.24),
-    inset 0 -9px 14px rgba(0, 0, 0, 0.28);
-}
-
-.poker-orbit-logo::before {
-  content: "";
-  position: absolute;
-  inset: 13%;
-  border: 2px solid rgba(85, 201, 189, 0.74);
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 2px rgba(255, 243, 207, 0.18),
-    0 0 14px rgba(85, 201, 189, 0.38);
-}
-
-.poker-orbit-logo::after {
-  content: "";
-  position: absolute;
-  width: 28%;
-  aspect-ratio: 1;
-  left: 50%;
-  top: 50%;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 35% 25%, #ffffff, var(--diner-cream) 28%, var(--diner-mint) 54%, var(--diner-mint-dark));
-  box-shadow:
-    0 0 0 3px rgba(255, 243, 207, 0.16),
-    0 0 14px rgba(85, 201, 189, 0.72);
-  transform: rotate(0deg) translateX(98%) rotate(0deg);
-  transform-origin: 0 0;
-  animation: orbit-logo-ball 5.4s linear infinite;
-}
-
-.poker-orbit-logo span,
-.poker-orbit-logo strong {
-  position: relative;
-  z-index: 1;
-  line-height: 0.88;
-  text-shadow:
-    1px 1px 0 var(--diner-red-dark),
-    0 0 10px rgba(255, 243, 207, 0.38);
-}
-
-.poker-orbit-logo span {
-  align-self: end;
-  font-size: clamp(0.42rem, 1.4vw, 0.76rem);
-  letter-spacing: 0;
-}
-
-.poker-orbit-logo strong {
-  align-self: start;
-  color: #ffffff;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(0.66rem, 2.2vw, 1.18rem);
-  letter-spacing: 0;
-}
-
 .player-token-layer {
   position: absolute;
   inset: 0;
@@ -2637,13 +2548,6 @@ body[data-theme] .ring.inner {
   border-color: color-mix(in srgb, var(--diner-mint) 90%, transparent);
 }
 
-body[data-theme] .table-center {
-  background:
-    radial-gradient(circle at 50% 40%, color-mix(in srgb, #ffffff 18%, transparent), transparent 32%),
-    linear-gradient(145deg, var(--diner-red), var(--diner-red-dark));
-  color: var(--diner-cream);
-}
-
 body[data-theme] .inner-wheel-disc {
   border-color: color-mix(in srgb, var(--diner-cream) 86%, transparent);
   background:
@@ -2653,10 +2557,6 @@ body[data-theme] .inner-wheel-disc {
   box-shadow:
     inset 0 0 0 7px color-mix(in srgb, var(--diner-ink) 52%, transparent),
     0 0 22px color-mix(in srgb, var(--diner-cream) 24%, transparent);
-}
-
-body[data-theme] .poker-orbit-logo::before {
-  border-color: color-mix(in srgb, var(--diner-mint) 74%, transparent);
 }
 
 body[data-theme] .board-card,
@@ -2772,16 +2672,6 @@ body[data-theme] .dice-pip {
   to {
     transform: translateY(3%) rotate(2deg);
     filter: blur(0);
-  }
-}
-
-@keyframes orbit-logo-ball {
-  from {
-    transform: rotate(0deg) translateX(98%) rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg) translateX(98%) rotate(-360deg);
   }
 }
 

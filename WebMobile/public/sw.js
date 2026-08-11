@@ -1,4 +1,4 @@
-const CACHE_NAME = "poker-orbit-mobile-v69";
+const CACHE_NAME = "poker-orbit-mobile-v71";
 const APP_SHELL = [
   "/",
   "/index.html",
