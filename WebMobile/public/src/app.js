@@ -1,8 +1,6 @@
 import { createTurnModule } from "./turn.js";
 import { createCameraModule } from "./camera.js";
 import { createSlotReelModule } from "./slot-reel.js";
-import { createInnerWheelModule } from "./inner-wheel.js";
-import { createPrizeWheelRenderer } from "./prize-wheel-renderer.js";
 import { createCardAnimationModule } from "./card-animation.js";
 import { createPurchaseAuctionModule, getRankPurchasePrice } from "./purchase-auction.js";
 import { createOwnershipHighlightModule } from "./ownership-highlights.js";
@@ -20,9 +18,6 @@ const cardAnimationLayer = document.querySelector("#cardAnimationLayer");
 const currentTurnLabel = document.querySelector("#currentTurnLabel");
 const rollPointsLabel = document.querySelector("#rollPointsLabel");
 const landingCostLabel = document.querySelector("#landingCostLabel");
-const innerWheelRoot = document.querySelector("#innerWheel");
-const prizeWheelCanvas = document.querySelector("#prizeWheel3d");
-const innerWheelResultLabel = document.querySelector("#innerWheelResultLabel");
 const rollButton = document.querySelector("#rollButton");
 const slotReelRoot = document.querySelector("#slotReel");
 const slotRollButton = document.querySelector("#slotRollButton");
@@ -152,17 +147,10 @@ const cameraModule = createCameraModule({ boardStage, perspectiveTable, cameraCo
 const ownershipHighlightModule = createOwnershipHighlightModule({ boardRoot: boardCardRing });
 const cardAnimationModule = createCardAnimationModule({
   layer: cardAnimationLayer,
-  canSpin: canSpinForBoardCard,
-  onSpin: spinForBoardCard,
   onPurchase: purchaseBoardCard,
   onPass: passBoardCard
 });
 let currentLandingCost = 0;
-const innerWheelModule = createInnerWheelModule({
-  root: innerWheelRoot,
-  resultLabel: innerWheelResultLabel
-});
-createPrizeWheelRenderer({ root: innerWheelRoot, canvas: prizeWheelCanvas });
 
 createSlotReelModule({
   root: slotReelRoot,
@@ -747,7 +735,6 @@ function scheduleLandingCardAnimation(boardIndex, delayMs = 0) {
     }
 
     awaitingLandingDecision = true;
-    innerWheelModule.pointToBoardIndex(boardIndex, boardSpaceCount);
     cardAnimationModule.play(card);
   }, delayMs);
 }
@@ -774,96 +761,6 @@ function passBoardCard(cardElement) {
   cardElement?.classList.add("passed");
   awaitingLandingDecision = false;
   scheduleNextTurn(260);
-}
-
-function canSpinForBoardCard(cardElement) {
-  const cardCost = getBoardCardCost(cardElement);
-  const currentRollPoints = turnModule.getState().playerRollPoints[turnModule.getState().currentPlayer];
-
-  return cardElement?.dataset.purchaseState === "available" && currentRollPoints >= cardCost;
-}
-
-function spinForBoardCard(cardElement, promptControls, spinOptions = {}) {
-  const cardCost = getBoardCardCost(cardElement);
-  const didStartSpin = innerWheelModule.spin({
-    onBeforeSpin: () => spinOptions.freeSpin || turnModule.spendCurrentPlayerRollPoints(cardCost),
-    onResult: (prize, prizeMeta) => applyBonusWheelPrize(prize, prizeMeta, cardElement, promptControls)
-  });
-
-  if (!didStartSpin) {
-    promptControls.setStatus("Need RP");
-    promptControls.setSpinEnabled(canSpinForBoardCard(cardElement));
-  }
-}
-
-function applyBonusWheelPrize(prize, prizeMeta, cardElement, promptControls) {
-  promptControls.revealBonus?.(prize, prizeMeta?.type);
-  promptControls.setStatus(prize);
-
-  if (prize === "Free Card") {
-    promptControls.setPurchaseFree();
-    promptControls.setStatus("Card is free");
-    return;
-  }
-
-  if (prize === "50% Off") {
-    promptControls.setPurchaseDiscount(50);
-    promptControls.setStatus("50% off this card");
-    return;
-  }
-
-  if (prize === "Buy 1 Get 1 50% Off") {
-    promptControls.setPurchaseDiscount(50);
-    promptControls.setStatus("This card 50% off. Next-card discount later.");
-    return;
-  }
-
-  if (prize === "BANKRUPTCY") {
-    turnModule.clearCurrentPlayerRollPoints();
-    promptControls.setStatus("All RP lost");
-    return;
-  }
-
-  const rollPointPrize = /^(\+)?(\d+) RP$/.exec(prize);
-  if (rollPointPrize) {
-    turnModule.addCurrentPlayerRollPoints(Number.parseInt(rollPointPrize[2], 10));
-    return;
-  }
-
-  if (prize === "NO WIN") {
-    promptControls.setStatus("No win");
-    return;
-  }
-
-  if (prize === "Spin Again") {
-    promptControls.setStatus("Spin again");
-    promptControls.grantFreeSpin();
-    return;
-  }
-
-  if (prize === "Free Roll") {
-    addBonusToCurrentPlayer("Free Roll");
-    promptControls.setStatus("Free Roll held");
-    return;
-  }
-
-  if (prize === "PIC Card") {
-    addBonusToCurrentPlayer("PIC");
-    promptControls.setStatus("PIC card held");
-    return;
-  }
-
-  if (prize === "Shield") {
-    addBonusToCurrentPlayer("Shield");
-    promptControls.setStatus("Shield held");
-    return;
-  }
-
-  if (prize === "Steal") {
-    addBonusToCurrentPlayer("Steal");
-    promptControls.setStatus("Steal held");
-    return;
-  }
 }
 
 function scheduleNextTurn(delayMs = 0) {
@@ -1100,9 +997,7 @@ function renderTurnState(turnState) {
   landingCostLabel.textContent = `Spin cost ${currentLandingCost} RP`;
   purchaseAuctionModule.setActivePlayer(activePlayerIndex);
   renderBonusSlots(activePlayerIndex);
-  const canSpinInnerWheel = currentRollPoints >= currentLandingCost;
-  innerWheelModule.setSpinEnabled(canSpinInnerWheel);
-  slotReelRoot.classList.toggle("spin-ready", canSpinInnerWheel);
+  slotReelRoot.classList.remove("spin-ready");
 
   document.querySelectorAll(".seat-marker").forEach((seat) => {
     seat.classList.toggle("active", Number(seat.dataset.seat) === turnState.currentPlayer);
