@@ -784,7 +784,6 @@ h2 {
   border: 3px solid rgba(255, 243, 207, 0.86);
   border-radius: 50%;
   background:
-    radial-gradient(circle, transparent 0 19%, rgba(19, 15, 13, 0.92) 20% 23%, transparent 24%),
     repeating-conic-gradient(from -90deg, rgba(38, 26, 22, 0.72) 0deg 0.55deg, transparent 0.55deg 6.428571deg),
     var(--inner-wheel-segments);
   box-shadow:
@@ -2551,7 +2550,6 @@ body[data-theme] .ring.inner {
 body[data-theme] .inner-wheel-disc {
   border-color: color-mix(in srgb, var(--diner-cream) 86%, transparent);
   background:
-    radial-gradient(circle, transparent 0 19%, color-mix(in srgb, var(--bsg-bg) 92%, #000) 20% 23%, transparent 24%),
     repeating-conic-gradient(from -90deg, color-mix(in srgb, var(--diner-ink) 72%, transparent) 0deg 0.55deg, transparent 0.55deg 6.428571deg),
     var(--inner-wheel-segments);
   box-shadow:
