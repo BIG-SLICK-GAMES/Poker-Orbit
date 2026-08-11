@@ -33,36 +33,36 @@ export const MASTER_CONTROL = {
       followsToken: false,
       cameraLeftRightPercent: 0,
       cameraUpDownPercent: -16,
-      cameraZoomPercent: 188,
+      cameraZoomPercent: 100,
       cameraRollPercent: 0,
       tablePitchDegrees: 52,
       tableUpDownPercent: 8,
-      tableSizePercent: 146,
+      tableSizePercent: 100,
       mobile: {
         cameraLeftRightPercent: 0,
         cameraUpDownPercent: -10,
-        cameraZoomPercent: 172,
+        cameraZoomPercent: 100,
         tablePitchDegrees: 52,
         tableUpDownPercent: 7,
-        tableSizePercent: 136
+        tableSizePercent: 100
       }
     },
     moveFront: {
       followsToken: false,
       cameraLeftRightPercent: 0,
       cameraUpDownPercent: 8,
-      cameraZoomPercent: 144,
+      cameraZoomPercent: 100,
       cameraRollPercent: 0,
       tablePitchDegrees: 68,
       tableUpDownPercent: 7,
-      tableSizePercent: 118,
+      tableSizePercent: 100,
       mobile: {
-        cameraLeftRightPercent: -50,
+        cameraLeftRightPercent: 0,
         cameraUpDownPercent: 12,
-        cameraZoomPercent: 172,
+        cameraZoomPercent: 100,
         tablePitchDegrees: 72,
         tableUpDownPercent: 12,
-        tableSizePercent: 128
+        tableSizePercent: 100
       }
     },
     tableWide: {
@@ -76,7 +76,7 @@ export const MASTER_CONTROL = {
       tableSizePercent: 100,
       mobile: {
         cameraUpDownPercent: 18,
-        cameraZoomPercent: 96,
+        cameraZoomPercent: 100,
         tablePitchDegrees: 58,
         tableUpDownPercent: 0,
         tableSizePercent: 100

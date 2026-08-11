@@ -1,23 +1,23 @@
 :root {
-  --bsg-bg: #130f0d;
-  --bsg-panel: #2d1714;
-  --bsg-accent: #d92d27;
-  --bsg-success: #55c9bd;
-  --bsg-warning: #fff3cf;
+  --bsg-bg: #080b14;
+  --bsg-panel: #1c1324;
+  --bsg-accent: #f4c95d;
+  --bsg-success: #43d6c9;
+  --bsg-warning: #fff1b7;
   --bsg-text: #ffffff;
-  --bsg-muted: #d9cab5;
-  --bsg-border: #7a4a32;
-  --table: #0d5149;
-  --table-deep: #07332f;
-  --danger-red: #d62839;
-  --ink: #261a16;
-  --diner-red: #b8201c;
-  --diner-red-dark: #5f1714;
-  --diner-cream: #fff3cf;
-  --diner-mint: #55c9bd;
-  --diner-mint-dark: #14736e;
-  --diner-chrome: #d7dde0;
-  --diner-ink: #261a16;
+  --bsg-muted: #d9d0bd;
+  --bsg-border: #9d7a38;
+  --table: #0b655b;
+  --table-deep: #052f32;
+  --danger-red: #e83f4f;
+  --ink: #15121b;
+  --diner-red: #9f2437;
+  --diner-red-dark: #3f0c1b;
+  --diner-cream: #fff1b7;
+  --diner-mint: #43d6c9;
+  --diner-mint-dark: #096c70;
+  --diner-chrome: #e5d6a8;
+  --diner-ink: #15121b;
 }
 
 body[data-theme="casino"] {
@@ -98,14 +98,16 @@ body {
   padding-bottom: max(env(safe-area-inset-bottom), 0px);
   padding-left: max(env(safe-area-inset-left), 0px);
   background:
-    linear-gradient(0deg, rgba(255, 243, 207, 0.05) 0 1px, transparent 1px 100%),
-    linear-gradient(90deg, rgba(255, 243, 207, 0.04) 0 1px, transparent 1px 100%),
-    radial-gradient(circle at 18% 12%, rgba(85, 201, 189, 0.18), transparent 30%),
-    radial-gradient(circle at 82% 8%, rgba(217, 45, 39, 0.22), transparent 28%),
-    linear-gradient(155deg, #1d1210, var(--bsg-bg) 52%, #062d2b);
+    linear-gradient(0deg, rgba(244, 201, 93, 0.08) 0 1px, transparent 1px 100%),
+    linear-gradient(90deg, rgba(67, 214, 201, 0.07) 0 1px, transparent 1px 100%),
+    radial-gradient(circle at 16% 10%, rgba(67, 214, 201, 0.24), transparent 32%),
+    radial-gradient(circle at 82% 8%, rgba(232, 63, 79, 0.26), transparent 30%),
+    radial-gradient(circle at 50% 115%, rgba(244, 201, 93, 0.18), transparent 42%),
+    linear-gradient(155deg, #170a16, var(--bsg-bg) 48%, #052f32);
   background-size:
     32px 32px,
     32px 32px,
+    auto,
     auto,
     auto,
     auto;
@@ -150,8 +152,8 @@ select:focus-visible {
   inset: 0;
   z-index: -1;
   background:
-    repeating-linear-gradient(90deg, rgba(255, 243, 207, 0.06) 0 16px, transparent 16px 32px),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 38%, rgba(0, 0, 0, 0.2));
+    repeating-linear-gradient(90deg, rgba(244, 201, 93, 0.07) 0 16px, transparent 16px 32px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 38%, rgba(0, 0, 0, 0.28));
   pointer-events: none;
 }
 
@@ -490,11 +492,12 @@ h2 {
   place-items: center;
   overflow: hidden;
   background:
-    linear-gradient(0deg, rgba(255, 243, 207, 0.11) 0 1px, transparent 1px 100%),
-    linear-gradient(90deg, rgba(255, 243, 207, 0.09) 0 1px, transparent 1px 100%),
-    radial-gradient(circle at 50% 45%, rgba(246, 196, 83, 0.18), transparent 48%),
-    linear-gradient(145deg, rgba(8, 64, 58, 0.96), rgba(13, 79, 72, 0.86) 48%, rgba(61, 22, 19, 0.72)),
-    repeating-linear-gradient(45deg, rgba(255, 243, 207, 0.1) 0 12px, rgba(184, 32, 28, 0.09) 12px 24px);
+    linear-gradient(0deg, rgba(255, 241, 183, 0.1) 0 1px, transparent 1px 100%),
+    linear-gradient(90deg, rgba(67, 214, 201, 0.09) 0 1px, transparent 1px 100%),
+    radial-gradient(circle at 50% 46%, rgba(244, 201, 93, 0.26), transparent 46%),
+    radial-gradient(circle at 50% 66%, rgba(159, 36, 55, 0.26), transparent 52%),
+    linear-gradient(145deg, rgba(5, 47, 50, 0.98), rgba(11, 101, 91, 0.9) 50%, rgba(63, 12, 27, 0.82)),
+    repeating-linear-gradient(45deg, rgba(255, 241, 183, 0.11) 0 12px, rgba(67, 214, 201, 0.08) 12px 24px);
   background-size:
     28px 28px,
     28px 28px,
@@ -506,7 +509,7 @@ h2 {
 
 .perspective-table {
   position: relative;
-  width: min(118vw, 86dvh, 860px);
+  width: min(220vw, 160dvh, 1720px);
   aspect-ratio: 1;
   display: grid;
   place-items: center;
@@ -530,6 +533,10 @@ h2 {
 
 .board-stage[data-camera-mode="table-wide"] {
   perspective-origin: 50% 78%;
+}
+
+.board-stage[data-camera-mode="table-wide"] .perspective-table {
+  width: min(132vw, 96dvh, 1320px);
 }
 
 .perspective-table::after {
@@ -560,7 +567,7 @@ h2 {
     rotateX(var(--board-camera-tilt, 58deg))
     rotate(var(--control-rotation))
     translateY(var(--board-camera-y, -4%))
-    scale(1.06)
+    scale(1)
     scale(var(--board-camera-scale, 1))
     scale(var(--control-scale));
   transform-style: preserve-3d;
@@ -577,13 +584,13 @@ h2 {
 .board-stage[data-camera-mode="turn-focus"] .orbit-board {
   --board-camera-tilt: 52deg;
   --board-camera-y: 8%;
-  --board-camera-scale: 1.46;
+  --board-camera-scale: 1;
 }
 
 .board-stage[data-camera-mode="move-front"] .orbit-board {
   --board-camera-tilt: 67deg;
   --board-camera-y: 2%;
-  --board-camera-scale: 1.12;
+  --board-camera-scale: 1;
 }
 
 .board-stage[data-camera-mode="table-wide"] .orbit-board {
@@ -614,8 +621,8 @@ h2 {
 
 .board-card {
   position: absolute;
-  width: clamp(19px, 3.9vw, 34px);
-  height: clamp(28px, 5.6vw, 50px);
+  width: clamp(38px, 7.8vw, 68px);
+  height: clamp(56px, 11.2vw, 100px);
   display: grid;
   place-items: center;
   gap: 1px;
@@ -625,7 +632,7 @@ h2 {
   background:
     linear-gradient(180deg, #fffef7, var(--diner-cream));
   color: var(--ink);
-  font-size: clamp(0.42rem, 1.3vw, 0.72rem);
+  font-size: clamp(0.56rem, 1.65vw, 0.92rem);
   font-weight: 900;
   line-height: 1;
   box-shadow:
@@ -637,7 +644,8 @@ h2 {
     rotate(var(--tile-rotation))
     rotate(var(--control-rotation))
     translateZ(18px)
-    scale(var(--control-scale));
+    scale(var(--control-scale))
+    scale(0.7);
   transform-origin: center;
   backface-visibility: hidden;
   will-change: transform;
@@ -812,8 +820,8 @@ h2 {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 4.9%;
-  height: 4.9%;
+  width: 9.8%;
+  height: 9.8%;
   aspect-ratio: auto;
   display: grid;
   place-items: center;
@@ -821,9 +829,9 @@ h2 {
   transform:
     translate(-50%, -50%)
     rotate(var(--slot-angle))
-    translateY(-940%)
+    translateY(-470%)
     rotate(calc(-1 * var(--slot-angle)))
-    rotate(calc(-1 * var(--inner-wheel-rotation)));
+    scale(0.5);
   transform-origin: center;
 }
 
@@ -1295,6 +1303,7 @@ h2 {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  image-rendering: auto;
   border-radius: 0;
 }
 
@@ -2013,6 +2022,7 @@ h2 {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  image-rendering: auto;
   border-radius: 0;
 }
 
@@ -2865,8 +2875,12 @@ body[data-theme] .dice-pip {
   }
 
   .perspective-table {
-    width: min(122vw, 70dvh, 560px);
+    width: min(232vw, 134dvh, 1260px);
     justify-self: center;
+  }
+
+  .board-stage[data-camera-mode="table-wide"] .perspective-table {
+    width: min(136vw, 82dvh, 820px);
   }
 
   .board-stage[data-camera-mode="turn-focus"] {
@@ -2882,17 +2896,17 @@ body[data-theme] .dice-pip {
   }
 
   .board-stage[data-camera-mode="turn-focus"] .orbit-board {
-    --viewport-board-x: -7%;
+    --viewport-board-x: 0%;
     --viewport-board-y: 0%;
     --board-camera-tilt: 52deg;
     --board-camera-y: 7%;
-    --board-camera-scale: 1.36;
+    --board-camera-scale: 1;
   }
 
   .board-stage[data-camera-mode="move-front"] .orbit-board {
     --board-camera-tilt: 70deg;
     --board-camera-y: 7%;
-    --board-camera-scale: 1.24;
+    --board-camera-scale: 1;
   }
 
   .board-stage[data-camera-mode="table-wide"] .orbit-board {
@@ -3143,13 +3157,17 @@ body[data-theme] .dice-pip {
   }
 
   .perspective-table {
-    width: min(74vw, 82dvh);
+    width: min(154vw, 170dvh, 1560px);
+  }
+
+  .board-stage[data-camera-mode="table-wide"] .perspective-table {
+    width: min(96vw, 106dvh, 1180px);
   }
 
   .board-card {
-    width: clamp(16px, 3vw, 25px);
-    height: clamp(23px, 4.5vw, 37px);
-    font-size: clamp(0.4rem, 1.1vw, 0.65rem);
+    width: clamp(32px, 6vw, 50px);
+    height: clamp(46px, 9vw, 74px);
+    font-size: clamp(0.5rem, 1.35vw, 0.78rem);
     border-radius: 2px;
   }
 }

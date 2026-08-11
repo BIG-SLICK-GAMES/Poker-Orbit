@@ -39,25 +39,25 @@ const themeStorageKey = "poker-orbit-theme-v1";
 const customThemeLimit = 5;
 const themePresets = {
   diner: {
-    label: "40s Diner",
+    label: "Poker Orbit",
     colors: {
-      bsgBg: "#130f0d",
-      bsgPanel: "#2d1714",
-      bsgAccent: "#d92d27",
-      bsgSuccess: "#55c9bd",
-      bsgWarning: "#fff3cf",
-      bsgBorder: "#7a4a32",
-      table: "#0d5149",
-      tableDeep: "#07332f",
-      dangerRed: "#d62839",
-      ink: "#261a16",
-      dinerRed: "#b8201c",
-      dinerRedDark: "#5f1714",
-      dinerCream: "#fff3cf",
-      dinerMint: "#55c9bd",
-      dinerMintDark: "#14736e",
-      dinerChrome: "#d7dde0",
-      dinerInk: "#261a16"
+      bsgBg: "#080b14",
+      bsgPanel: "#1c1324",
+      bsgAccent: "#f4c95d",
+      bsgSuccess: "#43d6c9",
+      bsgWarning: "#fff1b7",
+      bsgBorder: "#9d7a38",
+      table: "#0b655b",
+      tableDeep: "#052f32",
+      dangerRed: "#e83f4f",
+      ink: "#15121b",
+      dinerRed: "#9f2437",
+      dinerRedDark: "#3f0c1b",
+      dinerCream: "#fff1b7",
+      dinerMint: "#43d6c9",
+      dinerMintDark: "#096c70",
+      dinerChrome: "#e5d6a8",
+      dinerInk: "#15121b"
     }
   },
   casino: {
