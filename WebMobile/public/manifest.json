@@ -1,0 +1,19 @@
+{
+  "name": "Poker Orbit",
+  "short_name": "Poker Orbit",
+  "description": "Big Slick Games mobile-first Poker Orbit shell.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#161616",
+  "theme_color": "#ff8a1c",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

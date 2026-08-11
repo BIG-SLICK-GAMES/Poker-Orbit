@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#ff8a1c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Poker Orbit">
+    <title>Poker Orbit</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" href="./icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./icon.svg">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="app-shell" id="appShell">
+      <section class="screen splash-screen active" data-screen="splash" aria-labelledby="splashTitle">
+        <div class="brand-mark" aria-hidden="true">
+          <span>BSG</span>
+        </div>
+        <div class="splash-copy">
+          <p class="eyebrow">Big Slick Games</p>
+          <h1 id="splashTitle">Poker Orbit</h1>
+          <p class="tagline">Mobile-first card board prototype shell.</p>
+        </div>
+        <button class="primary-btn" data-go="lobby" type="button">Enter Lobby</button>
+      </section>
+
+      <section class="screen lobby-screen" data-screen="lobby" aria-labelledby="lobbyTitle">
+        <header class="screen-header">
+          <div>
+            <p class="eyebrow">Lobby</p>
+            <h2 id="lobbyTitle">Choose Your Table</h2>
+          </div>
+          <button class="icon-btn" data-go="settings" type="button" aria-label="Open settings">⚙</button>
+        </header>
+
+        <div class="player-card">
+          <div class="avatar">BSG</div>
+          <div>
+            <strong>Guest Player</strong>
+            <span>Prototype profile</span>
+          </div>
+          <span class="wallet">$2,500</span>
+        </div>
+
+        <div class="table-list">
+          <button class="table-tile featured" data-go="game" type="button">
+            <span>Orbit Table</span>
+            <strong>Casual Match</strong>
+            <em>2-4 players</em>
+          </button>
+          <button class="table-tile" data-go="game" type="button">
+            <span>Quick Play</span>
+            <strong>Fast Round</strong>
+            <em>Low stakes</em>
+          </button>
+          <button class="table-tile locked" type="button">
+            <span>Ranked</span>
+            <strong>Coming Soon</strong>
+            <em>Season table</em>
+          </button>
+        </div>
+      </section>
+
+      <section class="screen game-screen" data-screen="game" aria-labelledby="gameTitle">
+        <header class="game-topbar" data-control="gameTopbar">
+          <button class="icon-btn" data-go="lobby" type="button" aria-label="Back to lobby">‹</button>
+          <div>
+            <p class="eyebrow">Live Table</p>
+            <h2 id="gameTitle">Orbit Table</h2>
+          </div>
+          <button class="view-toggle-btn" id="viewToggleButton" type="button" aria-pressed="false">Wide</button>
+          <button class="icon-btn" data-go="settings" type="button" aria-label="Open settings">⚙</button>
+        </header>
+
+        <section class="board-stage" id="boardStage" aria-label="Game board placeholder">
+          <div class="perspective-table" id="perspectiveTable" data-control="perspectiveTable">
+            <div class="seat-marker seat-p1 active" data-seat="0" data-control="seatP1">P1</div>
+            <div class="seat-marker seat-p2" data-seat="1" data-control="seatP2">P2</div>
+            <div class="seat-marker seat-p3" data-seat="2" data-control="seatP3">P3</div>
+            <div class="seat-marker seat-p4" data-seat="3" data-control="seatP4">P4</div>
+          <div class="orbit-board" id="orbitBoard" data-control="orbitBoard">
+            <div class="board-rotator" id="boardRotator">
+              <div class="board-card-ring" id="boardCardRing" data-control="boardCardRing" aria-label="56 board cards"></div>
+              <div class="ring outer" data-control="outerRing"></div>
+              <div class="ring inner" data-control="innerRing"></div>
+              <div class="inner-wheel" id="innerWheel">
+                <div class="inner-wheel-pointer" aria-hidden="true"></div>
+                <div class="inner-wheel-disc" data-inner-wheel-disc>
+                  <span data-inner-wheel-prize>Bonus Card</span>
+                </div>
+              </div>
+              <div class="table-center poker-orbit-logo" data-control="tableCenter" aria-label="Poker Orbit">
+                <span>Poker</span>
+                <strong>Orbit</strong>
+              </div>
+              <div class="player-token-layer" id="playerTokenLayer" aria-label="Player tokens"></div>
+            </div>
+          </div>
+          </div>
+        </section>
+        <div class="card-animation-layer" id="cardAnimationLayer" aria-hidden="true"></div>
+
+        <section class="hand-panel" data-control="handPanel">
+          <div class="turn-strip">
+            <span id="currentTurnLabel">Player 1 turn</span>
+          </div>
+          <section class="slot-reel" id="slotReel" aria-label="Roll-O-Matic number generator">
+            <div class="doubles-lamp" data-doubles-lamp aria-pressed="false">
+              <span>Doubles</span>
+            </div>
+            <div class="rp-meter">
+              <span>RP</span>
+              <strong id="rollPointsLabel">0</strong>
+            </div>
+            <span class="visually-hidden" id="landingCostLabel">Spin cost 1 RP</span>
+            <span class="visually-hidden" id="innerWheelResultLabel">Bonus Card</span>
+            <div class="slot-machine">
+              <div class="slot-window" data-reel>1</div>
+              <div class="slot-window" data-reel>1</div>
+            </div>
+            <button class="slot-roll-btn" id="slotRollButton" type="button">ROLL</button>
+            <div class="bonus-slots" id="playerBonusSlots" aria-label="Held bonuses">
+              <span class="bonus-slot" data-bonus-slot></span>
+              <span class="bonus-slot" data-bonus-slot></span>
+              <span class="bonus-slot" data-bonus-slot></span>
+            </div>
+          </section>
+          <div class="economy-strip" aria-label="Player economy">
+            <div class="chip-bank">
+              <span>Chips</span>
+              <strong id="chipBankLabel">10,000</strong>
+            </div>
+            <div class="owned-count">
+              <span>Cards</span>
+              <strong id="ownedCardCountLabel">0</strong>
+            </div>
+          </div>
+          <div class="card-hand" id="playerCardHand" aria-label="Player owned cards">
+            <span class="empty-hand">No cards</span>
+          </div>
+        </section>
+      </section>
+
+      <section class="screen settings-screen" data-screen="settings" aria-labelledby="settingsTitle">
+        <header class="screen-header">
+          <div>
+            <p class="eyebrow">Settings</p>
+            <h2 id="settingsTitle">Game Setup</h2>
+          </div>
+          <button class="icon-btn" data-back type="button" aria-label="Back">×</button>
+        </header>
+
+        <div class="settings-list">
+          <section class="settings-preview" aria-label="Settings preview">
+            <div class="preview-board">
+              <span class="preview-ring"></span>
+              <span class="preview-card red">A</span>
+              <span class="preview-card black">K</span>
+              <span class="preview-chip"></span>
+            </div>
+            <div class="preview-console">
+              <span>Theme</span>
+              <strong id="settingsPreviewTheme">40s Diner</strong>
+            </div>
+          </section>
+
+          <details class="settings-section" open>
+            <summary>
+              <span>Theme</span>
+              <strong id="themeSectionSummary">40s Diner</strong>
+            </summary>
+            <section class="theme-settings setting-row" id="themeSettings" aria-label="Theme settings"></section>
+          </details>
+
+          <details class="settings-section">
+            <summary>
+              <span>Audio & Motion</span>
+              <strong>FX / Music</strong>
+            </summary>
+            <label class="setting-row">
+              <span>Sound FX</span>
+              <input type="checkbox" checked>
+            </label>
+            <label class="setting-row">
+              <span>Music</span>
+              <input type="checkbox">
+            </label>
+            <label class="setting-row">
+              <span>Reduced Motion</span>
+              <input id="reducedMotionToggle" type="checkbox">
+            </label>
+          </details>
+
+          <details class="settings-section">
+            <summary>
+              <span>Table</span>
+              <strong>Brightness</strong>
+            </summary>
+            <label class="setting-row">
+              <span>Table Brightness</span>
+              <input type="range" min="1" max="10" value="7">
+            </label>
+          </details>
+
+        </div>
+
+        <button class="primary-btn" data-back type="button">Done</button>
+      </section>
+    </main>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

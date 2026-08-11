@@ -1,0 +1,1144 @@
+import { createTurnModule } from "./turn.js";
+import { createCameraModule } from "./camera.js";
+import { createSlotReelModule } from "./slot-reel.js";
+import { createInnerWheelModule } from "./inner-wheel.js";
+import { createCardAnimationModule } from "./card-animation.js";
+import { createPurchaseAuctionModule, getRankPurchasePrice } from "./purchase-auction.js";
+import { createOwnershipHighlightModule } from "./ownership-highlights.js";
+import { getBonusIconSrc } from "./bonus-icons.js";
+import { MASTER_CONTROL } from "./master-control.js";
+
+const shell = document.querySelector("#appShell");
+const screens = new Map([...document.querySelectorAll("[data-screen]")].map((screen) => [screen.dataset.screen, screen]));
+const boardCardRing = document.querySelector("#boardCardRing");
+const boardStage = document.querySelector("#boardStage");
+const boardRotator = document.querySelector("#boardRotator");
+const perspectiveTable = document.querySelector("#perspectiveTable");
+const playerTokenLayer = document.querySelector("#playerTokenLayer");
+const cardAnimationLayer = document.querySelector("#cardAnimationLayer");
+const currentTurnLabel = document.querySelector("#currentTurnLabel");
+const rollPointsLabel = document.querySelector("#rollPointsLabel");
+const landingCostLabel = document.querySelector("#landingCostLabel");
+const innerWheelRoot = document.querySelector("#innerWheel");
+const innerWheelResultLabel = document.querySelector("#innerWheelResultLabel");
+const rollButton = document.querySelector("#rollButton");
+const slotReelRoot = document.querySelector("#slotReel");
+const slotRollButton = document.querySelector("#slotRollButton");
+const playerBonusSlots = document.querySelector("#playerBonusSlots");
+const viewToggleButton = document.querySelector("#viewToggleButton");
+const endTurnButton = document.querySelector("#endTurnButton");
+const playerCardHand = document.querySelector("#playerCardHand");
+const chipBankLabel = document.querySelector("#chipBankLabel");
+const ownedCardCountLabel = document.querySelector("#ownedCardCountLabel");
+const themeSettings = document.querySelector("#themeSettings");
+const settingsPreviewTheme = document.querySelector("#settingsPreviewTheme");
+const themeSectionSummary = document.querySelector("#themeSectionSummary");
+const boardSpaceCount = 56;
+const startingPlayerPositions = [28, 14, 0, 42];
+const themeStorageKey = "poker-orbit-theme-v1";
+const customThemeLimit = 5;
+const themePresets = {
+  diner: {
+    label: "40s Diner",
+    colors: {
+      bsgBg: "#130f0d",
+      bsgPanel: "#2d1714",
+      bsgAccent: "#d92d27",
+      bsgSuccess: "#55c9bd",
+      bsgWarning: "#fff3cf",
+      bsgBorder: "#7a4a32",
+      table: "#0d5149",
+      tableDeep: "#07332f",
+      dangerRed: "#d62839",
+      ink: "#261a16",
+      dinerRed: "#b8201c",
+      dinerRedDark: "#5f1714",
+      dinerCream: "#fff3cf",
+      dinerMint: "#55c9bd",
+      dinerMintDark: "#14736e",
+      dinerChrome: "#d7dde0",
+      dinerInk: "#261a16"
+    }
+  },
+  casino: {
+    label: "Casino Green",
+    colors: {
+      bsgBg: "#07130e",
+      bsgPanel: "#123524",
+      bsgAccent: "#d7a62f",
+      bsgSuccess: "#48d38b",
+      bsgWarning: "#fff0ba",
+      bsgBorder: "#d7a62f",
+      table: "#08603e",
+      tableDeep: "#04291b",
+      dangerRed: "#cf2435",
+      ink: "#102016",
+      dinerRed: "#16633f",
+      dinerRedDark: "#092a1d",
+      dinerCream: "#fff0ba",
+      dinerMint: "#48d38b",
+      dinerMintDark: "#096f45",
+      dinerChrome: "#e2d294",
+      dinerInk: "#102016"
+    }
+  },
+  noir: {
+    label: "Noir Club",
+    colors: {
+      bsgBg: "#0d0d10",
+      bsgPanel: "#242226",
+      bsgAccent: "#c6a15b",
+      bsgSuccess: "#b8c0c2",
+      bsgWarning: "#f4e1b8",
+      bsgBorder: "#5f5650",
+      table: "#242a2d",
+      tableDeep: "#111315",
+      dangerRed: "#a72631",
+      ink: "#141315",
+      dinerRed: "#2c2a2e",
+      dinerRedDark: "#111113",
+      dinerCream: "#f4e1b8",
+      dinerMint: "#b8c0c2",
+      dinerMintDark: "#596065",
+      dinerChrome: "#d7d0c2",
+      dinerInk: "#141315"
+    }
+  },
+  neon: {
+    label: "Neon Orbit",
+    colors: {
+      bsgBg: "#100519",
+      bsgPanel: "#25103b",
+      bsgAccent: "#ff3d8b",
+      bsgSuccess: "#26f1d8",
+      bsgWarning: "#fff48a",
+      bsgBorder: "#7d5cff",
+      table: "#142c68",
+      tableDeep: "#080e2b",
+      dangerRed: "#ff3d8b",
+      ink: "#12071e",
+      dinerRed: "#6e2cff",
+      dinerRedDark: "#240d55",
+      dinerCream: "#fff48a",
+      dinerMint: "#26f1d8",
+      dinerMintDark: "#087e92",
+      dinerChrome: "#d8d1ff",
+      dinerInk: "#12071e"
+    }
+  }
+};
+const customThemeFields = [
+  { key: "dinerRed", label: "Console" },
+  { key: "dinerMint", label: "Accent" },
+  { key: "dinerCream", label: "Card cream" },
+  { key: "table", label: "Table" },
+  { key: "tableDeep", label: "Table dark" },
+  { key: "bsgBg", label: "Background" },
+  { key: "bsgAccent", label: "Prize gold" },
+  { key: "dangerRed", label: "Red suits" }
+];
+let customThemeColors = { ...themePresets.diner.colors };
+let savedCustomThemes = [];
+let activeThemeName = "diner";
+let activeCustomThemeId = "";
+
+loadSavedTheme();
+createThemeSettings();
+
+const turnModule = createTurnModule(4, { boardSpaceCount, startingPositions: startingPlayerPositions });
+const cameraModule = createCameraModule({ boardStage, perspectiveTable, cameraControl: MASTER_CONTROL.camera });
+const ownershipHighlightModule = createOwnershipHighlightModule({ boardRoot: boardCardRing });
+const cardAnimationModule = createCardAnimationModule({
+  layer: cardAnimationLayer,
+  canSpin: canSpinForBoardCard,
+  onSpin: spinForBoardCard,
+  onPurchase: purchaseBoardCard,
+  onPass: passBoardCard
+});
+let currentLandingCost = 0;
+const innerWheelModule = createInnerWheelModule({
+  root: innerWheelRoot,
+  resultLabel: innerWheelResultLabel
+});
+
+createSlotReelModule({
+  root: slotReelRoot,
+  rollButton: slotRollButton,
+  externalRollButton: rollButton,
+  min: 1,
+  max: 6,
+  onRollComplete: ({ total }) => {
+    window.clearTimeout(pendingNextTurnTimer);
+    awaitingLandingDecision = false;
+    turnModule.completeCurrentRoll(total);
+  }
+});
+const suitIcons = {
+  H: "\u2665",
+  D: "\u2666",
+  C: "\u2663",
+  S: "\u2660"
+};
+const suitNames = {
+  H: "Hearts",
+  D: "Diamonds",
+  C: "Clubs",
+  S: "Spades"
+};
+const purchaseAuctionModule = createPurchaseAuctionModule({
+  playerCount: 4,
+  startingChips: 10000,
+  handRoot: playerCardHand,
+  chipsLabel: chipBankLabel,
+  cardCountLabel: ownedCardCountLabel,
+  suitIcons
+});
+const tokenStepDurationMs = Math.max(60, numberOrDefault(MASTER_CONTROL.gameplay?.tokenStepDurationMs, 230));
+const tokenStepCards = Math.max(1, Math.trunc(numberOrDefault(MASTER_CONTROL.gameplay?.tokenStepCards, 1)));
+const moveCameraSettleMs = Math.max(0, numberOrDefault(MASTER_CONTROL.gameplay?.moveCameraSettleMs, 360));
+const endTurnBoardHoldMs = Math.max(0, numberOrDefault(MASTER_CONTROL.gameplay?.endTurnBoardHoldMs, 0));
+let lastRenderedTurnState = null;
+let pendingBoardCenterTimer = 0;
+let boardRotationDegrees = 0;
+let boardRotationAnimationFrame = 0;
+const tokenAnimationTimers = new Map();
+let pendingCardAnimationTimer = 0;
+let pendingNextTurnTimer = 0;
+let awaitingLandingDecision = false;
+let suppressNextTurnFocus = false;
+let boardViewMode = "zoom";
+let currentScreen = "splash";
+let previousScreen = "lobby";
+const playerBonuses = Array.from({ length: 4 }, () => []);
+
+createBoardCards();
+createPlayerTokens();
+formatMiniCards();
+applyMasterControl();
+turnModule.subscribe(renderTurnState);
+registerServiceWorker();
+
+document.addEventListener("click", (event) => {
+  const goButton = event.target.closest("[data-go]");
+  if (goButton) {
+    showScreen(goButton.dataset.go);
+    return;
+  }
+
+  if (event.target.closest("[data-back]")) {
+    showScreen(previousScreen);
+  }
+});
+
+viewToggleButton?.addEventListener("click", () => {
+  boardViewMode = boardViewMode === "zoom" ? "wide" : "zoom";
+  applyBoardViewMode(turnModule.getState());
+});
+
+document.querySelector("#reducedMotionToggle").addEventListener("change", (event) => {
+  shell.classList.toggle("reduce-motion", event.target.checked);
+});
+
+endTurnButton?.addEventListener("click", () => {
+  suppressNextTurnFocus = true;
+  applyBoardViewMode(turnModule.getState());
+  window.setTimeout(() => {
+    turnModule.nextTurn();
+  }, endTurnBoardHoldMs);
+});
+
+function showScreen(name) {
+  if (!screens.has(name) || name === currentScreen) {
+    return;
+  }
+
+  if (currentScreen === "settings") {
+    screens.get("settings").classList.remove("active");
+    shell.classList.remove("settings-over-game");
+    currentScreen = previousScreen;
+    if (name === previousScreen) {
+      screens.get(previousScreen).classList.add("active");
+      return;
+    }
+  }
+
+  previousScreen = currentScreen === "settings" ? previousScreen : currentScreen;
+  const opensSettingsOverGame = name === "settings" && currentScreen === "game";
+  if (!opensSettingsOverGame) {
+    screens.get(currentScreen).classList.remove("active");
+  }
+  screens.get(name).classList.add("active");
+  shell.classList.toggle("settings-over-game", opensSettingsOverGame);
+  currentScreen = name;
+
+}
+
+function loadSavedTheme() {
+  let savedTheme = { name: "diner", customColors: customThemeColors, savedCustomThemes: [] };
+
+  try {
+    const storedTheme = JSON.parse(localStorage.getItem(themeStorageKey) || "null");
+    if (storedTheme && typeof storedTheme === "object") {
+      savedTheme = storedTheme;
+    } else {
+      const oldThemeName = localStorage.getItem(themeStorageKey);
+      if (oldThemeName) {
+        savedTheme = { name: oldThemeName, customColors: customThemeColors };
+      }
+    }
+  } catch {
+    const oldThemeName = localStorage.getItem(themeStorageKey);
+    savedTheme = { name: oldThemeName || "diner", customColors: customThemeColors };
+  }
+
+  savedCustomThemes = normalizeSavedCustomThemes(savedTheme.savedCustomThemes);
+  customThemeColors = { ...themePresets.diner.colors, ...(savedTheme.customColors || {}) };
+  applyTheme(savedTheme.name || "diner");
+}
+
+function applyTheme(themeName) {
+  const savedCustomTheme = getSavedCustomTheme(themeName);
+  const selectedTheme = themePresets[themeName] ? themeName : savedCustomTheme ? themeName : "custom";
+
+  if (savedCustomTheme) {
+    customThemeColors = { ...themePresets.diner.colors, ...savedCustomTheme.colors };
+    fillDerivedCustomThemeColors();
+    activeCustomThemeId = savedCustomTheme.id;
+  } else if (selectedTheme === "custom") {
+    fillDerivedCustomThemeColors();
+    activeCustomThemeId = "";
+  } else {
+    activeCustomThemeId = "";
+  }
+
+  const colors = selectedTheme === "custom" || savedCustomTheme
+    ? customThemeColors
+    : themePresets[selectedTheme].colors;
+
+  activeThemeName = selectedTheme;
+  document.body.dataset.theme = themePresets[selectedTheme] ? selectedTheme : "custom";
+  applyThemeColors(colors);
+  syncThemeSettings(selectedTheme);
+  saveTheme(selectedTheme);
+}
+
+function createThemeSettings() {
+  const presetButtons = Object.entries(themePresets).map(([name, preset]) => createThemePresetButton(name, preset)).join("");
+  const customSwatches = customThemeFields.map((field) => `
+    <label>
+      <span>${field.label}</span>
+      <input type="color" data-theme-color="${field.key}">
+    </label>
+  `).join("");
+
+  themeSettings.classList.add("theme-control");
+  themeSettings.innerHTML = `
+    <div class="theme-control-head">
+      <strong>Theme</strong>
+      <span data-theme-status>Preset</span>
+    </div>
+    <div class="theme-preset-grid" role="group" aria-label="Theme presets">
+      ${presetButtons}
+      <span data-saved-theme-buttons></span>
+      <button class="theme-preset custom" type="button" data-theme-preset="custom">
+        <span class="theme-swatch-row">
+          <i style="--swatch:#b8201c"></i>
+          <i style="--swatch:#55c9bd"></i>
+          <i style="--swatch:#fff3cf"></i>
+        </span>
+        <strong>Custom</strong>
+      </button>
+    </div>
+    <div class="custom-theme-panel" data-custom-theme hidden>
+      <label class="custom-theme-name">
+        <span>Name</span>
+        <input type="text" maxlength="18" data-theme-name placeholder="Custom theme">
+      </label>
+      ${customSwatches}
+      <button class="custom-theme-save" type="button" data-save-custom-theme>Save Custom Theme</button>
+      <span class="custom-theme-limit" data-custom-theme-limit>0 / ${customThemeLimit} saved</span>
+    </div>
+  `;
+
+  bindThemePresetButtons();
+
+  themeSettings.querySelectorAll("[data-theme-color]").forEach((input) => {
+    input.addEventListener("input", () => {
+      customThemeColors[input.dataset.themeColor] = input.value;
+      fillDerivedCustomThemeColors();
+      applyTheme("custom");
+    });
+  });
+
+  themeSettings.querySelector("[data-save-custom-theme]").addEventListener("click", saveCurrentCustomTheme);
+  renderSavedCustomThemeButtons();
+  syncThemeSettings(activeThemeName);
+}
+
+function createThemePresetButton(name, preset) {
+  return `
+    <button class="theme-preset" type="button" data-theme-preset="${name}">
+      <span class="theme-swatch-row">
+        <i style="--swatch:${preset.colors.dinerRed}"></i>
+        <i style="--swatch:${preset.colors.dinerMint}"></i>
+        <i style="--swatch:${preset.colors.dinerCream}"></i>
+      </span>
+      <strong>${preset.label}</strong>
+    </button>
+  `;
+}
+
+function bindThemePresetButtons() {
+  themeSettings.querySelectorAll("[data-theme-preset]").forEach((button) => {
+    if (button.dataset.themeBound === "true") {
+      return;
+    }
+
+    button.dataset.themeBound = "true";
+    button.addEventListener("click", () => {
+      const themeName = button.dataset.themePreset;
+      if (themePresets[themeName]) {
+        customThemeColors = { ...themePresets[themeName].colors };
+      }
+      applyTheme(themeName);
+    });
+  });
+}
+
+function renderSavedCustomThemeButtons() {
+  const savedThemeRoot = themeSettings.querySelector("[data-saved-theme-buttons]");
+  if (!savedThemeRoot) {
+    return;
+  }
+
+  savedThemeRoot.replaceChildren(...savedCustomThemes.map((theme) => {
+    const button = document.createElement("button");
+    button.className = "theme-preset saved-custom";
+    button.type = "button";
+    button.dataset.themePreset = `custom:${theme.id}`;
+    button.dataset.savedThemeId = theme.id;
+    button.innerHTML = `
+      <span class="theme-swatch-row">
+        <i style="--swatch:${theme.colors.dinerRed}"></i>
+        <i style="--swatch:${theme.colors.dinerMint}"></i>
+        <i style="--swatch:${theme.colors.dinerCream}"></i>
+      </span>
+      <strong>${escapeHtml(theme.label)}</strong>
+    `;
+    return button;
+  }));
+
+  bindThemePresetButtons();
+}
+
+function saveCurrentCustomTheme() {
+  fillDerivedCustomThemeColors();
+  const nameInput = themeSettings.querySelector("[data-theme-name]");
+  const label = cleanCustomThemeName(nameInput.value || getNextCustomThemeName());
+  const existingIndex = activeCustomThemeId
+    ? savedCustomThemes.findIndex((theme) => theme.id === activeCustomThemeId)
+    : -1;
+  const themeRecord = {
+    id: activeCustomThemeId || createCustomThemeId(),
+    label,
+    colors: { ...customThemeColors },
+    savedAt: Date.now()
+  };
+
+  if (existingIndex >= 0) {
+    savedCustomThemes[existingIndex] = themeRecord;
+  } else {
+    savedCustomThemes.push(themeRecord);
+  }
+
+  while (savedCustomThemes.length > customThemeLimit) {
+    savedCustomThemes.shift();
+  }
+
+  activeCustomThemeId = themeRecord.id;
+  activeThemeName = `custom:${themeRecord.id}`;
+  renderSavedCustomThemeButtons();
+  applyTheme(activeThemeName);
+}
+
+function syncThemeSettings(themeName) {
+  if (!themeSettings.hasChildNodes()) {
+    return;
+  }
+
+  themeSettings.querySelectorAll("[data-theme-preset]").forEach((button) => {
+    const savedId = button.dataset.savedThemeId || "";
+    const isSavedActive = savedId && savedId === activeCustomThemeId && themeName === `custom:${savedId}`;
+    button.classList.toggle("active", button.dataset.themePreset === themeName || isSavedActive);
+  });
+
+  const isCustomTheme = themeName === "custom" || themeName.startsWith("custom:");
+  themeSettings.querySelector("[data-custom-theme]").hidden = !isCustomTheme;
+  themeSettings.querySelector("[data-theme-status]").textContent = isCustomTheme ? "Custom" : "Preset";
+  const savedTheme = getSavedCustomTheme(themeName);
+  const themeLabel = savedTheme?.label || (themeName === "custom" ? "Custom" : themePresets[themeName]?.label || "40s Diner");
+  settingsPreviewTheme.textContent = themeLabel;
+  themeSectionSummary.textContent = themeLabel;
+  themeSettings.querySelector("[data-theme-name]").value = savedTheme?.label || (themeName === "custom" ? getNextCustomThemeName() : "");
+  themeSettings.querySelector("[data-custom-theme-limit]").textContent = `${savedCustomThemes.length} / ${customThemeLimit} saved`;
+
+  customThemeFields.forEach((field) => {
+    const input = themeSettings.querySelector(`[data-theme-color="${field.key}"]`);
+    if (input) {
+      input.value = customThemeColors[field.key];
+    }
+  });
+}
+
+function getSavedCustomTheme(themeName) {
+  const id = typeof themeName === "string" && themeName.startsWith("custom:")
+    ? themeName.slice("custom:".length)
+    : "";
+
+  if (!id) {
+    return null;
+  }
+
+  return savedCustomThemes.find((theme) => theme.id === id) || null;
+}
+
+function normalizeSavedCustomThemes(themes) {
+  if (!Array.isArray(themes)) {
+    return [];
+  }
+
+  return themes
+    .filter((theme) => theme && typeof theme === "object" && theme.colors && typeof theme.colors === "object")
+    .slice(-customThemeLimit)
+    .map((theme, index) => ({
+      id: String(theme.id || createCustomThemeId(index)),
+      label: cleanCustomThemeName(theme.label || `Custom ${index + 1}`),
+      colors: { ...themePresets.diner.colors, ...theme.colors },
+      savedAt: Number.isFinite(theme.savedAt) ? theme.savedAt : Date.now() + index
+    }));
+}
+
+function getNextCustomThemeName() {
+  return `Custom ${Math.min(savedCustomThemes.length + 1, customThemeLimit)}`;
+}
+
+function createCustomThemeId(seed = Date.now()) {
+  return `${seed.toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function cleanCustomThemeName(value) {
+  const name = String(value || "").trim().replace(/\s+/g, " ").slice(0, 18);
+  return name || getNextCustomThemeName();
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function fillDerivedCustomThemeColors() {
+  const dinerPreset = themePresets.diner.colors;
+  customThemeColors = {
+    ...dinerPreset,
+    ...customThemeColors,
+    dinerRedDark: customThemeColors.dinerRedDark || customThemeColors.dinerRed,
+    dinerMintDark: customThemeColors.dinerMintDark || customThemeColors.dinerMint,
+    dinerChrome: customThemeColors.dinerChrome || customThemeColors.dinerCream,
+    dinerInk: customThemeColors.dinerInk || dinerPreset.dinerInk,
+    ink: customThemeColors.ink || dinerPreset.ink,
+    bsgPanel: customThemeColors.bsgPanel || customThemeColors.dinerRed,
+    bsgSuccess: customThemeColors.bsgSuccess || customThemeColors.dinerMint,
+    bsgWarning: customThemeColors.bsgWarning || customThemeColors.dinerCream,
+    bsgBorder: customThemeColors.bsgBorder || customThemeColors.bsgAccent
+  };
+}
+
+function applyThemeColors(colors) {
+  const variableNames = {
+    bsgBg: "--bsg-bg",
+    bsgPanel: "--bsg-panel",
+    bsgAccent: "--bsg-accent",
+    bsgSuccess: "--bsg-success",
+    bsgWarning: "--bsg-warning",
+    bsgBorder: "--bsg-border",
+    table: "--table",
+    tableDeep: "--table-deep",
+    dangerRed: "--danger-red",
+    ink: "--ink",
+    dinerRed: "--diner-red",
+    dinerRedDark: "--diner-red-dark",
+    dinerCream: "--diner-cream",
+    dinerMint: "--diner-mint",
+    dinerMintDark: "--diner-mint-dark",
+    dinerChrome: "--diner-chrome",
+    dinerInk: "--diner-ink"
+  };
+
+  Object.entries(variableNames).forEach(([key, variableName]) => {
+    document.body.style.setProperty(variableName, colors[key]);
+  });
+}
+
+function saveTheme(themeName) {
+  localStorage.setItem(themeStorageKey, JSON.stringify({
+    name: themeName,
+    customColors: customThemeColors,
+    savedCustomThemes
+  }));
+}
+
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) {
+    return;
+  }
+
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  });
+}
+
+function createBoardCards() {
+  const cards = buildBoardDeck();
+  boardCardRing.replaceChildren(...cards.map((card, index) => {
+    const position = getBoardCardPosition(index);
+    const tile = document.createElement("button");
+    tile.type = "button";
+    tile.className = `board-card ${card.type || (card.suit === "H" || card.suit === "D" ? "red" : "black")}`;
+    tile.style.left = `${position.x}%`;
+    tile.style.top = `${position.y}%`;
+    tile.style.setProperty("--tile-rotation", `${position.rotation}deg`);
+    tile.dataset.index = String(index);
+    tile.dataset.rpCost = String(getCardRollPointCost(index));
+    tile.dataset.purchaseState = isPurchasableCardIndex(index) ? "available" : "unavailable";
+    tile.dataset.rank = card.label;
+    tile.dataset.suit = card.suit;
+    tile.dataset.cardName = card.name || `${card.label} of ${suitNames[card.suit]}`;
+    tile.dataset.cardPrice = String(getRankPurchasePrice(card.label));
+    tile.dataset.sellPrice = String(getCardSellPrice(card.label));
+    tile.dataset.penalty = String(getCardLandingPenalty(card.label));
+    tile.dataset.multiplier = getCardHandMultiplier(card.label);
+    tile.dataset.control = "boardCards";
+    tile.setAttribute("aria-label", `Board card ${index + 1}: ${card.name || `${card.label} of ${suitNames[card.suit]}`}`);
+    tile.innerHTML = `<span>${card.label}</span><strong>${suitIcons[card.suit] || ""}</strong>`;
+    return tile;
+  }));
+}
+
+function getCardRollPointCost(index) {
+  return (index % 6) + 1;
+}
+
+function isPurchasableCardIndex(index) {
+  return index >= 0 && index < 52;
+}
+
+function createPlayerTokens() {
+  const tokenColors = ["#ff8a1c", "#2fcf72", "#4f8cff", "#f6c453"];
+
+  playerTokenLayer.replaceChildren(...tokenColors.map((color, index) => {
+    const token = document.createElement("div");
+    token.className = "player-token";
+    token.dataset.token = String(index);
+    token.style.setProperty("--token-color", color);
+    token.setAttribute("aria-label", `Player ${index + 1} token`);
+    token.innerHTML = `
+      <span class="token-shadow"></span>
+      <span class="token-side"></span>
+      <span class="token-top">
+        <span class="token-crown"></span>
+        <span class="token-label">P${index + 1}</span>
+      </span>
+    `;
+    setTokenBoardPosition(token, startingPlayerPositions[index]);
+    return token;
+  }));
+}
+
+function getBoardCardPosition(index) {
+  const angle = (index / boardSpaceCount) * Math.PI * 2 - Math.PI / 2;
+
+  return {
+    x: 50 + Math.cos(angle) * 41.5,
+    y: 50 + Math.sin(angle) * 41.5,
+    rotation: (angle * 180 / Math.PI) + 90
+  };
+}
+
+function getBoardRotationForCardIndex(index) {
+  return 180 - ((index / boardSpaceCount) * 360);
+}
+
+function getContinuousBoardRotation(targetIndex) {
+  const baseRotation = getBoardRotationForCardIndex(targetIndex);
+  const rotationsFromCurrent = Math.round((boardRotationDegrees - baseRotation) / 360);
+
+  return baseRotation + rotationsFromCurrent * 360;
+}
+
+function centerBoardOnCardIndex(index, delayMs = 0) {
+  window.clearTimeout(pendingBoardCenterTimer);
+
+  pendingBoardCenterTimer = window.setTimeout(() => {
+    const targetRotation = getContinuousBoardRotation(index);
+    tweenBoardRotation(targetRotation);
+  }, delayMs);
+}
+
+function tweenBoardRotation(targetRotation) {
+  window.cancelAnimationFrame(boardRotationAnimationFrame);
+
+  const startRotation = boardRotationDegrees;
+  const change = targetRotation - startRotation;
+  const duration = shell.classList.contains("reduce-motion")
+    ? 0
+    : Math.max(160, tokenStepDurationMs * 0.92);
+
+  if (!duration || Math.abs(change) < 0.001) {
+    boardRotationDegrees = targetRotation;
+    boardRotator.style.setProperty("--player-rotation", `${boardRotationDegrees}deg`);
+    return;
+  }
+
+  const startTime = performance.now();
+
+  function animate(now) {
+    const progress = Math.min(1, (now - startTime) / duration);
+    const easedProgress = easeInOutCubic(progress);
+    boardRotationDegrees = startRotation + (change * easedProgress);
+    boardRotator.style.setProperty("--player-rotation", `${boardRotationDegrees}deg`);
+
+    if (progress < 1) {
+      boardRotationAnimationFrame = window.requestAnimationFrame(animate);
+      return;
+    }
+
+    boardRotationDegrees = targetRotation;
+    boardRotator.style.setProperty("--player-rotation", `${boardRotationDegrees}deg`);
+  }
+
+  boardRotationAnimationFrame = window.requestAnimationFrame(animate);
+}
+
+function easeInOutCubic(progress) {
+  return progress < 0.5
+    ? 4 * progress * progress * progress
+    : 1 - ((-2 * progress + 2) ** 3) / 2;
+}
+
+function scheduleLandingCardAnimation(boardIndex, delayMs = 0) {
+  window.clearTimeout(pendingCardAnimationTimer);
+
+  if (!isPurchasableCardIndex(boardIndex)) {
+    scheduleNextTurn(delayMs + 320);
+    return;
+  }
+
+  pendingCardAnimationTimer = window.setTimeout(() => {
+    const card = boardCardRing.querySelector(`.board-card[data-index="${boardIndex}"][data-purchase-state="available"]`);
+    if (!card) {
+      scheduleNextTurn(320);
+      return;
+    }
+
+    awaitingLandingDecision = true;
+    innerWheelModule.pointToBoardIndex(boardIndex, boardSpaceCount);
+    cardAnimationModule.play(card);
+  }, delayMs);
+}
+
+function purchaseBoardCard(cardElement, options = {}) {
+  if (!cardElement) {
+    return { success: false, message: "No card selected" };
+  }
+
+  const playerIndex = turnModule.getState().currentPlayer;
+  const purchaseResult = purchaseAuctionModule.purchase(cardElement, playerIndex, options);
+  if (!purchaseResult.success) {
+    return purchaseResult;
+  }
+
+  ownershipHighlightModule.markPurchased(cardElement, playerIndex);
+  awaitingLandingDecision = false;
+  scheduleNextTurn(360);
+
+  return purchaseResult;
+}
+
+function passBoardCard(cardElement) {
+  cardElement?.classList.add("passed");
+  awaitingLandingDecision = false;
+  scheduleNextTurn(260);
+}
+
+function canSpinForBoardCard(cardElement) {
+  const cardCost = getBoardCardCost(cardElement);
+  const currentRollPoints = turnModule.getState().playerRollPoints[turnModule.getState().currentPlayer];
+
+  return cardElement?.dataset.purchaseState === "available" && currentRollPoints >= cardCost;
+}
+
+function spinForBoardCard(cardElement, promptControls, spinOptions = {}) {
+  const cardCost = getBoardCardCost(cardElement);
+  const didStartSpin = innerWheelModule.spin({
+    onBeforeSpin: () => spinOptions.freeSpin || turnModule.spendCurrentPlayerRollPoints(cardCost),
+    onResult: (prize, prizeMeta) => applyBonusWheelPrize(prize, prizeMeta, cardElement, promptControls)
+  });
+
+  if (!didStartSpin) {
+    promptControls.setStatus("Need RP");
+    promptControls.setSpinEnabled(canSpinForBoardCard(cardElement));
+  }
+}
+
+function applyBonusWheelPrize(prize, prizeMeta, cardElement, promptControls) {
+  promptControls.revealBonus?.(prize, prizeMeta?.type);
+  promptControls.setStatus(prize);
+
+  if (prize === "Free Card") {
+    promptControls.setPurchaseFree();
+    promptControls.setStatus("Card is free");
+    return;
+  }
+
+  if (prize === "50% Off") {
+    promptControls.setPurchaseDiscount(50);
+    promptControls.setStatus("50% off this card");
+    return;
+  }
+
+  if (prize === "Buy 1 Get 1 50% Off") {
+    promptControls.setPurchaseDiscount(50);
+    promptControls.setStatus("This card 50% off. Next-card discount later.");
+    return;
+  }
+
+  if (prize === "BANKRUPTCY") {
+    turnModule.clearCurrentPlayerRollPoints();
+    promptControls.setStatus("All RP lost");
+    return;
+  }
+
+  const rollPointPrize = /^(\+)?(\d+) RP$/.exec(prize);
+  if (rollPointPrize) {
+    turnModule.addCurrentPlayerRollPoints(Number.parseInt(rollPointPrize[2], 10));
+    return;
+  }
+
+  if (prize === "NO WIN") {
+    promptControls.setStatus("No win");
+    return;
+  }
+
+  if (prize === "Spin Again") {
+    promptControls.setStatus("Spin again");
+    promptControls.grantFreeSpin();
+    return;
+  }
+
+  if (prize === "Free Roll") {
+    addBonusToCurrentPlayer("Free Roll");
+    promptControls.setStatus("Free Roll held");
+    return;
+  }
+
+  if (prize === "PIC Card") {
+    addBonusToCurrentPlayer("PIC");
+    promptControls.setStatus("PIC card held");
+    return;
+  }
+
+  if (prize === "Shield") {
+    addBonusToCurrentPlayer("Shield");
+    promptControls.setStatus("Shield held");
+    return;
+  }
+
+  if (prize === "Steal") {
+    addBonusToCurrentPlayer("Steal");
+    promptControls.setStatus("Steal held");
+    return;
+  }
+}
+
+function scheduleNextTurn(delayMs = 0) {
+  window.clearTimeout(pendingNextTurnTimer);
+
+  pendingNextTurnTimer = window.setTimeout(() => {
+    if (awaitingLandingDecision) {
+      return;
+    }
+
+    turnModule.nextTurn();
+  }, Math.max(0, delayMs));
+}
+
+function applyBoardViewMode(turnState, boardIndex = turnState.playerPositions[turnState.currentPlayer]) {
+  const presetName = boardViewMode === "wide" ? "tableWide" : "turnFocus";
+  cameraModule.setPreset(presetName, turnState, boardIndex);
+
+  if (viewToggleButton) {
+    viewToggleButton.textContent = boardViewMode === "wide" ? "Zoom" : "Wide";
+    viewToggleButton.setAttribute("aria-pressed", String(boardViewMode === "wide"));
+  }
+}
+
+function addBonusToCurrentPlayer(label) {
+  const playerIndex = turnModule.getState().currentPlayer;
+  const inventory = playerBonuses[playerIndex];
+
+  if (inventory.length >= 3) {
+    inventory.shift();
+  }
+
+  inventory.push(label);
+  renderBonusSlots(playerIndex);
+}
+
+function renderBonusSlots(playerIndex = turnModule.getState().currentPlayer) {
+  if (!playerBonusSlots) {
+    return;
+  }
+
+  const inventory = playerBonuses[playerIndex] || [];
+  playerBonusSlots.querySelectorAll("[data-bonus-slot]").forEach((slot, index) => {
+    const bonus = inventory[index] || "";
+    slot.dataset.bonus = bonus;
+    slot.innerHTML = bonus ? getBonusSlotMarkup(bonus) : "";
+    slot.classList.toggle("filled", Boolean(bonus));
+  });
+}
+
+function getBonusSlotMarkup(bonus) {
+  const labelMap = {
+    PIC: "PIC Card"
+  };
+  const imageSrc = getBonusIconSrc(labelMap[bonus] || bonus);
+  if (imageSrc) {
+    return `<span class="bonus-slot-icon image-icon" aria-label="${bonus} bonus"><img src="${imageSrc}" alt=""></span>`;
+  }
+
+  const bonusIcons = {
+    Shield: getShieldIconMarkup("Shield bonus"),
+    PIC: `<span class="bonus-slot-icon pic-icon" aria-label="PIC bonus">P</span>`,
+    "Free Roll": `<span class="bonus-slot-icon roll-icon" aria-label="Free Roll bonus">6</span>`,
+    Steal: `<span class="bonus-slot-icon steal-icon" aria-label="Steal bonus">$</span>`
+  };
+
+  return bonusIcons[bonus] || `<span class="bonus-slot-icon bonus-icon" aria-label="${bonus} bonus">*</span>`;
+}
+
+function getShieldIconMarkup(label = "Shield") {
+  return `
+    <span class="bonus-slot-icon shield-icon" aria-label="${label}">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 2.7 19 5.4v5.5c0 4.7-2.8 8.7-7 10.4-4.2-1.7-7-5.7-7-10.4V5.4l7-2.7Z"></path>
+        <path d="M12 5.5v12.1"></path>
+      </svg>
+    </span>
+  `;
+}
+
+function getBoardCardCost(cardElement) {
+  return Math.max(0, Number.parseInt(cardElement?.dataset.rpCost || "0", 10) || 0);
+}
+
+function setTokenBoardPosition(token, boardIndex) {
+  if (token.classList.contains("active")) {
+    setActiveTokenCameraPosition(token, boardIndex);
+    return;
+  }
+
+  const position = getTokenCardContactPosition(boardIndex);
+  token.style.left = `${position.x}%`;
+  token.style.top = `${position.y}%`;
+  token.style.setProperty("--token-rotation", `${position.rotation}deg`);
+  token.dataset.boardIndex = String(boardIndex);
+}
+
+function setActiveTokenCameraPosition(token, boardIndex) {
+  token.style.left = "50%";
+  token.style.top = "50%";
+  token.style.setProperty("--token-rotation", "0deg");
+  token.dataset.boardIndex = String(boardIndex);
+}
+
+function getTokenCardContactPosition(index) {
+  const angle = (index / boardSpaceCount) * Math.PI * 2 - Math.PI / 2;
+  const radius = 42.65;
+
+  return {
+    x: 50 + Math.cos(angle) * radius,
+    y: 50 + Math.sin(angle) * radius,
+    rotation: (angle * 180 / Math.PI) + 90
+  };
+}
+
+function animateTokenClockwise(token, fromIndex, toIndex, delayMs = 0) {
+  const playerIndex = Number(token.dataset.token);
+  const existingTimers = tokenAnimationTimers.get(playerIndex) || [];
+  existingTimers.forEach((timer) => window.clearTimeout(timer));
+
+  const distance = (toIndex - fromIndex + boardSpaceCount) % boardSpaceCount;
+  const timers = [];
+  let moved = 0;
+  let frame = 0;
+
+  setActiveTokenCameraPosition(token, fromIndex);
+
+  while (moved < distance) {
+    moved += Math.min(tokenStepCards, distance - moved);
+    const nextIndex = (fromIndex + moved) % boardSpaceCount;
+    frame += 1;
+    timers.push(window.setTimeout(() => {
+      centerBoardOnCardIndex(nextIndex, 0);
+      setActiveTokenCameraPosition(token, nextIndex);
+    }, delayMs + (frame * tokenStepDurationMs)));
+  }
+
+  tokenAnimationTimers.set(playerIndex, timers);
+
+  return delayMs + (frame * tokenStepDurationMs);
+}
+
+function formatMiniCards() {
+  document.querySelectorAll(".mini-card").forEach((card) => {
+    const match = card.textContent.trim().match(/^(.+)([♥♦♣♠])$/);
+
+    if (!match) {
+      return;
+    }
+
+    card.innerHTML = `<span>${match[1]}</span><strong>${match[2]}</strong>`;
+  });
+}
+
+function applyMasterControl() {
+  document.querySelectorAll("[data-control]").forEach((element) => {
+    const control = MASTER_CONTROL[element.dataset.control];
+
+    if (!control) {
+      return;
+    }
+
+    element.style.setProperty("--control-x", `${numberOrDefault(control.xPercent, 0)}%`);
+    element.style.setProperty("--control-y", `${numberOrDefault(control.yPercent, 0)}%`);
+    element.style.setProperty("--control-rotation", `${numberOrDefault(control.rotationPercent, 0) * 3.6}deg`);
+    element.style.setProperty("--control-scale", String(numberOrDefault(control.scalePercent, 100) / 100));
+  });
+}
+
+function numberOrDefault(value, fallback) {
+  return Number.isFinite(value) ? value : fallback;
+}
+
+function buildBoardDeck() {
+  const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+  const suits = ["H", "C", "D", "S"];
+  const deck = Array.from({ length: 52 }, (_, index) => {
+    const label = ranks[index % ranks.length];
+    const suit = suits[index % suits.length];
+    return { label, suit };
+  });
+  deck.push(
+    { label: "W", suit: "", type: "wild", name: "Wild card" },
+    { label: "W", suit: "", type: "wild", name: "Wild card" },
+    { label: "?", suit: "", type: "mystery", name: "Mystery card" },
+    { label: "?", suit: "", type: "mystery", name: "Mystery card" }
+  );
+  return deck;
+}
+
+function getCardSellPrice(rank) {
+  return Math.floor(getRankPurchasePrice(rank) * 0.5);
+}
+
+function getCardLandingPenalty(rank) {
+  return Math.max(50, Math.floor(getRankPurchasePrice(rank) * 0.2));
+}
+
+function getCardHandMultiplier(rank) {
+  const multiplierMap = {
+    A: "x3.0",
+    K: "x2.5",
+    Q: "x2.25",
+    J: "x2.0",
+    "10": "x1.8",
+    "9": "x1.7",
+    "8": "x1.6",
+    "7": "x1.5",
+    "6": "x1.4",
+    "5": "x1.3",
+    "4": "x1.2",
+    "3": "x1.1",
+    "2": "x1.0"
+  };
+
+  return multiplierMap[rank] || "x1.0";
+}
+
+function renderTurnState(turnState) {
+  const activePlayerIndex = turnState.currentPlayer;
+  const activeBoardIndex = turnState.playerPositions[activePlayerIndex];
+  currentLandingCost = getCardRollPointCost(activeBoardIndex);
+  const currentRollPoints = turnState.playerRollPoints[activePlayerIndex];
+  const previousActiveBoardIndex = lastRenderedTurnState?.playerPositions?.[activePlayerIndex];
+  const didActiveTurnChange = lastRenderedTurnState?.currentPlayer !== undefined
+    && lastRenderedTurnState.currentPlayer !== activePlayerIndex;
+  const didActiveTokenMove = lastRenderedTurnState?.currentPlayer === activePlayerIndex
+    && previousActiveBoardIndex !== undefined
+    && previousActiveBoardIndex !== activeBoardIndex;
+
+  perspectiveTable.dataset.currentPlayer = String(turnState.currentPlayerNumber);
+  currentTurnLabel.textContent = `Player ${turnState.currentPlayerNumber} turn`;
+  rollPointsLabel.textContent = String(currentRollPoints);
+  landingCostLabel.textContent = `Spin cost ${currentLandingCost} RP`;
+  purchaseAuctionModule.setActivePlayer(activePlayerIndex);
+  renderBonusSlots(activePlayerIndex);
+  const canSpinInnerWheel = currentRollPoints >= currentLandingCost;
+  innerWheelModule.setSpinEnabled(canSpinInnerWheel);
+  slotReelRoot.classList.toggle("spin-ready", canSpinInnerWheel);
+
+  document.querySelectorAll(".seat-marker").forEach((seat) => {
+    seat.classList.toggle("active", Number(seat.dataset.seat) === turnState.currentPlayer);
+  });
+
+  document.querySelectorAll(".player-token").forEach((token) => {
+    const playerIndex = Number(token.dataset.token);
+    const targetBoardIndex = turnState.playerPositions[playerIndex];
+    token.classList.toggle("active", playerIndex === turnState.currentPlayer);
+
+    if (playerIndex === activePlayerIndex && didActiveTokenMove) {
+      return;
+    }
+
+    setTokenBoardPosition(token, targetBoardIndex);
+  });
+
+  const activeToken = document.querySelector(`.player-token[data-token="${activePlayerIndex}"]`);
+  let tokenMoveDelay = 0;
+
+  if (didActiveTokenMove) {
+    centerBoardOnCardIndex(activeBoardIndex, 0);
+    tokenMoveDelay = activeToken
+      ? animateTokenClockwise(activeToken, previousActiveBoardIndex, activeBoardIndex, moveCameraSettleMs)
+      : moveCameraSettleMs;
+    applyBoardViewMode(turnState, activeBoardIndex);
+    scheduleLandingCardAnimation(activeBoardIndex, tokenMoveDelay + 540);
+  } else {
+    centerBoardOnCardIndex(activeBoardIndex, 0);
+    if (suppressNextTurnFocus) {
+      suppressNextTurnFocus = false;
+      applyBoardViewMode(turnState, activeBoardIndex);
+    } else if (!lastRenderedTurnState || didActiveTurnChange) {
+      applyBoardViewMode(turnState, activeBoardIndex);
+    }
+  }
+
+  lastRenderedTurnState = {
+    ...turnState,
+    playerPositions: [...turnState.playerPositions]
+  };
+}

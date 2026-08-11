@@ -1,0 +1,14 @@
+{
+  "name": "@big-slick-games/poker-orbit-web-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Mobile-first Poker Orbit browser template.",
+  "type": "module",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node server/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

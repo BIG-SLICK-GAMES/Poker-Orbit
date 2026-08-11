@@ -1,0 +1,48 @@
+# Unity generated folders
+/[Aa]rchive/
+/[Aa]ssets/
+[Ll]ibrary/
+/[Pp]ackages/
+/[Pp]roject[Ss]ettings/
+[Tt]emp/
+/[Tt]ools/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+
+# Unity generated project files
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity cache / local tooling
+.vs/
+.vscode/
+sysinfo.txt
+*.tmp
+
+# Web/mobile dependencies and generated output
+node_modules/
+dist/
+build/
+.vite/
+.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local generated media from captures
+WebMobile/_video_frames/

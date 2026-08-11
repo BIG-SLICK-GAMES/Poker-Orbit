@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Poker Orbit">
+  <rect width="512" height="512" rx="112" fill="#130f0d"/>
+  <circle cx="256" cy="256" r="184" fill="#b8201c" stroke="#fff3cf" stroke-width="18"/>
+  <circle cx="256" cy="256" r="112" fill="#0d5149" stroke="#55c9bd" stroke-width="12"/>
+  <path d="M256 105c82 0 151 69 151 151S338 407 256 407 105 338 105 256 174 105 256 105Zm0 42c-60 0-109 49-109 109s49 109 109 109 109-49 109-109-49-109-109-109Z" fill="#fff3cf"/>
+  <text x="256" y="246" text-anchor="middle" fill="#fff3cf" font-family="Georgia, serif" font-size="76" font-weight="900">Poker</text>
+  <text x="256" y="318" text-anchor="middle" fill="#ffffff" font-family="Georgia, serif" font-size="86" font-weight="900">Orbit</text>
+</svg>
