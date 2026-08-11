@@ -2,6 +2,7 @@ import { createTurnModule } from "./turn.js";
 import { createCameraModule } from "./camera.js";
 import { createSlotReelModule } from "./slot-reel.js";
 import { createInnerWheelModule } from "./inner-wheel.js";
+import { createPrizeWheelRenderer } from "./prize-wheel-renderer.js";
 import { createCardAnimationModule } from "./card-animation.js";
 import { createPurchaseAuctionModule, getRankPurchasePrice } from "./purchase-auction.js";
 import { createOwnershipHighlightModule } from "./ownership-highlights.js";
@@ -20,6 +21,7 @@ const currentTurnLabel = document.querySelector("#currentTurnLabel");
 const rollPointsLabel = document.querySelector("#rollPointsLabel");
 const landingCostLabel = document.querySelector("#landingCostLabel");
 const innerWheelRoot = document.querySelector("#innerWheel");
+const prizeWheelCanvas = document.querySelector("#prizeWheel3d");
 const innerWheelResultLabel = document.querySelector("#innerWheelResultLabel");
 const rollButton = document.querySelector("#rollButton");
 const slotReelRoot = document.querySelector("#slotReel");
@@ -160,6 +162,7 @@ const innerWheelModule = createInnerWheelModule({
   root: innerWheelRoot,
   resultLabel: innerWheelResultLabel
 });
+createPrizeWheelRenderer({ root: innerWheelRoot, canvas: prizeWheelCanvas });
 
 createSlotReelModule({
   root: slotReelRoot,
