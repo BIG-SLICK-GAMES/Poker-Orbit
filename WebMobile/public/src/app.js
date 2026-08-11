@@ -5,6 +5,7 @@ import { createCardAnimationModule } from "./card-animation.js";
 import { createPurchaseAuctionModule, getRankPurchasePrice } from "./purchase-auction.js";
 import { createOwnershipHighlightModule } from "./ownership-highlights.js";
 import { getBonusIconSrc } from "./bonus-icons.js";
+import { buildBonusWheelPrizes } from "./bonus-wheel.js";
 import { MASTER_CONTROL } from "./master-control.js";
 
 const shell = document.querySelector("#appShell");
@@ -148,7 +149,9 @@ const ownershipHighlightModule = createOwnershipHighlightModule({ boardRoot: boa
 const cardAnimationModule = createCardAnimationModule({
   layer: cardAnimationLayer,
   onPurchase: purchaseBoardCard,
-  onPass: passBoardCard
+  onPass: passBoardCard,
+  onSpin: spinForBoardCard,
+  canSpin: canSpinForBoardCard
 });
 let currentLandingCost = 0;
 
@@ -763,6 +766,92 @@ function passBoardCard(cardElement) {
   scheduleNextTurn(260);
 }
 
+function canSpinForBoardCard(cardElement) {
+  if (!cardElement || cardElement.dataset.purchaseState !== "available") {
+    return false;
+  }
+
+  const playerIndex = turnModule.getState().currentPlayer;
+  const currentRollPoints = turnModule.getState().playerRollPoints[playerIndex];
+  return currentRollPoints >= getBoardCardCost(cardElement);
+}
+
+function spinForBoardCard(cardElement, promptControls, options = {}) {
+  if (!cardElement || !promptControls) {
+    return;
+  }
+
+  const spinCost = getBoardCardCost(cardElement);
+  const isFreeSpin = Boolean(options.freeSpin);
+
+  if (!isFreeSpin && !turnModule.spendCurrentPlayerRollPoints(spinCost)) {
+    promptControls.setStatus(`Need ${spinCost} RP`);
+    promptControls.setSpinEnabled();
+    return;
+  }
+
+  const prizes = buildBonusWheelPrizes();
+  const winningIndex = Math.floor(Math.random() * prizes.length);
+  promptControls.startBonusWheel({
+    prizes,
+    winningIndex,
+    onComplete: (prize) => applyBonusWheelPrize(prize, cardElement, promptControls)
+  });
+}
+
+function applyBonusWheelPrize(prize, cardElement, promptControls) {
+  switch (prize.type) {
+    case "free-card":
+      promptControls.setPurchaseFree();
+      break;
+    case "discount":
+      promptControls.setPurchaseDiscount(50);
+      break;
+    case "spin-again":
+      promptControls.grantFreeSpin();
+      promptControls.setStatus("Spin again won");
+      break;
+    case "bogo":
+      addBonusToCurrentPlayer("Buy 1 Get 1 50% Off");
+      promptControls.setStatus("Bonus saved");
+      break;
+    case "pic":
+      addBonusToCurrentPlayer("PIC");
+      promptControls.setStatus("PIC saved");
+      break;
+    case "free-roll":
+      addBonusToCurrentPlayer("Free Roll");
+      promptControls.setStatus("Free Roll saved");
+      break;
+    case "rp":
+      turnModule.addCurrentPlayerRollPoints(100);
+      promptControls.setStatus("100 RP added");
+      break;
+    case "bankruptcy":
+      turnModule.clearCurrentPlayerRollPoints();
+      promptControls.setStatus("All RP lost");
+      break;
+    case "shield":
+      addBonusToCurrentPlayer("Shield");
+      promptControls.setStatus("Shield saved");
+      break;
+    case "steal":
+      addBonusToCurrentPlayer("Steal");
+      promptControls.setStatus("Steal saved");
+      break;
+    default:
+      promptControls.setStatus("No win");
+      break;
+  }
+
+  if (prize.type === "no-win") {
+    promptControls.setStatus("No win");
+  }
+
+  currentLandingCost = getBoardCardCost(cardElement);
+  renderTurnState(turnModule.getState());
+}
+
 function scheduleNextTurn(delayMs = 0) {
   window.clearTimeout(pendingNextTurnTimer);
 
@@ -997,7 +1086,7 @@ function renderTurnState(turnState) {
   landingCostLabel.textContent = `Spin cost ${currentLandingCost} RP`;
   purchaseAuctionModule.setActivePlayer(activePlayerIndex);
   renderBonusSlots(activePlayerIndex);
-  slotReelRoot.classList.remove("spin-ready");
+  slotReelRoot.classList.toggle("spin-ready", currentRollPoints >= currentLandingCost);
 
   document.querySelectorAll(".seat-marker").forEach((seat) => {
     seat.classList.toggle("active", Number(seat.dataset.seat) === turnState.currentPlayer);
