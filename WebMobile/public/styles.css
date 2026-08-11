@@ -584,8 +584,8 @@ h2 {
 
 .board-stage[data-camera-mode="turn-focus"] .orbit-board {
   --board-camera-tilt: 52deg;
-  --board-camera-y: 0%;
-  --board-camera-scale: 1;
+  --board-camera-y: -129%;
+  --board-camera-scale: 2;
 }
 
 .board-stage[data-camera-mode="move-front"] .orbit-board {
@@ -2900,8 +2900,8 @@ body[data-theme] .dice-pip {
     --viewport-board-x: 0%;
     --viewport-board-y: 0%;
     --board-camera-tilt: 52deg;
-    --board-camera-y: 0%;
-    --board-camera-scale: 1;
+    --board-camera-y: -129%;
+    --board-camera-scale: 2;
   }
 
   .board-stage[data-camera-mode="move-front"] .orbit-board {

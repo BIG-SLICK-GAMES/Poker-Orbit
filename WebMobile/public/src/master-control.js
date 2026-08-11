@@ -36,15 +36,15 @@ export const MASTER_CONTROL = {
       cameraZoomPercent: 100,
       cameraRollPercent: 0,
       tablePitchDegrees: 52,
-      tableUpDownPercent: 8,
-      tableSizePercent: 100,
+      tableUpDownPercent: -129,
+      tableSizePercent: 200,
       mobile: {
         cameraLeftRightPercent: 0,
         cameraUpDownPercent: 0,
         cameraZoomPercent: 100,
         tablePitchDegrees: 52,
-        tableUpDownPercent: 7,
-        tableSizePercent: 100
+        tableUpDownPercent: -129,
+        tableSizePercent: 200
       }
     },
     moveFront: {
