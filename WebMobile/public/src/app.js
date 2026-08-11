@@ -1121,10 +1121,9 @@ function renderTurnState(turnState) {
   let tokenMoveDelay = 0;
 
   if (didActiveTokenMove) {
-    centerBoardOnCardIndex(activeBoardIndex, 0);
     tokenMoveDelay = activeToken
-      ? animateTokenClockwise(activeToken, previousActiveBoardIndex, activeBoardIndex, moveCameraSettleMs)
-      : moveCameraSettleMs;
+      ? animateTokenClockwise(activeToken, previousActiveBoardIndex, activeBoardIndex, 0)
+      : 0;
     applyBoardViewMode(turnState, activeBoardIndex);
     scheduleLandingCardAnimation(activeBoardIndex, tokenMoveDelay + 540);
   } else {
