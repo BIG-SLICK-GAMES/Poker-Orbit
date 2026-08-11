@@ -32,7 +32,7 @@ export const MASTER_CONTROL = {
     turnFocus: {
       followsToken: false,
       cameraLeftRightPercent: 0,
-      cameraUpDownPercent: -16,
+      cameraUpDownPercent: 0,
       cameraZoomPercent: 100,
       cameraRollPercent: 0,
       tablePitchDegrees: 52,
@@ -40,7 +40,7 @@ export const MASTER_CONTROL = {
       tableSizePercent: 100,
       mobile: {
         cameraLeftRightPercent: 0,
-        cameraUpDownPercent: -10,
+        cameraUpDownPercent: 0,
         cameraZoomPercent: 100,
         tablePitchDegrees: 52,
         tableUpDownPercent: 7,
@@ -50,7 +50,7 @@ export const MASTER_CONTROL = {
     moveFront: {
       followsToken: false,
       cameraLeftRightPercent: 0,
-      cameraUpDownPercent: 8,
+      cameraUpDownPercent: 0,
       cameraZoomPercent: 100,
       cameraRollPercent: 0,
       tablePitchDegrees: 68,
@@ -58,7 +58,7 @@ export const MASTER_CONTROL = {
       tableSizePercent: 100,
       mobile: {
         cameraLeftRightPercent: 0,
-        cameraUpDownPercent: 12,
+        cameraUpDownPercent: 0,
         cameraZoomPercent: 100,
         tablePitchDegrees: 72,
         tableUpDownPercent: 12,
@@ -68,14 +68,14 @@ export const MASTER_CONTROL = {
     tableWide: {
       followsToken: false,
       cameraLeftRightPercent: 0,
-      cameraUpDownPercent: 18,
+      cameraUpDownPercent: 0,
       cameraZoomPercent: 100,
       cameraRollPercent: 0,
       tablePitchDegrees: 58,
       tableUpDownPercent: 0,
       tableSizePercent: 100,
       mobile: {
-        cameraUpDownPercent: 18,
+        cameraUpDownPercent: 0,
         cameraZoomPercent: 100,
         tablePitchDegrees: 58,
         tableUpDownPercent: 0,
@@ -86,7 +86,7 @@ export const MASTER_CONTROL = {
 
   gameTopbar: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   perspectiveTable: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
-  orbitBoard: { xPercent: 0, yPercent: -22, rotationPercent: 0, scalePercent: 100 },
+  orbitBoard: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   boardCardRing: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   boardCards: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 118 },
   outerRing: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },

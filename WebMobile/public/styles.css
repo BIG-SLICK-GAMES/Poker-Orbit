@@ -343,6 +343,7 @@ h2 {
 
 .perspective-table[data-control] {
   transform:
+    translateX(calc((100vw - 100%) / 2))
     translate(var(--control-x), var(--control-y))
     translate(var(--camera-x, 0%), var(--camera-y, 0%))
     rotate(var(--camera-rotation, 0deg))
@@ -554,7 +555,7 @@ h2 {
 
 .orbit-board {
   --viewport-board-x: 0%;
-  --viewport-board-y: -10%;
+  --viewport-board-y: 0%;
   position: absolute;
   inset: 0;
   display: grid;
@@ -583,19 +584,19 @@ h2 {
 
 .board-stage[data-camera-mode="turn-focus"] .orbit-board {
   --board-camera-tilt: 52deg;
-  --board-camera-y: 8%;
+  --board-camera-y: 0%;
   --board-camera-scale: 1;
 }
 
 .board-stage[data-camera-mode="move-front"] .orbit-board {
   --board-camera-tilt: 67deg;
-  --board-camera-y: 2%;
+  --board-camera-y: 0%;
   --board-camera-scale: 1;
 }
 
 .board-stage[data-camera-mode="table-wide"] .orbit-board {
   --board-camera-tilt: 58deg;
-  --board-camera-y: -4%;
+  --board-camera-y: 0%;
   --board-camera-scale: 1;
 }
 
@@ -2899,19 +2900,19 @@ body[data-theme] .dice-pip {
     --viewport-board-x: 0%;
     --viewport-board-y: 0%;
     --board-camera-tilt: 52deg;
-    --board-camera-y: 7%;
+    --board-camera-y: 0%;
     --board-camera-scale: 1;
   }
 
   .board-stage[data-camera-mode="move-front"] .orbit-board {
     --board-camera-tilt: 70deg;
-    --board-camera-y: 7%;
+    --board-camera-y: 0%;
     --board-camera-scale: 1;
   }
 
   .board-stage[data-camera-mode="table-wide"] .orbit-board {
     --board-camera-tilt: 58deg;
-    --board-camera-y: -5%;
+    --board-camera-y: 0%;
     --board-camera-scale: 1;
   }
 
