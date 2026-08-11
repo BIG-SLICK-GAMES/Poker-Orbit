@@ -88,7 +88,7 @@ export const MASTER_CONTROL = {
   perspectiveTable: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   orbitBoard: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   boardCardRing: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
-  boardCards: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 118 },
+  boardCards: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 160 },
   outerRing: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   innerRing: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   tableCenter: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
