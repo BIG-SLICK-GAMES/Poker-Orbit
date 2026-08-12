@@ -10,18 +10,20 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
     activeCardElement = cardElement;
     const sourceRect = cardElement.getBoundingClientRect();
     const frameRect = getFrameRect(layer);
+    const sourceLeft = sourceRect.left - frameRect.left;
+    const sourceTop = sourceRect.top - frameRect.top;
     const targetWidth = Math.min(218, Math.max(172, frameRect.width * 0.52));
     const targetHeight = targetWidth * 1.46;
-    const targetLeft = frameRect.left + ((frameRect.width - targetWidth) / 2);
-    const targetTop = frameRect.top + Math.max(72, (frameRect.height - targetHeight) * 0.34);
+    const targetLeft = (frameRect.width - targetWidth) / 2;
+    const targetTop = Math.max(72, (frameRect.height - targetHeight) * 0.34);
     const controls = document.createElement("div");
     const clone = cardElement.cloneNode(true);
     clone.className = `featured-card-flight ${getFeaturedCardClasses(cardElement)}`;
     clone.removeAttribute("data-control");
     clone.removeAttribute("aria-label");
     clone.innerHTML = getFeaturedCardMarkup(cardElement);
-    clone.style.left = `${sourceRect.left}px`;
-    clone.style.top = `${sourceRect.top}px`;
+    clone.style.left = `${sourceLeft}px`;
+    clone.style.top = `${sourceTop}px`;
     clone.style.width = `${sourceRect.width}px`;
     clone.style.height = `${sourceRect.height}px`;
     clone.style.opacity = "0";
@@ -131,16 +133,16 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
     activeAnimation = clone.animate(
       [
         {
-          left: `${sourceRect.left}px`,
-          top: `${sourceRect.top}px`,
+          left: `${sourceLeft}px`,
+          top: `${sourceTop}px`,
           width: `${sourceRect.width}px`,
           height: `${sourceRect.height}px`,
           transform: "rotateY(0deg) rotateZ(0deg) translateZ(0) scale(1)",
           opacity: 0
         },
         {
-          left: `${sourceRect.left}px`,
-          top: `${sourceRect.top}px`,
+          left: `${sourceLeft}px`,
+          top: `${sourceTop}px`,
           width: `${sourceRect.width}px`,
           height: `${sourceRect.height}px`,
           transform: "rotateY(0deg) rotateZ(0deg) translateZ(0) scale(1)",
@@ -148,8 +150,8 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
           offset: 0.08
         },
         {
-          left: `${sourceRect.left + sourceRect.width * 0.2}px`,
-          top: `${sourceRect.top - 72}px`,
+          left: `${sourceLeft + sourceRect.width * 0.2}px`,
+          top: `${sourceTop - 72}px`,
           width: `${sourceRect.width * 1.4}px`,
           height: `${sourceRect.height * 1.4}px`,
           transform: "rotateY(0deg) rotateZ(-8deg) translateZ(80px) scale(1.15)",
@@ -157,8 +159,8 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
           offset: 0.32
         },
         {
-          left: `${sourceRect.left + sourceRect.width * 0.35}px`,
-          top: `${sourceRect.top - 86}px`,
+          left: `${sourceLeft + sourceRect.width * 0.35}px`,
+          top: `${sourceTop - 86}px`,
           width: `${sourceRect.width * 1.46}px`,
           height: `${sourceRect.height * 1.46}px`,
           transform: "rotateY(150deg) rotateZ(-14deg) translateZ(100px) scale(1.12)",

@@ -877,7 +877,7 @@ h2 {
 }
 
 .featured-card-flight {
-  position: fixed;
+  position: absolute;
   z-index: 31;
   display: grid;
   place-items: stretch;
@@ -1020,7 +1020,7 @@ h2 {
 }
 
 .featured-card-actions {
-  position: fixed;
+  position: absolute;
   z-index: 32;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
