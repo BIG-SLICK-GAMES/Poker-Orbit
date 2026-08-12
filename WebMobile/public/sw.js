@@ -1,4 +1,4 @@
-const CACHE_NAME = "poker-orbit-mobile-v91";
+const CACHE_NAME = "poker-orbit-mobile-v92";
 const APP_SHELL = [
   "/",
   "/index.html",
@@ -6,6 +6,7 @@ const APP_SHELL = [
   "/manifest.json",
   "/icon.svg",
   "/src/app.js",
+  "/src/board-model.js",
   "/src/bonus-icons.js",
   "/src/bonus-slot-prizes.js",
   "/src/camera.js",
@@ -15,6 +16,10 @@ const APP_SHELL = [
   "/src/purchase-auction.js",
   "/src/slot-reel.js",
   "/src/turn.js",
+  "/vendor/three/three.module.js",
+  "/vendor/three/examples/jsm/loaders/GLTFLoader.js",
+  "/vendor/three/examples/jsm/utils/BufferGeometryUtils.js",
+  "/assets/models/poker-orbit-board.glb",
   "/assets/bonus-icons/100rp.png",
   "/assets/bonus-icons/50off.png",
   "/assets/bonus-icons/bankrupt.png",
