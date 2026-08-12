@@ -23,6 +23,8 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
     clone.style.top = `${sourceRect.top}px`;
     clone.style.width = `${sourceRect.width}px`;
     clone.style.height = `${sourceRect.height}px`;
+    clone.style.opacity = "0";
+    clone.style.transform = "rotateY(0deg) rotateZ(0deg) translateZ(0) scale(1)";
 
     controls.className = "featured-card-actions";
     controls.hidden = true;
@@ -132,7 +134,16 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
           width: `${sourceRect.width}px`,
           height: `${sourceRect.height}px`,
           transform: "rotateY(0deg) rotateZ(0deg) translateZ(0) scale(1)",
-          opacity: 0.92
+          opacity: 0
+        },
+        {
+          left: `${sourceRect.left}px`,
+          top: `${sourceRect.top}px`,
+          width: `${sourceRect.width}px`,
+          height: `${sourceRect.height}px`,
+          transform: "rotateY(0deg) rotateZ(0deg) translateZ(0) scale(1)",
+          opacity: 0.92,
+          offset: 0.08
         },
         {
           left: `${sourceRect.left + sourceRect.width * 0.2}px`,
