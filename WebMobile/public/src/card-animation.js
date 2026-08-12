@@ -59,7 +59,7 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
       layer.append(slotOverlay.root);
       controls.classList.add("bonus-slot-mode");
       clone.classList.remove("waiting-purchase");
-      await wait(window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 3300);
+      await runBonusSlotReels(slotOverlay.reels);
       slotOverlay.root.classList.add("resolved");
       setStatus(prize.label);
       onComplete?.(prize);
@@ -191,16 +191,91 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
 
 function createBonusSlotMachineElement(prize) {
   const root = document.createElement("div");
+  const symbol = getPrizeSymbol(prize);
   root.className = "bonus-slot-overlay";
   root.innerHTML = `
-    <img class="bonus-slot-gif" src="/assets/bonus-slot-machine.gif" alt="" draggable="false">
+    <div class="bonus-slot-machine" data-prize="${prize.type}">
+      <div class="bonus-slot-sign">BONUS</div>
+      <div class="bonus-slot-window" aria-hidden="true">
+        ${[0, 1, 2].map((index) => `
+          <div class="bonus-slot-reel" style="--reel-index:${index}">
+            <div class="bonus-slot-strip">
+              ${buildReelSymbols(symbol, index)}
+            </div>
+          </div>
+        `).join("")}
+        <span class="bonus-slot-win-line"></span>
+      </div>
+      <span class="bonus-slot-handle"></span>
+      <div class="bonus-slot-lamps" aria-hidden="true">${Array.from({ length: 7 }, () => "<i></i>").join("")}</div>
+    </div>
     <strong class="bonus-slot-result">${prize.label}</strong>
   `;
-  return { root };
+  return { root, reels: [...root.querySelectorAll(".bonus-slot-reel")] };
 }
 
 function wait(ms) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+async function runBonusSlotReels(reels) {
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (reducedMotion) {
+    reels.forEach((reel) => reel.classList.add("locked"));
+    return;
+  }
+
+  reels.forEach((reel) => reel.classList.add("spinning"));
+  await wait(1480);
+
+  for (const reel of reels) {
+    reel.classList.remove("spinning");
+    reel.classList.add("locking");
+    await wait(240);
+    reel.classList.remove("locking");
+    reel.classList.add("locked");
+  }
+
+  await wait(260);
+}
+
+function buildReelSymbols(finalSymbol, reelIndex) {
+  const pool = [
+    { icon: "7", label: "JACKPOT" },
+    { icon: "$", label: "CHIPS" },
+    { icon: "RP", label: "POINTS" },
+    { icon: "50", label: "OFF" },
+    { icon: "PIC", label: "PICK" },
+    { icon: "NO", label: "LOSE" }
+  ];
+  const sequence = Array.from({ length: 10 }, (_, index) => pool[(index + reelIndex * 2) % pool.length]);
+  sequence.push(finalSymbol);
+
+  return sequence.map((symbol, index) => `
+    <span class="bonus-slot-symbol ${index === sequence.length - 1 ? "final" : ""}">
+      <b>${symbol.icon}</b>
+      <small>${symbol.label}</small>
+    </span>
+  `).join("");
+}
+
+function getPrizeSymbol(prize) {
+  const symbols = {
+    "free-card": { icon: "A", label: "FREE" },
+    discount: { icon: "50", label: "OFF" },
+    "no-win": { icon: "NO", label: "WIN" },
+    "spin-again": { icon: "SPIN", label: "AGAIN" },
+    bogo: { icon: "B1G1", label: "50" },
+    pic: { icon: "PIC", label: "CARD" },
+    "free-roll": { icon: "ROLL", label: "FREE" },
+    rp: { icon: "100", label: "RP" },
+    bankruptcy: { icon: "0", label: "BANKRUPT" },
+    shield: { icon: "SHLD", label: "BLOCK" },
+    steal: { icon: "STEAL", label: "TAKE" }
+  };
+
+  return symbols[prize.type] || { icon: "7", label: "BONUS" };
 }
 
 function getFeaturedCardMarkup(cardElement) {
