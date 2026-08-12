@@ -9,10 +9,11 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
 
     activeCardElement = cardElement;
     const sourceRect = cardElement.getBoundingClientRect();
-    const targetWidth = Math.min(218, Math.max(172, window.innerWidth * 0.52));
+    const frameRect = getFrameRect(layer);
+    const targetWidth = Math.min(218, Math.max(172, frameRect.width * 0.52));
     const targetHeight = targetWidth * 1.46;
-    const targetLeft = (window.innerWidth - targetWidth) / 2;
-    const targetTop = Math.max(72, (window.innerHeight - targetHeight) * 0.34);
+    const targetLeft = frameRect.left + ((frameRect.width - targetWidth) / 2);
+    const targetTop = frameRect.top + Math.max(72, (frameRect.height - targetHeight) * 0.34);
     const controls = document.createElement("div");
     const clone = cardElement.cloneNode(true);
     clone.className = `featured-card-flight ${getFeaturedCardClasses(cardElement)}`;
@@ -240,6 +241,16 @@ function getFeaturedCardClasses(cardElement) {
   return ["red", "black", "wild", "mystery"]
     .filter((className) => cardElement.classList.contains(className))
     .join(" ");
+}
+
+function getFrameRect(layer) {
+  const shell = layer.closest(".app-shell");
+  return shell?.getBoundingClientRect() || {
+    left: 0,
+    top: 0,
+    width: window.innerWidth,
+    height: window.innerHeight
+  };
 }
 
 function wait(ms) {

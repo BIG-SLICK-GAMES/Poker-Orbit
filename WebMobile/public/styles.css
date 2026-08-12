@@ -117,6 +117,61 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+@media (min-width: 760px) and (min-height: 680px) {
+  body {
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background:
+      radial-gradient(circle at 50% 20%, rgba(255, 243, 207, 0.12), transparent 28%),
+      radial-gradient(circle at 16% 12%, rgba(67, 214, 201, 0.22), transparent 30%),
+      radial-gradient(circle at 82% 8%, rgba(232, 63, 79, 0.22), transparent 28%),
+      linear-gradient(155deg, #170a16, var(--bsg-bg) 52%, #052f32);
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    height: min(956px, calc(100dvh - 36px));
+    max-width: calc(100vw - 36px);
+    aspect-ratio: 9 / 19.5;
+    border: 12px solid #09080c;
+    border-radius: 42px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 18%),
+      #111217;
+    box-shadow:
+      inset 0 0 0 2px rgba(255, 255, 255, 0.08),
+      0 24px 70px rgba(0, 0, 0, 0.58),
+      0 0 0 1px rgba(255, 243, 207, 0.12);
+    pointer-events: none;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    top: max(30px, calc((100dvh - min(956px, calc(100dvh - 36px))) / 2 + 14px));
+    left: 50%;
+    width: 118px;
+    height: 22px;
+    border-radius: 0 0 16px 16px;
+    background: #09080c;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .app-shell {
+    height: min(932px, calc(100dvh - 76px));
+    max-width: calc(100vw - 76px);
+    aspect-ratio: 9 / 19.5;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 0 0 1px rgba(0, 0, 0, 0.7);
+  }
+}
+
 button,
 input,
 select {
@@ -144,6 +199,7 @@ select:focus-visible {
   position: relative;
   overflow: hidden;
   isolation: isolate;
+  contain: layout paint;
 }
 
 .app-shell::before {
@@ -771,7 +827,7 @@ h2 {
 }
 
 .card-animation-layer {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 30;
   display: none;
@@ -1042,7 +1098,7 @@ h2 {
 }
 
 .bonus-slot-overlay {
-  position: fixed;
+  position: absolute;
   left: 50%;
   top: 48%;
   z-index: 33;
@@ -3234,6 +3290,118 @@ body[data-theme] .dice-pip {
     max-width: 620px;
     width: 100%;
     margin: 0 auto;
+  }
+}
+
+@media (min-width: 760px) and (min-height: 680px) {
+  .screen {
+    padding: 5px;
+  }
+
+  .lobby-screen,
+  .settings-screen {
+    max-width: none;
+    width: auto;
+    margin: 0;
+  }
+
+  .game-screen.active {
+    display: flex;
+  }
+
+  .game-screen {
+    gap: 4px;
+  }
+
+  .game-topbar {
+    min-height: 34px;
+    padding: 4px 6px;
+    font-size: 0.72rem;
+  }
+
+  .board-stage {
+    min-height: 52dvh;
+    perspective: 760px;
+    place-items: center;
+  }
+
+  .perspective-table {
+    width: min(232vw, 134dvh, 1260px);
+    justify-self: center;
+  }
+
+  .board-stage[data-camera-mode="table-wide"] .perspective-table {
+    width: min(136vw, 82dvh, 820px);
+  }
+
+  .board-stage[data-camera-mode="turn-focus"] {
+    perspective-origin: 50% 86%;
+  }
+
+  .board-stage[data-camera-mode="turn-focus"] .orbit-board {
+    --viewport-board-x: 0%;
+    --viewport-board-y: 0%;
+    --board-camera-tilt: 52deg;
+    --board-camera-y: -129%;
+    --board-camera-scale: 2;
+  }
+
+  .hand-panel {
+    max-width: none;
+    padding: 5px;
+  }
+
+  .slot-reel {
+    grid-template-columns: 50px minmax(72px, 1fr) 56px minmax(142px, 1.15fr);
+    grid-template-rows: 18px 36px;
+    gap: 4px 5px;
+    margin-bottom: 4px;
+    padding: 5px;
+  }
+
+  .doubles-lamp {
+    height: 18px;
+    font-size: 0.42rem;
+  }
+
+  .rp-meter {
+    height: 36px;
+    grid-template-columns: 19px minmax(0, 1fr);
+    padding: 3px 4px;
+  }
+
+  .slot-machine {
+    grid-template-columns: repeat(2, minmax(34px, 43px));
+    gap: 6px;
+    padding: 4px 7px;
+  }
+
+  .slot-window {
+    max-width: 43px;
+    padding: 4px;
+    border-radius: 6px;
+    font-size: 1.72rem;
+  }
+
+  .slot-roll-btn {
+    min-height: 44px;
+    font-size: 0.78rem;
+  }
+
+  .bonus-slots {
+    min-width: 132px;
+    gap: 3px;
+  }
+
+  .card-hand {
+    height: 62px;
+    min-height: 62px;
+  }
+
+  .mini-card {
+    width: clamp(30px, 9.6vw, 40px);
+    height: calc(100% - 8px);
+    max-height: 54px;
   }
 }
 
