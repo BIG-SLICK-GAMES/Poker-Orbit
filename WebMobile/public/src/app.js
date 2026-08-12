@@ -5,7 +5,7 @@ import { createCardAnimationModule } from "./card-animation.js";
 import { createPurchaseAuctionModule, getRankPurchasePrice } from "./purchase-auction.js";
 import { createOwnershipHighlightModule } from "./ownership-highlights.js";
 import { getBonusIconSrc } from "./bonus-icons.js";
-import { buildBonusWheelPrizes } from "./bonus-wheel.js";
+import { buildBonusSlotPrizes } from "./bonus-slot-prizes.js";
 import { MASTER_CONTROL } from "./master-control.js";
 
 const shell = document.querySelector("#appShell");
@@ -790,16 +790,15 @@ function spinForBoardCard(cardElement, promptControls, options = {}) {
     return;
   }
 
-  const prizes = buildBonusWheelPrizes();
+  const prizes = buildBonusSlotPrizes();
   const winningIndex = Math.floor(Math.random() * prizes.length);
-  promptControls.startBonusWheel({
-    prizes,
-    winningIndex,
-    onComplete: (prize) => applyBonusWheelPrize(prize, cardElement, promptControls)
+  promptControls.startBonusSlotMachine({
+    prize: prizes[winningIndex],
+    onComplete: (prize) => applyBonusSlotPrize(prize, cardElement, promptControls)
   });
 }
 
-function applyBonusWheelPrize(prize, cardElement, promptControls) {
+function applyBonusSlotPrize(prize, cardElement, promptControls) {
   switch (prize.type) {
     case "free-card":
       promptControls.setPurchaseFree();
