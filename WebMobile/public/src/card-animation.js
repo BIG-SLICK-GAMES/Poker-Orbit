@@ -223,18 +223,15 @@ function createBonusWheelElement(prizes) {
 
 async function buildWheelSegments(segments) {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const buildOrder = shuffleIndexes(segments.length);
 
-  for (let index = 0; index < segments.length; index += 1) {
+  for (const index of buildOrder) {
     segments[index].classList.add("building", "lit");
-    await wait(reducedMotion ? 0 : 24);
+    await wait(reducedMotion ? 0 : 28);
     segments[index].classList.remove("building");
     segments[index].classList.add("built");
-    if (index > 0) {
-      segments[index - 1].classList.remove("lit");
-    }
+    segments[index].classList.remove("lit");
   }
-
-  segments.at(-1)?.classList.remove("lit");
 
   await wait(reducedMotion ? 0 : 160);
 
@@ -249,6 +246,17 @@ async function buildWheelSegments(segments) {
   }
 
   segments.at(-1)?.classList.remove("lit");
+}
+
+function shuffleIndexes(length) {
+  const indexes = Array.from({ length }, (_, index) => index);
+
+  for (let index = indexes.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [indexes[index], indexes[swapIndex]] = [indexes[swapIndex], indexes[index]];
+  }
+
+  return indexes;
 }
 
 async function spinWheelToPrize(disc, comet, winningSegment, winningIndex, segmentCount) {
