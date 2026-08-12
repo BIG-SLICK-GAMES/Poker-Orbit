@@ -195,15 +195,10 @@ function createBonusWheelElement(prizes) {
   const overlay = document.createElement("div");
   const disc = document.createElement("div");
   const comet = document.createElement("span");
-  const pointer = document.createElement("span");
-  const title = document.createElement("strong");
   const segmentDegrees = 360 / prizes.length;
   overlay.className = "bonus-wheel-overlay";
   disc.className = "bonus-wheel-disc";
   comet.className = "bonus-wheel-comet";
-  pointer.className = "bonus-wheel-pointer";
-  title.className = "bonus-wheel-title";
-  title.textContent = "Bonus Wheel";
 
   const segments = prizes.map((prize, index) => {
     const segment = document.createElement("span");
@@ -221,17 +216,33 @@ function createBonusWheelElement(prizes) {
   });
 
   disc.append(comet);
-  overlay.append(title, pointer, disc);
+  overlay.append(disc);
 
   return { overlay, disc, comet, segments };
 }
 
 async function buildWheelSegments(segments) {
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   for (let index = 0; index < segments.length; index += 1) {
     segments[index].classList.add("building", "lit");
-    await wait(window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 22);
+    await wait(reducedMotion ? 0 : 24);
     segments[index].classList.remove("building");
     segments[index].classList.add("built");
+    if (index > 0) {
+      segments[index - 1].classList.remove("lit");
+    }
+  }
+
+  segments.at(-1)?.classList.remove("lit");
+
+  await wait(reducedMotion ? 0 : 160);
+
+  for (let index = 0; index < segments.length; index += 1) {
+    segments[index].classList.add("labeling", "lit");
+    await wait(reducedMotion ? 0 : 18);
+    segments[index].classList.remove("labeling");
+    segments[index].classList.add("labeled");
     if (index > 0) {
       segments[index - 1].classList.remove("lit");
     }
