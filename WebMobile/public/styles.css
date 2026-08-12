@@ -129,46 +129,13 @@ body {
       linear-gradient(155deg, #170a16, var(--bsg-bg) 52%, #052f32);
   }
 
-  body::before {
-    content: "";
-    position: fixed;
-    height: min(956px, calc(100dvh - 36px));
-    max-width: calc(100vw - 36px);
-    aspect-ratio: 9 / 19.5;
-    border: 12px solid #09080c;
-    border-radius: 42px;
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 18%),
-      #111217;
-    box-shadow:
-      inset 0 0 0 2px rgba(255, 255, 255, 0.08),
-      0 24px 70px rgba(0, 0, 0, 0.58),
-      0 0 0 1px rgba(255, 243, 207, 0.12);
-    pointer-events: none;
-  }
-
-  body::after {
-    content: "";
-    position: fixed;
-    top: max(30px, calc((100dvh - min(956px, calc(100dvh - 36px))) / 2 + 14px));
-    left: 50%;
-    width: 118px;
-    height: 22px;
-    border-radius: 0 0 16px 16px;
-    background: #09080c;
-    transform: translateX(-50%);
-    pointer-events: none;
-  }
-
   .app-shell {
-    height: min(932px, calc(100dvh - 76px));
-    max-width: calc(100vw - 76px);
+    height: min(932px, calc(100dvh - 48px));
+    max-width: calc(100vw - 48px);
     aspect-ratio: 9 / 19.5;
-    border-radius: 30px;
+    border-radius: 0;
     overflow: hidden;
-    box-shadow:
-      inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-      0 0 0 1px rgba(0, 0, 0, 0.7);
+    box-shadow: none;
   }
 }
 
