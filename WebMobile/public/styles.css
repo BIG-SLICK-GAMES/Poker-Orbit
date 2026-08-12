@@ -1066,42 +1066,11 @@ h2 {
   aspect-ratio: 1;
   border: 0;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 50%, #28140b 0 12%, transparent 12.3%),
-    radial-gradient(circle, rgba(255, 233, 133, 0.12), rgba(23, 10, 22, 0.9) 58%, #090407);
-  box-shadow:
-    0 0 42px rgba(255, 233, 133, 0.24),
-    0 30px 70px rgba(0, 0, 0, 0.62),
-    inset 0 0 0 2px rgba(255, 255, 255, 0.22);
-  overflow: hidden;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
   transform: rotate(0deg);
   will-change: transform;
-}
-
-.bonus-wheel-disc::before {
-  content: "";
-  position: absolute;
-  inset: 12%;
-  z-index: 2;
-  border: 3px solid rgba(255, 233, 133, 0.92);
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 2px rgba(38, 26, 22, 0.72),
-    inset 0 0 18px rgba(0, 0, 0, 0.42);
-}
-
-.bonus-wheel-disc::after {
-  content: "";
-  position: absolute;
-  inset: 42%;
-  z-index: 4;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 38% 26%, rgba(255, 255, 255, 0.72), transparent 28%),
-    linear-gradient(145deg, #ffe985, #d88919 60%, #7e2a0e);
-  box-shadow:
-    0 0 0 4px rgba(38, 26, 22, 0.76),
-    0 0 24px rgba(255, 233, 133, 0.48);
 }
 
 .bonus-wheel-segment {
@@ -1114,7 +1083,7 @@ h2 {
   display: block;
   color: #fffef7;
   opacity: 0;
-  transform: rotate(var(--segment-start)) scale(0.08);
+  transform: rotate(var(--segment-start)) scale(0);
   transform-origin: 50% 50%;
 }
 
@@ -1165,7 +1134,7 @@ h2 {
 
 .bonus-wheel-segment.building {
   opacity: 1;
-  animation: wheel-slice-build 150ms cubic-bezier(0.18, 1.22, 0.22, 1) both;
+  animation: wheel-slice-build 260ms cubic-bezier(0.18, 1.22, 0.22, 1) both;
 }
 
 .bonus-wheel-segment.built {
@@ -2630,12 +2599,15 @@ body[data-theme] .dice-pip {
 @keyframes wheel-slice-build {
   0% {
     opacity: 0;
-    transform: rotate(var(--segment-start)) scale(0.08);
-    filter: brightness(1.9) saturate(1.4);
+    transform: rotate(var(--segment-start)) scale(0);
+    filter: brightness(2.1) saturate(1.45);
   }
-  68% {
+  58% {
     opacity: 1;
-    transform: rotate(var(--segment-start)) scale(1.045);
+    transform: rotate(var(--segment-start)) scale(1.11);
+  }
+  82% {
+    transform: rotate(var(--segment-start)) scale(0.96);
   }
   100% {
     opacity: 1;

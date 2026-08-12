@@ -227,13 +227,14 @@ async function buildWheelSegments(segments) {
 
   for (const index of buildOrder) {
     segments[index].classList.add("building", "lit");
-    await wait(reducedMotion ? 0 : 28);
-    segments[index].classList.remove("building");
     segments[index].classList.add("built");
-    segments[index].classList.remove("lit");
+    window.setTimeout(() => {
+      segments[index]?.classList.remove("building", "lit");
+    }, reducedMotion ? 0 : 260);
+    await wait(reducedMotion ? 0 : 32);
   }
 
-  await wait(reducedMotion ? 0 : 160);
+  await wait(reducedMotion ? 0 : 300);
 
   for (let index = 0; index < segments.length; index += 1) {
     segments[index].classList.add("labeling", "lit");
