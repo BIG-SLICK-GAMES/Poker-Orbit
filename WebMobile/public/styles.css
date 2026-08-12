@@ -92,7 +92,11 @@ body {
   margin: 0;
   min-height: 100vh;
   min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
+  display: grid;
+  place-items: center;
   padding-top: max(env(safe-area-inset-top), 0px);
   padding-right: max(env(safe-area-inset-right), 0px);
   padding-bottom: max(env(safe-area-inset-bottom), 0px);
@@ -119,8 +123,6 @@ body {
 
 @media (min-width: 760px) and (min-height: 680px) {
   body {
-    display: grid;
-    place-items: center;
     padding: 24px;
     background:
       radial-gradient(circle at 50% 20%, rgba(255, 243, 207, 0.12), transparent 28%),
@@ -129,14 +131,6 @@ body {
       linear-gradient(155deg, #170a16, var(--bsg-bg) 52%, #052f32);
   }
 
-  .app-shell {
-    height: min(932px, calc(100dvh - 48px));
-    max-width: calc(100vw - 48px);
-    aspect-ratio: 9 / 19.5;
-    border-radius: 0;
-    overflow: hidden;
-    box-shadow: none;
-  }
 }
 
 button,
@@ -160,13 +154,22 @@ select:focus-visible {
 }
 
 .app-shell {
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
+  width: min(100vw, 430px, calc(100dvh * 9 / 19.5));
+  height: min(100vh, 932px, calc(100vw * 19.5 / 9));
+  height: min(100dvh, 932px, calc(100vw * 19.5 / 9));
+  aspect-ratio: 9 / 19.5;
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  contain: layout paint;
+  contain: layout paint size;
+  container-type: size;
+}
+
+@media (min-width: 760px) and (min-height: 680px) {
+  .app-shell {
+    width: min(430px, calc(100vw - 48px), calc((100dvh - 48px) * 9 / 19.5));
+    height: min(932px, calc(100dvh - 48px), calc((100vw - 48px) * 19.5 / 9));
+  }
 }
 
 .app-shell::before {
@@ -185,7 +188,7 @@ select:focus-visible {
   inset: 0;
   display: none;
   min-height: 0;
-  padding: clamp(14px, 4vw, 28px);
+  padding: clamp(14px, 4cqw, 28px);
   animation: screen-in 180ms ease;
 }
 
@@ -200,9 +203,9 @@ select:focus-visible {
 .settings-over-game .settings-screen.active {
   inset: 10px;
   z-index: 50;
-  width: min(430px, calc(100vw - 20px));
-  height: calc(100dvh - 20px);
-  max-height: calc(100dvh - 20px);
+  width: calc(100cqw - 20px);
+  height: calc(100cqh - 20px);
+  max-height: calc(100cqh - 20px);
   margin-left: auto;
   padding: 10px;
   border: 1px solid rgba(255, 243, 207, 0.38);
@@ -227,7 +230,7 @@ select:focus-visible {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(20px, 5vh, 36px);
+  gap: clamp(20px, 5cqh, 36px);
   text-align: center;
   background:
     linear-gradient(90deg, transparent 0 46%, rgba(255, 243, 207, 0.08) 46% 54%, transparent 54%),
@@ -235,7 +238,7 @@ select:focus-visible {
 }
 
 .brand-mark {
-  width: clamp(112px, 34vw, 170px);
+  width: clamp(112px, 34cqw, 170px);
   aspect-ratio: 1;
   display: grid;
   place-items: center;
@@ -253,7 +256,7 @@ select:focus-visible {
 
 .brand-mark span {
   color: var(--diner-cream);
-  font-size: clamp(2rem, 10vw, 3.4rem);
+  font-size: clamp(2rem, 10cqw, 3.4rem);
   font-weight: 900;
   text-shadow:
     2px 2px 0 var(--diner-red-dark),
@@ -276,7 +279,7 @@ p {
 }
 
 h1 {
-  font-size: clamp(2.45rem, 12vw, 4.8rem);
+  font-size: clamp(2.45rem, 12cqw, 4.8rem);
   line-height: 0.94;
   color: var(--diner-cream);
   text-shadow:
@@ -285,7 +288,7 @@ h1 {
 }
 
 h2 {
-  font-size: clamp(1.35rem, 5.6vw, 2.4rem);
+  font-size: clamp(1.35rem, 5.6cqw, 2.4rem);
   line-height: 1;
   color: var(--diner-cream);
   text-shadow: 2px 2px 0 rgba(95, 23, 20, 0.72);
@@ -366,7 +369,6 @@ h2 {
 
 .perspective-table[data-control] {
   transform:
-    translateX(calc((100vw - 100%) / 2))
     translate(var(--control-x), var(--control-y))
     translate(var(--camera-x, 0%), var(--camera-y, 0%))
     rotate(var(--camera-rotation, 0deg))
@@ -506,7 +508,7 @@ h2 {
 
 .game-screen {
   flex-direction: column;
-  gap: clamp(8px, 2vw, 14px);
+  gap: clamp(8px, 2cqw, 14px);
 }
 
 .board-stage {
@@ -533,7 +535,7 @@ h2 {
 
 .perspective-table {
   position: relative;
-  width: min(220vw, 160dvh, 1720px);
+  width: min(220cqw, 160cqh, 1720px);
   aspect-ratio: 1;
   display: grid;
   place-items: center;
@@ -560,7 +562,7 @@ h2 {
 }
 
 .board-stage[data-camera-mode="table-wide"] .perspective-table {
-  width: min(132vw, 96dvh, 1320px);
+  width: min(132cqw, 96cqh, 1320px);
 }
 
 .perspective-table::after {
@@ -645,8 +647,8 @@ h2 {
 
 .board-card {
   position: absolute;
-  width: clamp(38px, 7.8vw, 68px);
-  height: clamp(56px, 11.2vw, 100px);
+  width: clamp(38px, 7.8cqw, 68px);
+  height: clamp(56px, 11.2cqw, 100px);
   display: grid;
   place-items: center;
   gap: 1px;
@@ -656,7 +658,7 @@ h2 {
   background:
     linear-gradient(180deg, #fffef7, var(--diner-cream));
   color: var(--ink);
-  font-size: clamp(0.56rem, 1.65vw, 0.92rem);
+  font-size: clamp(0.56rem, 1.65cqw, 0.92rem);
   font-weight: 900;
   line-height: 1;
   box-shadow:
@@ -758,7 +760,7 @@ h2 {
   position: absolute;
   z-index: 1;
   border-radius: 50%;
-  border: clamp(13px, 3.1vw, 28px) solid rgba(255, 243, 207, 0.88);
+  border: clamp(13px, 3.1cqw, 28px) solid rgba(255, 243, 207, 0.88);
   box-shadow:
     inset 0 0 0 6px rgba(184, 32, 28, 0.42),
     0 0 26px rgba(255, 243, 207, 0.24);
@@ -832,7 +834,7 @@ h2 {
     radial-gradient(circle at 50% 20%, #ffffff, transparent 26%),
     linear-gradient(180deg, #ffe985, #f6c453 54%, #b8201c);
   color: #39140f;
-  font-size: clamp(0.9rem, 3vw, 1.25rem);
+  font-size: clamp(0.9rem, 3cqw, 1.25rem);
   font-weight: 900;
   line-height: 1;
   text-transform: uppercase;
@@ -903,12 +905,12 @@ h2 {
 }
 
 .featured-card-main span {
-  font-size: clamp(1.5rem, 8vw, 2.45rem);
+  font-size: clamp(1.5rem, 8cqw, 2.45rem);
   font-weight: 900;
 }
 
 .featured-card-main strong {
-  font-size: clamp(2.3rem, 12vw, 3.85rem);
+  font-size: clamp(2.3rem, 12cqw, 3.85rem);
   line-height: 0.82;
 }
 
@@ -936,7 +938,7 @@ h2 {
 .featured-card-stats dt {
   color: rgba(38, 26, 22, 0.58);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: clamp(0.44rem, 1.7vw, 0.56rem);
+  font-size: clamp(0.44rem, 1.7cqw, 0.56rem);
   font-weight: 900;
   line-height: 1;
   text-transform: uppercase;
@@ -944,7 +946,7 @@ h2 {
 
 .featured-card-stats dd {
   color: var(--ink);
-  font-size: clamp(0.64rem, 2.4vw, 0.82rem);
+  font-size: clamp(0.64rem, 2.4cqw, 0.82rem);
   font-weight: 900;
   line-height: 1.05;
 }
@@ -1071,7 +1073,7 @@ h2 {
   z-index: 33;
   display: grid;
   place-items: center;
-  width: min(82vw, 420px);
+  width: min(82cqw, 420px);
   pointer-events: auto;
   transform: translate(-50%, -50%) scale(0.72);
   animation: bonus-slot-pop 320ms cubic-bezier(0.18, 1.22, 0.22, 1) both;
@@ -1087,7 +1089,7 @@ h2 {
   aspect-ratio: 1.24;
   display: grid;
   place-items: center;
-  border: clamp(5px, 1.5vw, 9px) solid #fff1b7;
+  border: clamp(5px, 1.5cqw, 9px) solid #fff1b7;
   border-radius: 28px;
   background:
     radial-gradient(circle at 32% 18%, rgba(255, 255, 255, 0.28), transparent 20%),
@@ -1105,7 +1107,7 @@ h2 {
   left: 50%;
   top: -104px;
   z-index: 8;
-  width: min(96vw, 360px);
+  width: min(96cqw, 360px);
   min-height: 76px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 32px;
@@ -1136,7 +1138,7 @@ h2 {
 }
 
 .bonus-prize-info strong {
-  font-size: clamp(0.9rem, 3vw, 1.12rem);
+  font-size: clamp(0.9rem, 3cqw, 1.12rem);
   font-weight: 900;
   line-height: 1;
   text-transform: uppercase;
@@ -1144,7 +1146,7 @@ h2 {
 
 .bonus-prize-info span {
   color: rgba(255, 243, 207, 0.82);
-  font-size: clamp(0.64rem, 2.3vw, 0.78rem);
+  font-size: clamp(0.64rem, 2.3cqw, 0.78rem);
   font-weight: 800;
   line-height: 1.1;
 }
@@ -1177,7 +1179,7 @@ h2 {
 .bonus-slot-machine[data-prize="shield"] .bonus-slot-symbol.final b,
 .bonus-slot-machine[data-prize="steal"] .bonus-slot-symbol.final b,
 .bonus-slot-machine[data-prize="spin-again"] .bonus-slot-symbol.final b {
-  font-size: clamp(0.82rem, 3.6vw, 1.5rem);
+  font-size: clamp(0.82rem, 3.6cqw, 1.5rem);
 }
 
 .bonus-slot-machine[data-prize="bankruptcy"] .bonus-slot-symbol.final b {
@@ -1209,7 +1211,7 @@ h2 {
     radial-gradient(circle at 50% 24%, rgba(255, 255, 255, 0.5), transparent 28%),
     linear-gradient(180deg, #ffe985, #d88919 64%, #8a3a0e);
   color: #3f0c1b;
-  font-size: clamp(1.25rem, 5.2vw, 2.15rem);
+  font-size: clamp(1.25rem, 5.2cqw, 2.15rem);
   font-weight: 900;
   line-height: 1;
   text-align: center;
@@ -1226,8 +1228,8 @@ h2 {
   height: 34%;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(7px, 2vw, 12px);
-  padding: clamp(8px, 2.4vw, 13px);
+  gap: clamp(7px, 2cqw, 12px);
+  padding: clamp(8px, 2.4cqw, 13px);
   border: 4px solid #2a140b;
   border-radius: 16px;
   background:
@@ -1285,7 +1287,7 @@ h2 {
 
 .bonus-slot-symbol b {
   max-width: 100%;
-  font-size: clamp(1.2rem, 6.2vw, 2.45rem);
+  font-size: clamp(1.2rem, 6.2cqw, 2.45rem);
   font-weight: 900;
   line-height: 0.88;
   text-shadow:
@@ -1296,7 +1298,7 @@ h2 {
 .bonus-slot-symbol small {
   max-width: 100%;
   color: #741324;
-  font-size: clamp(0.46rem, 1.8vw, 0.72rem);
+  font-size: clamp(0.46rem, 1.8cqw, 0.72rem);
   font-weight: 900;
   line-height: 0.9;
   text-transform: uppercase;
@@ -1408,7 +1410,7 @@ h2 {
     linear-gradient(180deg, rgba(255, 255, 255, 0.24), transparent 44%),
     linear-gradient(180deg, var(--diner-red), var(--diner-red-dark));
   color: var(--diner-cream);
-  font-size: clamp(0.76rem, 3vw, 1.05rem);
+  font-size: clamp(0.76rem, 3cqw, 1.05rem);
   font-weight: 900;
   line-height: 1;
   text-align: center;
@@ -1426,11 +1428,11 @@ h2 {
 
 .player-token {
   position: absolute;
-  width: clamp(25px, 6.3vw, 48px);
-  height: clamp(31px, 7.8vw, 60px);
+  width: clamp(25px, 6.3cqw, 48px);
+  height: clamp(31px, 7.8cqw, 60px);
   display: block;
   color: #ffffff;
-  font-size: clamp(0.5rem, 1.45vw, 0.72rem);
+  font-size: clamp(0.5rem, 1.45cqw, 0.72rem);
   font-weight: 900;
   transform-style: preserve-3d;
   perspective: 240px;
@@ -2981,19 +2983,19 @@ body[data-theme] .dice-pip {
   }
 
   .board-stage {
-    min-height: 52dvh;
+    min-height: 52cqh;
     border-radius: 6px;
     perspective: 760px;
     place-items: center;
   }
 
   .perspective-table {
-    width: min(232vw, 134dvh, 1260px);
+    width: min(232cqw, 134cqh, 1260px);
     justify-self: center;
   }
 
   .board-stage[data-camera-mode="table-wide"] .perspective-table {
-    width: min(136vw, 82dvh, 820px);
+    width: min(136cqw, 82cqh, 820px);
   }
 
   .board-stage[data-camera-mode="turn-focus"] {
@@ -3182,17 +3184,17 @@ body[data-theme] .dice-pip {
   }
 
   .featured-card-actions {
-    width: min(92vw, 310px) !important;
-    left: 4vw !important;
+    width: min(92cqw, 310px) !important;
+    left: 4cqw !important;
   }
 
   .bonus-slot-overlay {
-    width: min(92vw, 360px);
+    width: min(92cqw, 360px);
   }
 
   .bonus-prize-info {
     top: -92px;
-    width: min(94vw, 330px);
+    width: min(94cqw, 330px);
   }
 
   .bonus-slot-window {
@@ -3212,7 +3214,7 @@ body[data-theme] .dice-pip {
 
   @keyframes bonus-card-slide {
     to {
-      transform: translateX(31vw) translateY(-24vh) rotateY(360deg) rotateZ(12deg) translateZ(140px) scale(0.4);
+      transform: translateX(31cqw) translateY(-24cqh) rotateY(360deg) rotateZ(12deg) translateZ(140px) scale(0.4);
       opacity: 0.9;
     }
   }
@@ -3220,7 +3222,7 @@ body[data-theme] .dice-pip {
 
 @media (min-width: 760px) {
   .screen {
-    padding: clamp(22px, 4vw, 44px);
+    padding: clamp(22px, 4cqw, 44px);
   }
 
   .lobby-screen {
@@ -3287,18 +3289,18 @@ body[data-theme] .dice-pip {
   }
 
   .board-stage {
-    min-height: 52dvh;
+    min-height: 52cqh;
     perspective: 760px;
     place-items: center;
   }
 
   .perspective-table {
-    width: min(232vw, 134dvh, 1260px);
+    width: min(232cqw, 134cqh, 1260px);
     justify-self: center;
   }
 
   .board-stage[data-camera-mode="table-wide"] .perspective-table {
-    width: min(136vw, 82dvh, 820px);
+    width: min(136cqw, 82cqh, 820px);
   }
 
   .board-stage[data-camera-mode="turn-focus"] {
@@ -3412,11 +3414,11 @@ body[data-theme] .dice-pip {
   }
 
   .perspective-table {
-    width: min(154vw, 170dvh, 1560px);
+    width: min(154cqw, 170cqh, 1560px);
   }
 
   .board-stage[data-camera-mode="table-wide"] .perspective-table {
-    width: min(96vw, 106dvh, 1180px);
+    width: min(96cqw, 106cqh, 1180px);
   }
 
   .board-card {
