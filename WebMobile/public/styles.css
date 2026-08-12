@@ -1049,7 +1049,7 @@ h2 {
   display: grid;
   place-items: center;
   width: min(82vw, 420px);
-  pointer-events: none;
+  pointer-events: auto;
   transform: translate(-50%, -50%) scale(0.72);
   animation: bonus-slot-pop 320ms cubic-bezier(0.18, 1.22, 0.22, 1) both;
 }
@@ -1074,6 +1074,79 @@ h2 {
     inset 0 -12px 28px rgba(0, 0, 0, 0.34),
     0 20px 34px rgba(0, 0, 0, 0.48),
     0 0 26px rgba(255, 233, 133, 0.28);
+  pointer-events: none;
+}
+
+.bonus-prize-info {
+  position: absolute;
+  left: 50%;
+  top: -104px;
+  z-index: 8;
+  width: min(96vw, 360px);
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px;
+  align-items: center;
+  gap: 3px 10px;
+  padding: 10px 10px 10px 14px;
+  border: 2px solid rgba(255, 243, 207, 0.88);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 42%),
+    linear-gradient(135deg, #3f0c1b, #150807);
+  color: var(--diner-cream);
+  box-shadow:
+    0 5px 0 rgba(38, 26, 22, 0.8),
+    0 16px 28px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: translateX(-50%) translateY(8px) scale(0.94);
+}
+
+.bonus-slot-overlay.resolved .bonus-prize-info {
+  animation: bonus-prize-info-in 240ms cubic-bezier(0.18, 1.22, 0.22, 1) both;
+}
+
+.bonus-prize-info strong,
+.bonus-prize-info span {
+  min-width: 0;
+  grid-column: 1;
+}
+
+.bonus-prize-info strong {
+  font-size: clamp(0.9rem, 3vw, 1.12rem);
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.bonus-prize-info span {
+  color: rgba(255, 243, 207, 0.82);
+  font-size: clamp(0.64rem, 2.3vw, 0.78rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.bonus-prize-close {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(38, 26, 22, 0.82);
+  border-radius: 50%;
+  background:
+    linear-gradient(180deg, #fffef7, var(--diner-cream));
+  color: #3f0c1b;
+  font-size: 0.88rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 3px 0 rgba(38, 26, 22, 0.72);
+}
+
+.bonus-prize-close:disabled {
+  cursor: wait;
+  opacity: 0.45;
 }
 
 .bonus-slot-machine[data-prize="bogo"] .bonus-slot-symbol.final b,
@@ -1835,15 +1908,18 @@ h2 {
   grid-row: 1 / span 2;
   align-self: stretch;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 5px;
+  grid-template-columns: repeat(3, minmax(42px, 1fr));
+  gap: 6px;
+  min-width: 148px;
 }
 
 .bonus-slot {
   min-width: 0;
+  min-height: 100%;
+  aspect-ratio: 1;
   display: grid;
   place-items: center;
-  padding: 3px;
+  padding: 4px;
   border: 2px dashed rgba(255, 243, 207, 0.42);
   border-radius: 7px;
   background:
@@ -1903,8 +1979,8 @@ h2 {
 }
 
 .bonus-slot-icon img {
-  width: 100%;
-  height: 100%;
+  width: 96%;
+  height: 96%;
   object-fit: contain;
   image-rendering: auto;
   border-radius: 0;
@@ -2010,7 +2086,8 @@ h2 {
   display: flex;
   gap: 6px;
   overflow-x: auto;
-  min-height: clamp(62px, 17vw, 82px);
+  height: clamp(70px, 17vw, 88px);
+  min-height: clamp(70px, 17vw, 88px);
   align-items: center;
   padding: 2px 2px 7px;
   -webkit-overflow-scrolling: touch;
@@ -2031,8 +2108,10 @@ h2 {
 
 .mini-card {
   flex: 0 0 auto;
-  width: clamp(40px, 12vw, 58px);
-  aspect-ratio: 0.68;
+  width: clamp(38px, 10.6vw, 54px);
+  height: calc(100% - 10px);
+  max-height: 72px;
+  aspect-ratio: auto;
   display: grid;
   place-items: center;
   gap: 2px;
@@ -2046,6 +2125,29 @@ h2 {
   box-shadow:
     0 2px 0 rgba(255, 255, 255, 0.45),
     0 8px 18px rgba(0, 0, 0, 0.32);
+}
+
+.rp-fly-chip {
+  position: fixed;
+  z-index: 80;
+  min-width: 58px;
+  padding: 6px 10px;
+  border: 2px solid rgba(255, 243, 207, 0.92);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.58), transparent 28%),
+    linear-gradient(180deg, #ffe985, #d88919 62%, #7e2a0e);
+  color: #27130d;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.72);
+  box-shadow:
+    0 4px 0 rgba(38, 26, 22, 0.76),
+    0 10px 18px rgba(0, 0, 0, 0.34);
+  animation: rp-fly-to-total 720ms cubic-bezier(0.16, 0.84, 0.22, 1) both;
 }
 
 .mini-card strong {
@@ -2733,6 +2835,33 @@ body[data-theme] .dice-pip {
   }
 }
 
+@keyframes bonus-prize-info-in {
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes rp-fly-to-total {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.58);
+  }
+  16% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+  100% {
+    opacity: 0;
+    transform:
+      translate(
+        calc(-50% + var(--rp-target-x, 0px)),
+        calc(-50% + var(--rp-target-y, 0px))
+      )
+      scale(0.72);
+  }
+}
+
 @keyframes bonus-reel-spin {
   from {
     transform: translateY(-100%);
@@ -2890,7 +3019,7 @@ body[data-theme] .dice-pip {
   }
 
   .slot-reel {
-    grid-template-columns: 54px minmax(76px, 1fr) 60px minmax(72px, 0.92fr);
+    grid-template-columns: 50px minmax(72px, 1fr) 56px minmax(142px, 1.15fr);
     grid-template-rows: 18px 36px;
     gap: 4px 5px;
     margin-bottom: 4px;
@@ -2958,9 +3087,11 @@ body[data-theme] .dice-pip {
 
   .bonus-slots {
     gap: 3px;
+    min-width: 132px;
   }
 
   .bonus-slot {
+    aspect-ratio: 1;
     border-width: 1px;
     border-radius: 5px;
     font-size: 0.4rem;
@@ -2973,11 +3104,15 @@ body[data-theme] .dice-pip {
 
   .card-hand {
     gap: 4px;
+    height: 62px;
+    min-height: 62px;
     padding-bottom: 4px;
   }
 
   .mini-card {
     width: clamp(30px, 9.6vw, 40px);
+    height: calc(100% - 8px);
+    max-height: 54px;
     border-radius: 6px;
   }
 
@@ -3030,6 +3165,11 @@ body[data-theme] .dice-pip {
 
   .bonus-slot-overlay {
     width: min(92vw, 360px);
+  }
+
+  .bonus-prize-info {
+    top: -92px;
+    width: min(94vw, 330px);
   }
 
   .bonus-slot-window {
@@ -3086,7 +3226,7 @@ body[data-theme] .dice-pip {
   }
 
   .slot-reel {
-    grid-template-columns: 92px minmax(152px, 1fr) 118px;
+    grid-template-columns: 92px minmax(152px, 1fr) 118px minmax(160px, 0.86fr);
     gap: 7px 10px;
   }
 

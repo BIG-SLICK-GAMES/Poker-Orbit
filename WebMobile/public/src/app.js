@@ -164,6 +164,7 @@ createSlotReelModule({
   onRollComplete: ({ total }) => {
     window.clearTimeout(pendingNextTurnTimer);
     awaitingLandingDecision = false;
+    animateRollPointsGain(total);
     turnModule.completeCurrentRoll(total);
   }
 });
@@ -203,6 +204,7 @@ let suppressNextTurnFocus = false;
 let boardViewMode = "zoom";
 let currentScreen = "splash";
 let previousScreen = "lobby";
+let paidBonusSpinUsedThisTurn = false;
 const playerBonuses = Array.from({ length: 4 }, () => []);
 
 createBoardCards();
@@ -576,6 +578,29 @@ function applyThemeColors(colors) {
   });
 }
 
+function animateRollPointsGain(amount) {
+  if (!rollPointsLabel || shell.classList.contains("reduce-motion")) {
+    return;
+  }
+
+  const normalizedAmount = Number.isFinite(amount) ? Math.max(0, Math.trunc(amount)) : 0;
+  if (!normalizedAmount) {
+    return;
+  }
+
+  const targetRect = rollPointsLabel.getBoundingClientRect();
+  const sourceRect = slotRollButton?.getBoundingClientRect() || rollButton?.getBoundingClientRect() || targetRect;
+  const chip = document.createElement("span");
+  chip.className = "rp-fly-chip";
+  chip.textContent = `+${normalizedAmount} RP`;
+  chip.style.left = `${sourceRect.left + (sourceRect.width / 2)}px`;
+  chip.style.top = `${sourceRect.top + (sourceRect.height / 2)}px`;
+  chip.style.setProperty("--rp-target-x", `${targetRect.left + (targetRect.width / 2) - sourceRect.left - (sourceRect.width / 2)}px`);
+  chip.style.setProperty("--rp-target-y", `${targetRect.top + (targetRect.height / 2) - sourceRect.top - (sourceRect.height / 2)}px`);
+  document.body.append(chip);
+  chip.addEventListener("animationend", () => chip.remove(), { once: true });
+}
+
 function saveTheme(themeName) {
   localStorage.setItem(themeStorageKey, JSON.stringify({
     name: themeName,
@@ -773,7 +798,8 @@ function canSpinForBoardCard(cardElement) {
 
   const playerIndex = turnModule.getState().currentPlayer;
   const currentRollPoints = turnModule.getState().playerRollPoints[playerIndex];
-  return currentRollPoints >= getBoardCardCost(cardElement);
+  return (!paidBonusSpinUsedThisTurn && currentRollPoints >= getBoardCardCost(cardElement))
+    || hasBonusSpinCard(playerIndex);
 }
 
 function spinForBoardCard(cardElement, promptControls, options = {}) {
@@ -783,11 +809,25 @@ function spinForBoardCard(cardElement, promptControls, options = {}) {
 
   const spinCost = getBoardCardCost(cardElement);
   const isFreeSpin = Boolean(options.freeSpin);
+  const playerIndex = turnModule.getState().currentPlayer;
 
-  if (!isFreeSpin && !turnModule.spendCurrentPlayerRollPoints(spinCost)) {
-    promptControls.setStatus(`Need ${spinCost} RP`);
-    promptControls.setSpinEnabled();
-    return;
+  if (!isFreeSpin) {
+    if (paidBonusSpinUsedThisTurn) {
+      if (!consumeBonusSpinCard(playerIndex)) {
+        promptControls.setStatus("Bonus spin already used");
+        promptControls.setSpinEnabled();
+        return;
+      }
+      promptControls.setStatus("Free Roll bonus used");
+    } else if (turnModule.spendCurrentPlayerRollPoints(spinCost)) {
+      paidBonusSpinUsedThisTurn = true;
+    } else if (consumeBonusSpinCard(playerIndex)) {
+      promptControls.setStatus("Free Roll bonus used");
+    } else {
+      promptControls.setStatus(`Need ${spinCost} RP`);
+      promptControls.setSpinEnabled();
+      return;
+    }
   }
 
   const prizes = buildBonusSlotPrizes();
@@ -883,6 +923,23 @@ function addBonusToCurrentPlayer(label) {
 
   inventory.push(label);
   renderBonusSlots(playerIndex);
+}
+
+function hasBonusSpinCard(playerIndex = turnModule.getState().currentPlayer) {
+  return (playerBonuses[playerIndex] || []).includes("Free Roll");
+}
+
+function consumeBonusSpinCard(playerIndex = turnModule.getState().currentPlayer) {
+  const inventory = playerBonuses[playerIndex] || [];
+  const bonusIndex = inventory.indexOf("Free Roll");
+
+  if (bonusIndex === -1) {
+    return false;
+  }
+
+  inventory.splice(bonusIndex, 1);
+  renderBonusSlots(playerIndex);
+  return true;
 }
 
 function renderBonusSlots(playerIndex = turnModule.getState().currentPlayer) {
@@ -1079,13 +1136,17 @@ function renderTurnState(turnState) {
     && previousActiveBoardIndex !== undefined
     && previousActiveBoardIndex !== activeBoardIndex;
 
+  if (!lastRenderedTurnState || didActiveTurnChange) {
+    paidBonusSpinUsedThisTurn = false;
+  }
+
   perspectiveTable.dataset.currentPlayer = String(turnState.currentPlayerNumber);
   currentTurnLabel.textContent = `Player ${turnState.currentPlayerNumber} turn`;
   rollPointsLabel.textContent = String(currentRollPoints);
   landingCostLabel.textContent = `Spin cost ${currentLandingCost} RP`;
   purchaseAuctionModule.setActivePlayer(activePlayerIndex);
   renderBonusSlots(activePlayerIndex);
-  slotReelRoot.classList.toggle("spin-ready", currentRollPoints >= currentLandingCost);
+  slotReelRoot.classList.toggle("spin-ready", (!paidBonusSpinUsedThisTurn && currentRollPoints >= currentLandingCost) || hasBonusSpinCard(activePlayerIndex));
 
   document.querySelectorAll(".seat-marker").forEach((seat) => {
     seat.classList.toggle("active", Number(seat.dataset.seat) === turnState.currentPlayer);

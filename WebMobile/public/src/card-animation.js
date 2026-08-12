@@ -15,7 +15,7 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
     const targetTop = Math.max(72, (window.innerHeight - targetHeight) * 0.34);
     const controls = document.createElement("div");
     const clone = cardElement.cloneNode(true);
-    clone.classList.add("featured-card-flight");
+    clone.className = `featured-card-flight ${getFeaturedCardClasses(cardElement)}`;
     clone.removeAttribute("data-control");
     clone.removeAttribute("aria-label");
     clone.innerHTML = getFeaturedCardMarkup(cardElement);
@@ -61,9 +61,10 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
       clone.classList.remove("waiting-purchase");
       await runBonusSlotReels(slotOverlay.reels);
       slotOverlay.root.classList.add("resolved");
+      slotOverlay.closeButton.disabled = false;
       setStatus(prize.label);
       onComplete?.(prize);
-      await wait(780);
+      await slotOverlay.dismissed;
       slotOverlay.root.classList.add("leaving");
       await wait(260);
       slotOverlay.root.remove();
@@ -150,9 +151,18 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
           top: `${sourceRect.top - 72}px`,
           width: `${sourceRect.width * 1.4}px`,
           height: `${sourceRect.height * 1.4}px`,
-          transform: "rotateY(150deg) rotateZ(-14deg) translateZ(80px) scale(1.15)",
+          transform: "rotateY(0deg) rotateZ(-8deg) translateZ(80px) scale(1.15)",
           opacity: 1,
-          offset: 0.42
+          offset: 0.32
+        },
+        {
+          left: `${sourceRect.left + sourceRect.width * 0.35}px`,
+          top: `${sourceRect.top - 86}px`,
+          width: `${sourceRect.width * 1.46}px`,
+          height: `${sourceRect.height * 1.46}px`,
+          transform: "rotateY(150deg) rotateZ(-14deg) translateZ(100px) scale(1.12)",
+          opacity: 1,
+          offset: 0.56
         },
         {
           left: `${targetLeft}px`,
@@ -192,8 +202,17 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
 function createBonusSlotMachineElement(prize) {
   const root = document.createElement("div");
   const symbol = getPrizeSymbol(prize);
+  let resolveDismissed;
+  const dismissed = new Promise((resolve) => {
+    resolveDismissed = resolve;
+  });
   root.className = "bonus-slot-overlay";
   root.innerHTML = `
+    <aside class="bonus-prize-info" aria-live="polite">
+      <button class="bonus-prize-close" type="button" aria-label="Close prize details">X</button>
+      <strong>${prize.label}</strong>
+      <span>${getPrizeDescription(prize)}</span>
+    </aside>
     <div class="bonus-slot-machine" data-prize="${prize.type}">
       <div class="bonus-slot-sign">BONUS</div>
       <div class="bonus-slot-window" aria-hidden="true">
@@ -211,7 +230,16 @@ function createBonusSlotMachineElement(prize) {
     </div>
     <strong class="bonus-slot-result">${prize.label}</strong>
   `;
-  return { root, reels: [...root.querySelectorAll(".bonus-slot-reel")] };
+  const closeButton = root.querySelector(".bonus-prize-close");
+  closeButton.disabled = true;
+  closeButton.addEventListener("click", () => resolveDismissed());
+  return { root, reels: [...root.querySelectorAll(".bonus-slot-reel")], closeButton, dismissed };
+}
+
+function getFeaturedCardClasses(cardElement) {
+  return ["red", "black", "wild", "mystery"]
+    .filter((className) => cardElement.classList.contains(className))
+    .join(" ");
 }
 
 function wait(ms) {
@@ -276,6 +304,24 @@ function getPrizeSymbol(prize) {
   };
 
   return symbols[prize.type] || { icon: "7", label: "BONUS" };
+}
+
+function getPrizeDescription(prize) {
+  const descriptions = {
+    "free-card": "Claim the landed card without paying chips.",
+    discount: "Buy this landed card for half price.",
+    "no-win": "No bonus this spin.",
+    "spin-again": "Take one extra bonus spin for free.",
+    bogo: "Save a Buy 1 Get 1 50% Off bonus.",
+    pic: "Save a PIC card bonus for a future chosen roll.",
+    "free-roll": "Save a free roll bonus.",
+    rp: "Add 100 RP to your total.",
+    bankruptcy: "Lose all current RP.",
+    shield: "Save a shield bonus.",
+    steal: "Save a steal bonus."
+  };
+
+  return descriptions[prize.type] || "Bonus applied.";
 }
 
 function getFeaturedCardMarkup(cardElement) {
