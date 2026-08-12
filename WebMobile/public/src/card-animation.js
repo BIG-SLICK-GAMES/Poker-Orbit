@@ -8,26 +8,24 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
     }
 
     activeCardElement = cardElement;
-    const sourceRect = cardElement.getBoundingClientRect();
     const frameRect = getFrameRect(layer);
-    const sourceLeft = sourceRect.left - frameRect.left;
-    const sourceTop = sourceRect.top - frameRect.top;
     const targetWidth = Math.min(218, Math.max(172, frameRect.width * 0.52));
     const targetHeight = targetWidth * 1.46;
     const targetLeft = (frameRect.width - targetWidth) / 2;
     const targetTop = Math.max(72, (frameRect.height - targetHeight) * 0.34);
+    const entryLeft = frameRect.width + 28;
     const controls = document.createElement("div");
     const clone = cardElement.cloneNode(true);
     clone.className = `featured-card-flight ${getFeaturedCardClasses(cardElement)}`;
     clone.removeAttribute("data-control");
     clone.removeAttribute("aria-label");
     clone.innerHTML = getFeaturedCardMarkup(cardElement);
-    clone.style.left = `${sourceLeft}px`;
-    clone.style.top = `${sourceTop}px`;
-    clone.style.width = `${sourceRect.width}px`;
-    clone.style.height = `${sourceRect.height}px`;
+    clone.style.left = `${entryLeft}px`;
+    clone.style.top = `${targetTop}px`;
+    clone.style.width = `${targetWidth}px`;
+    clone.style.height = `${targetHeight}px`;
     clone.style.opacity = "0";
-    clone.style.transform = "rotateY(0deg) rotateZ(0deg) translateZ(0) scale(1)";
+    clone.style.transform = "rotateY(0deg) rotateZ(7deg) translateZ(0) scale(0.98)";
 
     controls.className = "featured-card-actions";
     controls.hidden = true;
@@ -133,52 +131,34 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
     activeAnimation = clone.animate(
       [
         {
-          left: `${sourceLeft}px`,
-          top: `${sourceTop}px`,
-          width: `${sourceRect.width}px`,
-          height: `${sourceRect.height}px`,
-          transform: "rotateY(0deg) rotateZ(0deg) translateZ(0) scale(1)",
+          left: `${entryLeft}px`,
+          top: `${targetTop}px`,
+          width: `${targetWidth}px`,
+          height: `${targetHeight}px`,
+          transform: "rotateY(0deg) rotateZ(7deg) translateZ(0) scale(0.98)",
           opacity: 0
         },
         {
-          left: `${sourceLeft}px`,
-          top: `${sourceTop}px`,
-          width: `${sourceRect.width}px`,
-          height: `${sourceRect.height}px`,
-          transform: "rotateY(0deg) rotateZ(0deg) translateZ(0) scale(1)",
-          opacity: 0.92,
-          offset: 0.08
-        },
-        {
-          left: `${sourceLeft + sourceRect.width * 0.2}px`,
-          top: `${sourceTop - 72}px`,
-          width: `${sourceRect.width * 1.4}px`,
-          height: `${sourceRect.height * 1.4}px`,
-          transform: "rotateY(0deg) rotateZ(-8deg) translateZ(80px) scale(1.15)",
+          left: `${targetLeft + 18}px`,
+          top: `${targetTop}px`,
+          width: `${targetWidth}px`,
+          height: `${targetHeight}px`,
+          transform: "rotateY(0deg) rotateZ(-2deg) translateZ(90px) scale(1.02)",
           opacity: 1,
-          offset: 0.32
-        },
-        {
-          left: `${sourceLeft + sourceRect.width * 0.35}px`,
-          top: `${sourceTop - 86}px`,
-          width: `${sourceRect.width * 1.46}px`,
-          height: `${sourceRect.height * 1.46}px`,
-          transform: "rotateY(150deg) rotateZ(-14deg) translateZ(100px) scale(1.12)",
-          opacity: 1,
-          offset: 0.56
+          offset: 0.78
         },
         {
           left: `${targetLeft}px`,
           top: `${targetTop}px`,
           width: `${targetWidth}px`,
           height: `${targetHeight}px`,
-          transform: "rotateY(360deg) rotateZ(4deg) translateZ(140px) scale(1)",
+          transform: "rotateY(0deg) rotateZ(4deg) translateZ(140px) scale(1)",
           opacity: 1
         }
       ],
       {
-        duration: 860,
-        easing: "cubic-bezier(0.16, 0.84, 0.22, 1)",
+        duration: 520,
+        easing: "cubic-bezier(0.18, 0.9, 0.22, 1)",
         fill: "forwards"
       }
     );
