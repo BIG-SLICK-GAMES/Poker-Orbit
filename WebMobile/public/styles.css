@@ -3765,10 +3765,14 @@ body[data-theme] .hand-panel.console-panel::after {
   max-width: none;
   height: 100%;
   aspect-ratio: auto;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
   border: 0;
   border-radius: 10px;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background:
     radial-gradient(circle at 36% 25%, rgba(255, 255, 255, 0.58), transparent 20%),
     linear-gradient(180deg, rgba(8, 41, 75, 0.98), rgba(1, 7, 18, 0.98));
@@ -3776,6 +3780,7 @@ body[data-theme] .hand-panel.console-panel::after {
   font-family: Arial, Helvetica, sans-serif;
   font-size: clamp(1.42rem, 5.5cqw, 2.55rem);
   line-height: 1;
+  text-align: center;
   overflow: visible;
   clip-path: none;
   text-shadow:
