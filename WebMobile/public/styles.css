@@ -3600,3 +3600,273 @@ body[data-theme] .dice-pip {
     inset 0 0 0 1px rgba(36, 216, 255, 0.18),
     0 0 16px rgba(36, 216, 255, 0.16);
 }
+
+/* Console art overlay: coordinates are percentages of the supplied 1752x990 frame. */
+.hand-panel {
+  position: relative;
+  width: 100%;
+  min-height: clamp(242px, 31cqh, 330px);
+  height: clamp(242px, 31cqh, 330px);
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: url("./assets/ui/bottom-console.png") center / 100% 100% no-repeat;
+  box-shadow:
+    0 0 26px rgba(36, 216, 255, 0.34),
+    0 0 38px rgba(255, 138, 28, 0.16),
+    0 18px 42px rgba(0, 0, 0, 0.5);
+}
+
+.hand-panel::before,
+.hand-panel::after {
+  content: none;
+}
+
+.turn-strip {
+  position: absolute;
+  left: 4.2%;
+  top: 3.7%;
+  width: 91.6%;
+  height: 9.2%;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  color: rgba(204, 248, 255, 0.9);
+  font-size: clamp(0.58rem, 1.55cqw, 0.82rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-shadow:
+    0 0 8px rgba(36, 216, 255, 0.92),
+    0 1px 0 rgba(0, 0, 0, 0.9);
+}
+
+.slot-reel {
+  position: absolute;
+  inset: 0;
+  display: block;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  clip-path: none;
+  pointer-events: none;
+}
+
+.slot-reel > * {
+  pointer-events: auto;
+}
+
+.doubles-lamp,
+.rp-meter,
+.slot-machine,
+.slot-roll-btn,
+.bonus-slots,
+.economy-strip,
+.card-hand {
+  position: absolute;
+  margin: 0;
+}
+
+.doubles-lamp {
+  left: 5.2%;
+  top: 15.6%;
+  width: 12.6%;
+  height: 8%;
+  min-height: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(4, 8, 18, 0.34);
+  color: rgba(255, 178, 70, 0.78);
+  font-size: clamp(0.48rem, 1.2cqw, 0.7rem);
+  box-shadow: none;
+}
+
+.rp-meter {
+  left: 5.2%;
+  top: 27%;
+  width: 12.6%;
+  height: 14.2%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 30% minmax(0, 1fr);
+  gap: 5%;
+  padding: 4%;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(0, 10, 24, 0.38);
+  box-shadow: none;
+}
+
+.rp-meter span {
+  height: auto;
+  aspect-ratio: 1;
+  align-self: center;
+  background: rgba(36, 216, 255, 0.92);
+  color: #020714;
+  font-size: clamp(0.48rem, 1.25cqw, 0.68rem);
+}
+
+.rp-meter strong {
+  color: #ffffff;
+  font-size: clamp(1rem, 4.2cqw, 1.7rem);
+  text-shadow:
+    0 0 10px rgba(36, 216, 255, 0.9),
+    0 2px 0 rgba(0, 0, 0, 0.85);
+}
+
+.slot-machine {
+  left: 20%;
+  top: 16.4%;
+  width: 23.9%;
+  height: 25.1%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5.5%;
+  align-items: center;
+  justify-content: center;
+  padding: 4.8% 9%;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.slot-window {
+  width: 100%;
+  max-width: none;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 9px;
+  background:
+    radial-gradient(circle at 36% 25%, rgba(255, 255, 255, 0.58), transparent 20%),
+    linear-gradient(180deg, rgba(8, 41, 75, 0.98), rgba(1, 7, 18, 0.98));
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(1.42rem, 5.5cqw, 2.55rem);
+  text-shadow:
+    0 0 12px rgba(36, 216, 255, 0.86),
+    0 2px 0 rgba(0, 0, 0, 0.86);
+  box-shadow:
+    inset 0 0 0 1px rgba(36, 216, 255, 0.22),
+    0 0 12px rgba(36, 216, 255, 0.18);
+}
+
+.slot-roll-btn {
+  left: 45.2%;
+  top: 15.7%;
+  width: 15.2%;
+  height: 26.5%;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(70, 224, 255, 0.44), transparent 46%),
+    linear-gradient(180deg, rgba(0, 117, 255, 0.5), rgba(1, 7, 18, 0.45));
+  color: #ffffff;
+  font-size: clamp(0.78rem, 2.7cqw, 1.34rem);
+  text-shadow:
+    0 0 12px rgba(36, 216, 255, 0.92),
+    0 2px 0 rgba(0, 0, 0, 0.9);
+  box-shadow: none;
+}
+
+.slot-roll-btn:active {
+  transform: scale(0.96);
+  box-shadow: none;
+}
+
+.bonus-slots {
+  left: 62%;
+  top: 16.1%;
+  width: 34.2%;
+  height: 25.8%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5%;
+  padding: 0.9%;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.bonus-slot {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 5px;
+  background: rgba(10, 5, 7, 0.34);
+  box-shadow: none;
+}
+
+.economy-strip {
+  left: 4.2%;
+  top: 47.4%;
+  width: 91.6%;
+  height: 15.2%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18.5%;
+  gap: 3.2%;
+  pointer-events: none;
+}
+
+.chip-bank,
+.owned-count {
+  min-height: 0;
+  height: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(0, 12, 28, 0.26);
+  box-shadow: none;
+}
+
+.chip-bank span,
+.owned-count span {
+  color: rgba(191, 244, 255, 0.74);
+  font-size: clamp(0.5rem, 1.4cqw, 0.72rem);
+}
+
+.chip-bank strong,
+.owned-count strong {
+  color: #ffffff;
+  font-size: clamp(1rem, 3.6cqw, 1.58rem);
+  text-shadow:
+    0 0 10px rgba(36, 216, 255, 0.82),
+    0 2px 0 rgba(0, 0, 0, 0.9);
+}
+
+.card-hand {
+  left: 3.8%;
+  top: 67.2%;
+  width: 92.4%;
+  height: 26.9%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  gap: clamp(5px, 1.1cqw, 9px);
+  overflow-x: auto;
+  padding: 1.4% 2.2% 1.7%;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(0, 14, 34, 0.24);
+  box-shadow: none;
+}
+
+.empty-hand {
+  min-height: 50%;
+  border-color: rgba(36, 216, 255, 0.34);
+  color: rgba(191, 244, 255, 0.68);
+}
+
+.mini-card {
+  width: clamp(42px, 10.2cqw, 68px);
+  height: 90%;
+  max-height: none;
+}
