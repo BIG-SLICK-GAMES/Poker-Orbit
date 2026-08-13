@@ -992,24 +992,10 @@ function getBoardCardCost(cardElement) {
 }
 
 function setTokenBoardPosition(token, boardIndex) {
-  if (token.classList.contains("active")) {
-    setActiveTokenCameraPosition(token, boardIndex);
-    return;
-  }
-
   const position = getTokenCardContactPosition(boardIndex);
   token.style.left = `${position.x}%`;
   token.style.top = `${position.y}%`;
   token.style.setProperty("--token-rotation", `${position.rotation}deg`);
-  token.dataset.boardIndex = String(boardIndex);
-}
-
-function setActiveTokenCameraPosition(token, boardIndex) {
-  token.style.setProperty("--active-token-focus-x", "50%");
-  token.style.setProperty("--active-token-focus-y", "50%");
-  token.style.left = "var(--active-token-focus-x)";
-  token.style.top = "var(--active-token-focus-y)";
-  token.style.setProperty("--token-rotation", "0deg");
   token.dataset.boardIndex = String(boardIndex);
 }
 
@@ -1034,7 +1020,7 @@ function animateTokenClockwise(token, fromIndex, toIndex, delayMs = 0) {
   let moved = 0;
   let frame = 0;
 
-  setActiveTokenCameraPosition(token, fromIndex);
+  setTokenBoardPosition(token, fromIndex);
 
   while (moved < distance) {
     moved += Math.min(tokenStepCards, distance - moved);
@@ -1042,7 +1028,7 @@ function animateTokenClockwise(token, fromIndex, toIndex, delayMs = 0) {
     frame += 1;
     timers.push(window.setTimeout(() => {
       centerBoardOnCardIndex(nextIndex, 0);
-      setActiveTokenCameraPosition(token, nextIndex);
+      setTokenBoardPosition(token, nextIndex);
     }, delayMs + (frame * tokenStepDurationMs)));
   }
 
