@@ -609,8 +609,8 @@ h2 {
 
 .board-stage[data-camera-mode="turn-focus"] .orbit-board {
   --board-camera-tilt: 52deg;
-  --board-camera-y: -129%;
-  --board-camera-scale: 2;
+  --board-camera-y: 0%;
+  --board-camera-scale: 1.84;
 }
 
 .board-stage[data-camera-mode="move-front"] .orbit-board {
@@ -1536,6 +1536,8 @@ h2 {
 
 .player-token.active {
   filter: saturate(1.25);
+  left: var(--active-token-focus-x, 50%) !important;
+  top: var(--active-token-focus-y, 50%) !important;
   box-shadow:
     0 0 0 5px rgba(255, 255, 255, 0.18),
     0 0 24px var(--token-color),
@@ -3014,8 +3016,8 @@ body[data-theme] .dice-pip {
     --viewport-board-x: 0%;
     --viewport-board-y: 0%;
     --board-camera-tilt: 52deg;
-    --board-camera-y: -129%;
-    --board-camera-scale: 2;
+    --board-camera-y: 0%;
+    --board-camera-scale: 1.84;
   }
 
   .board-stage[data-camera-mode="move-front"] .orbit-board {
@@ -3311,8 +3313,8 @@ body[data-theme] .dice-pip {
     --viewport-board-x: 0%;
     --viewport-board-y: 0%;
     --board-camera-tilt: 52deg;
-    --board-camera-y: -129%;
-    --board-camera-scale: 2;
+    --board-camera-y: 0%;
+    --board-camera-scale: 1.84;
   }
 
   .hand-panel {

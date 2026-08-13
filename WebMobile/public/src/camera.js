@@ -8,11 +8,11 @@ export function createCameraModule({ boardStage, perspectiveTable, cameraControl
       mode: "turn-focus",
       followsToken: false,
       cameraLeftRightPercent: 0,
-      cameraUpDownPercent: 14,
+      cameraUpDownPercent: 0,
       cameraZoomPercent: 132,
       cameraRollPercent: 0,
       tablePitchDegrees: 66,
-      tableUpDownPercent: 5,
+      tableUpDownPercent: 0,
       tableSizePercent: 116,
       label: "Fixed player camera"
     },

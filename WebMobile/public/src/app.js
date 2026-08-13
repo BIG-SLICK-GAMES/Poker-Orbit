@@ -905,6 +905,7 @@ function scheduleNextTurn(delayMs = 0) {
 
 function applyBoardViewMode(turnState, boardIndex = turnState.playerPositions[turnState.currentPlayer]) {
   const presetName = boardViewMode === "wide" ? "tableWide" : "turnFocus";
+  centerBoardOnCardIndex(boardIndex, 0);
   cameraModule.setPreset(presetName, turnState, boardIndex);
 
   if (viewToggleButton) {
@@ -1004,8 +1005,10 @@ function setTokenBoardPosition(token, boardIndex) {
 }
 
 function setActiveTokenCameraPosition(token, boardIndex) {
-  token.style.left = "50%";
-  token.style.top = "50%";
+  token.style.setProperty("--active-token-focus-x", "50%");
+  token.style.setProperty("--active-token-focus-y", "50%");
+  token.style.left = "var(--active-token-focus-x)";
+  token.style.top = "var(--active-token-focus-y)";
   token.style.setProperty("--token-rotation", "0deg");
   token.dataset.boardIndex = String(boardIndex);
 }
