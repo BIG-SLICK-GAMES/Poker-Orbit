@@ -41,6 +41,8 @@ const cameraYValue = document.querySelector("#cameraYValue");
 const cameraResetButton = document.querySelector("#cameraResetButton");
 const boardSpaceCount = 54;
 const startingPlayerPositions = [27, 14, 0, 41];
+const fixedPlayerTokenPositions = [27, 14, 0, 41];
+const playerTokenColors = ["#24d8ff", "#ff2a4f", "#39ff7a", "#ff8a1c"];
 const themeStorageKey = "poker-orbit-theme-v1";
 const cameraStorageKey = "poker-orbit-camera-offset-v2";
 const cameraDefaultOffset = { x: -14, y: 0 };
@@ -756,16 +758,14 @@ function isPurchasableCardIndex(index) {
 }
 
 function createPlayerTokens() {
-  const tokenColors = ["#24d8ff", "#ff2a4f", "#39ff7a", "#ff8a1c"];
-
-  playerTokenLayer?.replaceChildren(...tokenColors.map((color, index) => {
+  playerTokenLayer?.replaceChildren(...playerTokenColors.map((color, index) => {
     const token = document.createElement("div");
     token.className = "player-token";
     token.dataset.token = String(index);
     token.style.setProperty("--token-color", color);
     token.setAttribute("aria-label", `Player ${index + 1} token`);
     token.innerHTML = `<span>P${index + 1}</span>`;
-    setTokenBoardPosition(token, startingPlayerPositions[index]);
+    setTokenBoardPosition(token, fixedPlayerTokenPositions[index]);
     return token;
   }));
 }
@@ -781,8 +781,9 @@ function getBoardCardPosition(index) {
   };
 }
 
-function getBoardRotationForCardIndex(index) {
-  return 180 - ((index / boardSpaceCount) * 360);
+function getBoardRotationForCardIndex(index, playerIndex = turnModule.getState().currentPlayer) {
+  const tokenIndex = fixedPlayerTokenPositions[playerIndex] ?? fixedPlayerTokenPositions[0];
+  return ((tokenIndex - index) / boardSpaceCount) * 360;
 }
 
 function getContinuousBoardRotation(targetIndex) {
@@ -796,7 +797,7 @@ function centerBoardOnCardIndex(index, delayMs = 0) {
   window.clearTimeout(pendingBoardCenterTimer);
 
   pendingBoardCenterTimer = window.setTimeout(() => {
-    tweenBoardRotation(0);
+    tweenBoardRotation(getContinuousBoardRotation(index));
   }, delayMs);
 }
 
@@ -873,6 +874,7 @@ function purchaseBoardCard(cardElement, options = {}) {
   }
 
   ownershipHighlightModule.markPurchased(cardElement, playerIndex);
+  updateBestHandHighlights();
   awaitingLandingDecision = false;
   scheduleNextTurn(360);
 
@@ -1104,17 +1106,13 @@ function getTokenInnerRingPosition(index) {
   };
 }
 
-function animateTokenClockwise(token, fromIndex, toIndex, delayMs = 0) {
-  const playerIndex = Number(token.dataset.token);
-  const existingTimers = tokenAnimationTimers.get(playerIndex) || [];
+function animateBoardClockwise(fromIndex, toIndex, delayMs = 0) {
+  const existingTimers = tokenAnimationTimers.get("board") || [];
   existingTimers.forEach((timer) => window.clearTimeout(timer));
-
   const distance = (toIndex - fromIndex + boardSpaceCount) % boardSpaceCount;
   const timers = [];
   let moved = 0;
   let frame = 0;
-
-  setTokenBoardPosition(token, fromIndex);
 
   while (moved < distance) {
     moved += Math.min(tokenStepCards, distance - moved);
@@ -1122,11 +1120,10 @@ function animateTokenClockwise(token, fromIndex, toIndex, delayMs = 0) {
     frame += 1;
     timers.push(window.setTimeout(() => {
       centerBoardOnCardIndex(nextIndex, 0);
-      setTokenBoardPosition(token, nextIndex);
     }, delayMs + (frame * tokenStepDurationMs)));
   }
 
-  tokenAnimationTimers.set(playerIndex, timers);
+  tokenAnimationTimers.set("board", timers);
 
   return delayMs + (frame * tokenStepDurationMs);
 }
@@ -1205,6 +1202,144 @@ function getCardHandMultiplier(rank) {
   return multiplierMap[rank] || "x1.0";
 }
 
+function updateBestHandHighlights() {
+  boardCardRing.querySelectorAll(".board-card.best-hand").forEach((card) => {
+    card.classList.remove("best-hand");
+    card.removeAttribute("data-best-hand");
+  });
+
+  playerTokenColors.forEach((_, playerIndex) => {
+    const bestCards = getBestPokerHandCards(purchaseAuctionModule.getPlayer(playerIndex).cards);
+    bestCards.forEach((card) => {
+      const boardCard = boardCardRing.querySelector(`.board-card[data-index="${card.boardIndex}"]`);
+      if (!boardCard) {
+        return;
+      }
+
+      boardCard.classList.add("best-hand");
+      boardCard.dataset.bestHand = String(playerIndex + 1);
+    });
+  });
+}
+
+function getBestPokerHandCards(cards) {
+  const playableCards = cards.filter((card) => rankValue(card.rank) > 0 && card.suit);
+  if (playableCards.length < 5) {
+    return [];
+  }
+
+  let bestCards = [];
+  let bestScore = null;
+
+  for (let first = 0; first < playableCards.length - 4; first += 1) {
+    for (let second = first + 1; second < playableCards.length - 3; second += 1) {
+      for (let third = second + 1; third < playableCards.length - 2; third += 1) {
+        for (let fourth = third + 1; fourth < playableCards.length - 1; fourth += 1) {
+          for (let fifth = fourth + 1; fifth < playableCards.length; fifth += 1) {
+            const candidate = [
+              playableCards[first],
+              playableCards[second],
+              playableCards[third],
+              playableCards[fourth],
+              playableCards[fifth]
+            ];
+            const score = scorePokerHand(candidate);
+            if (!bestScore || comparePokerScores(score, bestScore) > 0) {
+              bestScore = score;
+              bestCards = candidate;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return bestCards;
+}
+
+function scorePokerHand(cards) {
+  const values = cards.map((card) => rankValue(card.rank)).sort((a, b) => b - a);
+  const counts = new Map();
+  values.forEach((value) => counts.set(value, (counts.get(value) || 0) + 1));
+  const countGroups = [...counts.entries()].sort((first, second) => second[1] - first[1] || second[0] - first[0]);
+  const isFlush = cards.every((card) => card.suit === cards[0].suit);
+  const straightHigh = getStraightHigh(values);
+
+  if (isFlush && straightHigh) {
+    return [8, straightHigh];
+  }
+  if (countGroups[0][1] === 4) {
+    return [7, countGroups[0][0], ...values.filter((value) => value !== countGroups[0][0])];
+  }
+  if (countGroups[0][1] === 3 && countGroups[1]?.[1] === 2) {
+    return [6, countGroups[0][0], countGroups[1][0]];
+  }
+  if (isFlush) {
+    return [5, ...values];
+  }
+  if (straightHigh) {
+    return [4, straightHigh];
+  }
+  if (countGroups[0][1] === 3) {
+    return [3, countGroups[0][0], ...values.filter((value) => value !== countGroups[0][0])];
+  }
+  if (countGroups[0][1] === 2 && countGroups[1]?.[1] === 2) {
+    const pairValues = countGroups.slice(0, 2).map(([value]) => value).sort((a, b) => b - a);
+    return [2, ...pairValues, ...values.filter((value) => !pairValues.includes(value))];
+  }
+  if (countGroups[0][1] === 2) {
+    return [1, countGroups[0][0], ...values.filter((value) => value !== countGroups[0][0])];
+  }
+
+  return [0, ...values];
+}
+
+function comparePokerScores(score, bestScore) {
+  const length = Math.max(score.length, bestScore.length);
+  for (let index = 0; index < length; index += 1) {
+    const delta = (score[index] || 0) - (bestScore[index] || 0);
+    if (delta !== 0) {
+      return delta;
+    }
+  }
+  return 0;
+}
+
+function getStraightHigh(values) {
+  const uniqueValues = [...new Set(values)].sort((a, b) => b - a);
+  if (uniqueValues.join(",") === "14,5,4,3,2") {
+    return 5;
+  }
+
+  for (let index = 0; index <= uniqueValues.length - 5; index += 1) {
+    const run = uniqueValues.slice(index, index + 5);
+    if (run[0] - run[4] === 4) {
+      return run[0];
+    }
+  }
+
+  return 0;
+}
+
+function rankValue(rank) {
+  const values = {
+    A: 14,
+    K: 13,
+    Q: 12,
+    J: 11,
+    "10": 10,
+    "9": 9,
+    "8": 8,
+    "7": 7,
+    "6": 6,
+    "5": 5,
+    "4": 4,
+    "3": 3,
+    "2": 2
+  };
+  return values[rank] || 0;
+}
+
 function renderTurnState(turnState) {
   const activePlayerIndex = turnState.currentPlayer;
   const activeBoardIndex = turnState.playerPositions[activePlayerIndex];
@@ -1231,23 +1366,14 @@ function renderTurnState(turnState) {
 
   document.querySelectorAll(".player-token").forEach((token) => {
     const playerIndex = Number(token.dataset.token);
-    const targetBoardIndex = turnState.playerPositions[playerIndex];
     token.classList.toggle("active", playerIndex === turnState.currentPlayer);
-
-    if (playerIndex === activePlayerIndex && didActiveTokenMove) {
-      return;
-    }
-
-    setTokenBoardPosition(token, targetBoardIndex);
+    setTokenBoardPosition(token, fixedPlayerTokenPositions[playerIndex]);
   });
 
-  const activeToken = document.querySelector(`.player-token[data-token="${activePlayerIndex}"]`);
   let tokenMoveDelay = 0;
 
   if (didActiveTokenMove) {
-    tokenMoveDelay = activeToken
-      ? animateTokenClockwise(activeToken, previousActiveBoardIndex, activeBoardIndex, 0)
-      : 0;
+    tokenMoveDelay = animateBoardClockwise(previousActiveBoardIndex, activeBoardIndex, 0);
     applyBoardViewMode(turnState, activeBoardIndex);
     scheduleLandingCardAnimation(activeBoardIndex, tokenMoveDelay + 540);
   } else {

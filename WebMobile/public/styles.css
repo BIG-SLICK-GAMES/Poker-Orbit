@@ -833,6 +833,19 @@ h2 {
     inset 0 1px 0 rgba(255, 255, 255, 0.54);
 }
 
+.board-card.best-hand {
+  filter: saturate(1.28) brightness(1.08);
+  box-shadow:
+    0 0 0 3px var(--owner-color, rgba(36, 216, 255, 0.92)),
+    0 0 14px color-mix(in srgb, var(--owner-color, #24d8ff) 92%, transparent),
+    0 0 34px color-mix(in srgb, var(--owner-color, #24d8ff) 78%, transparent),
+    0 0 58px color-mix(in srgb, var(--owner-color, #24d8ff) 48%, transparent),
+    0 4px 9px rgba(0, 0, 0, 0.42),
+    inset 0 0 12px color-mix(in srgb, var(--owner-color, #24d8ff) 40%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  animation: best-hand-pulse 980ms ease-in-out infinite alternate;
+}
+
 .board-card.purchased::after {
   content: "P" attr(data-owner);
   position: absolute;
@@ -852,19 +865,19 @@ h2 {
 }
 
 .board-card.owned-by-player-1 {
-  --owner-color: #ff8a1c;
+  --owner-color: #24d8ff;
 }
 
 .board-card.owned-by-player-2 {
-  --owner-color: #2fcf72;
+  --owner-color: #ff2a4f;
 }
 
 .board-card.owned-by-player-3 {
-  --owner-color: #4f8cff;
+  --owner-color: #39ff7a;
 }
 
 .board-card.owned-by-player-4 {
-  --owner-color: #f6c453;
+  --owner-color: #ff8a1c;
 }
 
 .board-card.passed {
@@ -921,7 +934,6 @@ h2 {
     0 9px 12px rgba(0, 0, 0, 0.38);
   transform:
     translate(-50%, -50%)
-    rotate(var(--token-rotation, 0deg))
     translateZ(4px);
   transform-origin: center;
   transition:
@@ -947,7 +959,6 @@ h2 {
     0 12px 14px rgba(0, 0, 0, 0.42);
   transform:
     translate(-50%, -50%)
-    rotate(var(--token-rotation, 0deg))
     translateZ(8px)
     scale(1.08);
 }
@@ -2779,6 +2790,30 @@ body[data-theme] .dice-pip {
       0 0 28px rgba(85, 201, 189, 0.42),
       0 26px 46px rgba(0, 0, 0, 0.52),
       inset 0 2px 0 rgba(255, 255, 255, 0.82);
+  }
+}
+
+@keyframes best-hand-pulse {
+  from {
+    filter: saturate(1.08) brightness(1);
+    box-shadow:
+      0 0 0 2px var(--owner-color, rgba(36, 216, 255, 0.82)),
+      0 0 12px color-mix(in srgb, var(--owner-color, #24d8ff) 76%, transparent),
+      0 0 24px color-mix(in srgb, var(--owner-color, #24d8ff) 48%, transparent),
+      0 4px 9px rgba(0, 0, 0, 0.38),
+      inset 0 0 8px color-mix(in srgb, var(--owner-color, #24d8ff) 28%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  }
+  to {
+    filter: saturate(1.42) brightness(1.16);
+    box-shadow:
+      0 0 0 4px var(--owner-color, rgba(36, 216, 255, 1)),
+      0 0 18px color-mix(in srgb, var(--owner-color, #24d8ff) 96%, transparent),
+      0 0 42px color-mix(in srgb, var(--owner-color, #24d8ff) 82%, transparent),
+      0 0 70px color-mix(in srgb, var(--owner-color, #24d8ff) 56%, transparent),
+      0 5px 10px rgba(0, 0, 0, 0.44),
+      inset 0 0 16px color-mix(in srgb, var(--owner-color, #24d8ff) 48%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
 }
 
