@@ -553,7 +553,7 @@ h2 {
     auto,
     auto;
   perspective: 1200px;
-  perspective-origin: 50% 78%;
+  perspective-origin: 50% 50%;
 }
 
 .perspective-table {
@@ -573,15 +573,15 @@ h2 {
 }
 
 .board-stage[data-camera-mode="turn-focus"] {
-  perspective-origin: 50% 76%;
+  perspective-origin: 50% 50%;
 }
 
 .board-stage[data-camera-mode="move-front"] {
-  perspective-origin: 50% 88%;
+  perspective-origin: 50% 50%;
 }
 
 .board-stage[data-camera-mode="table-wide"] {
-  perspective-origin: 50% 78%;
+  perspective-origin: 50% 50%;
 }
 
 .board-stage[data-camera-mode="table-wide"] .perspective-table {
@@ -631,13 +631,13 @@ h2 {
 }
 
 .board-stage[data-camera-mode="turn-focus"] .orbit-board {
-  --board-camera-tilt: 52deg;
+  --board-camera-tilt: 58deg;
   --board-camera-y: 0%;
-  --board-camera-scale: 1.84;
+  --board-camera-scale: 1;
 }
 
 .board-stage[data-camera-mode="move-front"] .orbit-board {
-  --board-camera-tilt: 67deg;
+  --board-camera-tilt: 58deg;
   --board-camera-y: 0%;
   --board-camera-scale: 1;
 }
@@ -3037,6 +3037,7 @@ body[data-theme] .dice-pip {
     border-radius: 6px;
     perspective: 760px;
     place-items: center;
+    perspective-origin: 50% 50%;
   }
 
   .perspective-table {
@@ -3049,27 +3050,27 @@ body[data-theme] .dice-pip {
   }
 
   .board-stage[data-camera-mode="turn-focus"] {
-    perspective-origin: 50% 86%;
+    perspective-origin: 50% 50%;
   }
 
   .board-stage[data-camera-mode="move-front"] {
-    perspective-origin: 50% 91%;
+    perspective-origin: 50% 50%;
   }
 
   .board-stage[data-camera-mode="table-wide"] {
-    perspective-origin: 50% 78%;
+    perspective-origin: 50% 50%;
   }
 
   .board-stage[data-camera-mode="turn-focus"] .orbit-board {
     --viewport-board-x: 0%;
     --viewport-board-y: 0%;
-    --board-camera-tilt: 52deg;
+    --board-camera-tilt: 58deg;
     --board-camera-y: 0%;
-    --board-camera-scale: 1.84;
+    --board-camera-scale: 1;
   }
 
   .board-stage[data-camera-mode="move-front"] .orbit-board {
-    --board-camera-tilt: 70deg;
+    --board-camera-tilt: 58deg;
     --board-camera-y: 0%;
     --board-camera-scale: 1;
   }
@@ -3342,6 +3343,7 @@ body[data-theme] .dice-pip {
     min-height: 52cqh;
     perspective: 760px;
     place-items: center;
+    perspective-origin: 50% 50%;
   }
 
   .perspective-table {
@@ -3354,15 +3356,15 @@ body[data-theme] .dice-pip {
   }
 
   .board-stage[data-camera-mode="turn-focus"] {
-    perspective-origin: 50% 86%;
+    perspective-origin: 50% 50%;
   }
 
   .board-stage[data-camera-mode="turn-focus"] .orbit-board {
     --viewport-board-x: 0%;
     --viewport-board-y: 0%;
-    --board-camera-tilt: 52deg;
+    --board-camera-tilt: 58deg;
     --board-camera-y: 0%;
-    --board-camera-scale: 1.84;
+    --board-camera-scale: 1;
   }
 
   .hand-panel {

@@ -701,8 +701,7 @@ function centerBoardOnCardIndex(index, delayMs = 0) {
   window.clearTimeout(pendingBoardCenterTimer);
 
   pendingBoardCenterTimer = window.setTimeout(() => {
-    const targetRotation = getContinuousBoardRotation(index);
-    tweenBoardRotation(targetRotation);
+    tweenBoardRotation(0);
   }, delayMs);
 }
 
@@ -904,13 +903,13 @@ function scheduleNextTurn(delayMs = 0) {
 }
 
 function applyBoardViewMode(turnState, boardIndex = turnState.playerPositions[turnState.currentPlayer]) {
-  const presetName = boardViewMode === "wide" ? "tableWide" : "turnFocus";
+  const presetName = "tableWide";
   centerBoardOnCardIndex(boardIndex, 0);
   cameraModule.setPreset(presetName, turnState, boardIndex);
 
   if (viewToggleButton) {
-    viewToggleButton.textContent = boardViewMode === "wide" ? "Zoom" : "Wide";
-    viewToggleButton.setAttribute("aria-pressed", String(boardViewMode === "wide"));
+    viewToggleButton.textContent = "Wide";
+    viewToggleButton.setAttribute("aria-pressed", "true");
   }
 }
 
