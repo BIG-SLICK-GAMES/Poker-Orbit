@@ -13,6 +13,7 @@ const screens = new Map([...document.querySelectorAll("[data-screen]")].map((scr
 const boardCardRing = document.querySelector("#boardCardRing");
 const boardSlotRing = document.querySelector("#boardSlotRing");
 const boardStage = document.querySelector("#boardStage");
+const orbitBoard = document.querySelector("#orbitBoard");
 const boardRotator = document.querySelector("#boardRotator");
 const perspectiveTable = document.querySelector("#perspectiveTable");
 const playerTokenLayer = document.querySelector("#playerTokenLayer");
@@ -32,9 +33,17 @@ const ownedCardCountLabel = document.querySelector("#ownedCardCountLabel");
 const themeSettings = document.querySelector("#themeSettings");
 const settingsPreviewTheme = document.querySelector("#settingsPreviewTheme");
 const themeSectionSummary = document.querySelector("#themeSectionSummary");
+const cameraSectionSummary = document.querySelector("#cameraSectionSummary");
+const cameraXControl = document.querySelector("#cameraXControl");
+const cameraYControl = document.querySelector("#cameraYControl");
+const cameraXValue = document.querySelector("#cameraXValue");
+const cameraYValue = document.querySelector("#cameraYValue");
+const cameraResetButton = document.querySelector("#cameraResetButton");
 const boardSpaceCount = 54;
 const startingPlayerPositions = [27, 14, 0, 41];
 const themeStorageKey = "poker-orbit-theme-v1";
+const cameraStorageKey = "poker-orbit-camera-offset-v2";
+const cameraDefaultOffset = { x: -14, y: 0 };
 const customThemeLimit = 5;
 const themePresets = {
   diner: {
@@ -140,6 +149,7 @@ let customThemeColors = { ...themePresets.diner.colors };
 let savedCustomThemes = [];
 let activeThemeName = "diner";
 let activeCustomThemeId = "";
+let cameraOffset = loadSavedCameraOffset();
 
 loadSavedTheme();
 createThemeSettings();
@@ -212,6 +222,7 @@ createBoardCards();
 createPlayerTokens();
 formatMiniCards();
 applyMasterControl();
+applyCameraOffset();
 turnModule.subscribe(renderTurnState);
 registerServiceWorker();
 
@@ -234,6 +245,21 @@ viewToggleButton?.addEventListener("click", () => {
 
 document.querySelector("#reducedMotionToggle").addEventListener("change", (event) => {
   shell.classList.toggle("reduce-motion", event.target.checked);
+});
+
+cameraXControl?.addEventListener("input", (event) => {
+  cameraOffset.x = clampCameraOffset(Number(event.target.value));
+  applyCameraOffset({ persist: true });
+});
+
+cameraYControl?.addEventListener("input", (event) => {
+  cameraOffset.y = clampCameraOffset(Number(event.target.value));
+  applyCameraOffset({ persist: true });
+});
+
+cameraResetButton?.addEventListener("click", () => {
+  cameraOffset = { ...cameraDefaultOffset };
+  applyCameraOffset({ persist: true });
 });
 
 endTurnButton?.addEventListener("click", () => {
@@ -291,6 +317,70 @@ function loadSavedTheme() {
   savedCustomThemes = normalizeSavedCustomThemes(savedTheme.savedCustomThemes);
   customThemeColors = { ...themePresets.diner.colors, ...(savedTheme.customColors || {}) };
   applyTheme(savedTheme.name || "diner");
+}
+
+function loadSavedCameraOffset() {
+  try {
+    const storedOffset = JSON.parse(localStorage.getItem(cameraStorageKey) || "null");
+    if (storedOffset && typeof storedOffset === "object") {
+      return {
+        x: clampCameraOffset(Number(storedOffset.x)),
+        y: clampCameraOffset(Number(storedOffset.y))
+      };
+    }
+  } catch {
+    return { ...cameraDefaultOffset };
+  }
+
+  return { ...cameraDefaultOffset };
+}
+
+function applyCameraOffset({ persist = false } = {}) {
+  if (orbitBoard) {
+    orbitBoard.style.setProperty("--viewport-board-x", `${cameraOffset.x}%`);
+    orbitBoard.style.setProperty("--viewport-board-y", `${cameraOffset.y}%`);
+  }
+
+  if (cameraXControl) {
+    cameraXControl.value = String(cameraOffset.x);
+  }
+  if (cameraYControl) {
+    cameraYControl.value = String(cameraOffset.y);
+  }
+
+  const xLabel = formatCameraAxis(cameraOffset.x, "Left", "Right");
+  const yLabel = formatCameraAxis(cameraOffset.y, "Up", "Down");
+  if (cameraXValue) {
+    cameraXValue.textContent = xLabel;
+  }
+  if (cameraYValue) {
+    cameraYValue.textContent = yLabel;
+  }
+  if (cameraSectionSummary) {
+    cameraSectionSummary.textContent = `${xLabel} / ${yLabel}`;
+  }
+
+  if (persist) {
+    localStorage.setItem(cameraStorageKey, JSON.stringify(cameraOffset));
+  }
+}
+
+function clampCameraOffset(value) {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+  return Math.max(-20, Math.min(20, Math.round(value * 2) / 2));
+}
+
+function formatCameraAxis(value, negativeLabel, positiveLabel) {
+  if (Math.abs(value) < 0.01) {
+    return "Center";
+  }
+
+  const amount = Math.abs(value).toLocaleString(undefined, {
+    maximumFractionDigits: 1
+  });
+  return `${value < 0 ? negativeLabel : positiveLabel} ${amount}%`;
 }
 
 function applyTheme(themeName) {
@@ -666,22 +756,15 @@ function isPurchasableCardIndex(index) {
 }
 
 function createPlayerTokens() {
-  const tokenColors = ["#ff8a1c", "#2fcf72", "#4f8cff", "#f6c453"];
+  const tokenColors = ["#24d8ff", "#ff2a4f", "#39ff7a", "#ff8a1c"];
 
-  playerTokenLayer.replaceChildren(...tokenColors.map((color, index) => {
+  playerTokenLayer?.replaceChildren(...tokenColors.map((color, index) => {
     const token = document.createElement("div");
     token.className = "player-token";
     token.dataset.token = String(index);
     token.style.setProperty("--token-color", color);
     token.setAttribute("aria-label", `Player ${index + 1} token`);
-    token.innerHTML = `
-      <span class="token-shadow"></span>
-      <span class="token-side"></span>
-      <span class="token-top">
-        <span class="token-crown"></span>
-        <span class="token-label">P${index + 1}</span>
-      </span>
-    `;
+    token.innerHTML = `<span>P${index + 1}</span>`;
     setTokenBoardPosition(token, startingPlayerPositions[index]);
     return token;
   }));
@@ -1003,16 +1086,16 @@ function getBoardCardCost(cardElement) {
 }
 
 function setTokenBoardPosition(token, boardIndex) {
-  const position = getTokenCardContactPosition(boardIndex);
+  const position = getTokenInnerRingPosition(boardIndex);
   token.style.left = `${position.x}%`;
   token.style.top = `${position.y}%`;
   token.style.setProperty("--token-rotation", `${position.rotation}deg`);
   token.dataset.boardIndex = String(boardIndex);
 }
 
-function getTokenCardContactPosition(index) {
+function getTokenInnerRingPosition(index) {
   const angle = (index / boardSpaceCount) * Math.PI * 2 - Math.PI / 2;
-  const radius = 44.1;
+  const radius = 36.8;
 
   return {
     x: 50 + Math.cos(angle) * radius,
@@ -1145,10 +1228,6 @@ function renderTurnState(turnState) {
   purchaseAuctionModule.setActivePlayer(activePlayerIndex);
   renderBonusSlots(activePlayerIndex);
   slotReelRoot.classList.toggle("spin-ready", (!paidBonusSpinUsedThisTurn && currentRollPoints >= currentLandingCost) || hasBonusSpinCard(activePlayerIndex));
-
-  document.querySelectorAll(".seat-marker").forEach((seat) => {
-    seat.classList.toggle("active", Number(seat.dataset.seat) === turnState.currentPlayer);
-  });
 
   document.querySelectorAll(".player-token").forEach((token) => {
     const playerIndex = Number(token.dataset.token);

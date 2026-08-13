@@ -77,18 +77,8 @@
 
         <section class="board-stage" id="boardStage" aria-label="Game board placeholder">
           <div class="perspective-table" id="perspectiveTable" data-control="perspectiveTable">
-            <div class="seat-marker seat-p1 active" data-seat="0" data-control="seatP1">P1</div>
-            <div class="seat-marker seat-p2" data-seat="1" data-control="seatP2">P2</div>
-            <div class="seat-marker seat-p3" data-seat="2" data-control="seatP3">P3</div>
-            <div class="seat-marker seat-p4" data-seat="3" data-control="seatP4">P4</div>
           <div class="orbit-board" id="orbitBoard" data-control="orbitBoard">
             <div class="board-rotator" id="boardRotator">
-              <div class="board-neon-ring outer-blue" aria-hidden="true"></div>
-              <div class="board-neon-ring outer-orange" aria-hidden="true"></div>
-              <div class="board-neon-ring mid-blue" aria-hidden="true"></div>
-              <div class="board-neon-ring mid-orange" aria-hidden="true"></div>
-              <div class="board-neon-ring inner-blue" aria-hidden="true"></div>
-              <div class="board-neon-ring inner-orange" aria-hidden="true"></div>
               <div class="board-slot-ring" id="boardSlotRing" aria-hidden="true"></div>
               <div class="board-card-ring" id="boardCardRing" data-control="boardCardRing" aria-label="54 board cards"></div>
               <div class="player-token-layer" id="playerTokenLayer" aria-label="Player tokens"></div>
@@ -168,6 +158,26 @@
               <strong id="themeSectionSummary">40s Diner</strong>
             </summary>
             <section class="theme-settings setting-row" id="themeSettings" aria-label="Theme settings"></section>
+          </details>
+
+          <details class="settings-section">
+            <summary>
+              <span>Camera</span>
+              <strong id="cameraSectionSummary">Left 14% / Center</strong>
+            </summary>
+            <section class="camera-settings setting-row" aria-label="Camera controls">
+              <label class="camera-control-row">
+                <span>Move Camera Left / Right</span>
+                <input id="cameraXControl" type="range" min="-20" max="20" step="0.5" value="-14">
+                <strong id="cameraXValue">Left 14%</strong>
+              </label>
+              <label class="camera-control-row">
+                <span>Move Camera Up / Down</span>
+                <input id="cameraYControl" type="range" min="-20" max="20" step="0.5" value="0">
+                <strong id="cameraYValue">Center</strong>
+              </label>
+              <button class="camera-reset-btn" id="cameraResetButton" type="button">Reset Camera</button>
+            </section>
           </details>
 
           <details class="settings-section">
