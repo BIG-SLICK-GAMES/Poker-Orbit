@@ -31,8 +31,8 @@ const ownedCardCountLabel = document.querySelector("#ownedCardCountLabel");
 const themeSettings = document.querySelector("#themeSettings");
 const settingsPreviewTheme = document.querySelector("#settingsPreviewTheme");
 const themeSectionSummary = document.querySelector("#themeSectionSummary");
-const boardSpaceCount = 56;
-const startingPlayerPositions = [28, 14, 0, 42];
+const boardSpaceCount = 54;
+const startingPlayerPositions = [27, 14, 0, 41];
 const themeStorageKey = "poker-orbit-theme-v1";
 const customThemeLimit = 5;
 const themePresets = {
@@ -651,7 +651,7 @@ function getCardRollPointCost(index) {
 }
 
 function isPurchasableCardIndex(index) {
-  return index >= 0 && index < 52;
+  return index >= 0 && index < boardSpaceCount;
 }
 
 function createPlayerTokens() {
@@ -680,8 +680,8 @@ function getBoardCardPosition(index) {
   const angle = (index / boardSpaceCount) * Math.PI * 2 - Math.PI / 2;
 
   return {
-    x: 50 + Math.cos(angle) * 41.5,
-    y: 50 + Math.sin(angle) * 41.5,
+    x: 50 + Math.cos(angle) * 39.2,
+    y: 50 + Math.sin(angle) * 39.2,
     rotation: (angle * 180 / Math.PI) + 90
   };
 }
@@ -1000,7 +1000,7 @@ function setTokenBoardPosition(token, boardIndex) {
 
 function getTokenCardContactPosition(index) {
   const angle = (index / boardSpaceCount) * Math.PI * 2 - Math.PI / 2;
-  const radius = 42.65;
+  const radius = 39.2;
 
   return {
     x: 50 + Math.cos(angle) * radius,
@@ -1077,8 +1077,6 @@ function buildBoardDeck() {
   });
   deck.push(
     { label: "W", suit: "", type: "wild", name: "Wild card" },
-    { label: "W", suit: "", type: "wild", name: "Wild card" },
-    { label: "?", suit: "", type: "mystery", name: "Mystery card" },
     { label: "?", suit: "", type: "mystery", name: "Mystery card" }
   );
   return deck;

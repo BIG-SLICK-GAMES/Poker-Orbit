@@ -2,7 +2,7 @@ export function createCameraModule({ boardStage, perspectiveTable, cameraControl
   let returnFocusTimer = 0;
   let cutResetTimer = 0;
   const orbitBoard = boardStage.querySelector("#orbitBoard");
-  const boardSpaceCount = 56;
+  const boardSpaceCount = 54;
   const CAMERA_PRESETS = {
     turnFocus: {
       mode: "turn-focus",
@@ -36,7 +36,7 @@ export function createCameraModule({ boardStage, perspectiveTable, cameraControl
       cameraZoomPercent: 100,
       cameraRollPercent: 0,
       tablePitchDegrees: 58,
-      tableUpDownPercent: -4,
+      tableUpDownPercent: 0,
       tableSizePercent: 100,
       label: "Wide table camera"
     }
