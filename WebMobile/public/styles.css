@@ -3753,15 +3753,23 @@ body[data-theme] .hand-panel.console-panel::after {
   row-gap: 0;
   align-items: center;
   justify-content: center;
-  padding: 4.6% 0;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  box-shadow: none;
+  padding: 4.8% 6.8%;
+  border: 2px solid rgba(255, 138, 28, 0.92);
+  border-radius: 12px;
+  background:
+    linear-gradient(90deg, rgba(255, 138, 28, 0.24), transparent 16%, transparent 84%, rgba(255, 138, 28, 0.24)),
+    radial-gradient(circle at 50% 18%, rgba(36, 216, 255, 0.28), transparent 42%),
+    linear-gradient(180deg, rgba(3, 18, 37, 0.92), rgba(1, 5, 14, 0.96));
+  box-shadow:
+    inset 0 0 0 1px rgba(36, 216, 255, 0.52),
+    inset 0 0 18px rgba(36, 216, 255, 0.22),
+    0 0 14px rgba(255, 138, 28, 0.58),
+    0 0 24px rgba(36, 216, 255, 0.28);
   overflow: visible;
 }
 
 .hand-panel.console-panel .slot-window {
+  position: relative;
   width: 100%;
   max-width: none;
   height: 100%;
@@ -3769,32 +3777,53 @@ body[data-theme] .hand-panel.console-panel::after {
   min-width: 0;
   min-height: 0;
   padding: 0;
-  border: 0;
-  border-radius: 10px;
+  border: 1px solid rgba(36, 216, 255, 0.94);
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(circle at 36% 25%, rgba(255, 255, 255, 0.58), transparent 20%),
-    linear-gradient(180deg, rgba(8, 41, 75, 0.98), rgba(1, 7, 18, 0.98));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 24%, rgba(0, 0, 0, 0.22) 76%),
+    radial-gradient(circle at 50% 22%, rgba(36, 216, 255, 0.5), transparent 34%),
+    linear-gradient(180deg, rgba(5, 45, 82, 0.98), rgba(0, 13, 31, 0.98));
   color: #ffffff;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: clamp(1.42rem, 5.5cqw, 2.55rem);
+  font-size: clamp(1.5rem, 5.7cqw, 2.72rem);
+  font-weight: 900;
   line-height: 1;
   text-align: center;
   overflow: visible;
   clip-path: none;
   text-shadow:
-    0 0 12px rgba(36, 216, 255, 0.86),
+    0 0 8px rgba(255, 138, 28, 0.72),
+    0 0 16px rgba(36, 216, 255, 0.98),
     0 2px 0 rgba(0, 0, 0, 0.86);
   box-shadow:
-    inset 0 0 0 1px rgba(36, 216, 255, 0.22),
-    0 0 12px rgba(36, 216, 255, 0.18);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 0 18px rgba(36, 216, 255, 0.2),
+    0 0 10px rgba(36, 216, 255, 0.46);
+}
+
+.hand-panel.console-panel .slot-window::before {
+  content: "";
+  position: absolute;
+  inset: 9% 12%;
+  border-top: 1px solid rgba(36, 216, 255, 0.26);
+  border-bottom: 1px solid rgba(255, 138, 28, 0.24);
+  pointer-events: none;
 }
 
 .hand-panel.console-panel .slot-window:nth-child(1),
 .hand-panel.console-panel .slot-window:nth-child(2) {
   justify-self: stretch;
+}
+
+.hand-panel.console-panel .slot-reel.rolling .slot-machine {
+  box-shadow:
+    inset 0 0 0 1px rgba(36, 216, 255, 0.72),
+    inset 0 0 24px rgba(36, 216, 255, 0.34),
+    0 0 20px rgba(255, 138, 28, 0.74),
+    0 0 32px rgba(36, 216, 255, 0.38);
 }
 
 .hand-panel.console-panel .slot-roll-btn {
