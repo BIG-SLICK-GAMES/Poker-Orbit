@@ -1227,7 +1227,9 @@ function updateBestHandHighlights() {
 function getBestPokerHandCards(cards) {
   const playableCards = cards.filter((card) => rankValue(card.rank) > 0 && card.suit);
   if (playableCards.length < 5) {
-    return [];
+    return [...playableCards]
+      .sort((first, second) => rankValue(second.rank) - rankValue(first.rank))
+      .slice(0, Math.max(1, playableCards.length));
   }
 
   let bestCards = [];
