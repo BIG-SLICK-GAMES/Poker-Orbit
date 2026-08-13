@@ -922,7 +922,6 @@ h2 {
   transform:
     translate(-50%, -50%)
     rotate(var(--token-rotation, 0deg))
-    rotateX(58deg)
     translateZ(4px);
   transform-origin: center;
   transition:
@@ -934,7 +933,7 @@ h2 {
 }
 
 .player-token span {
-  transform: rotateX(-26deg);
+  transform: none;
 }
 
 .player-token.active {
@@ -949,7 +948,6 @@ h2 {
   transform:
     translate(-50%, -50%)
     rotate(var(--token-rotation, 0deg))
-    rotateX(58deg)
     translateZ(8px)
     scale(1.08);
 }
