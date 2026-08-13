@@ -41,7 +41,6 @@ const cameraYValue = document.querySelector("#cameraYValue");
 const cameraResetButton = document.querySelector("#cameraResetButton");
 const boardSpaceCount = 54;
 const startingPlayerPositions = [27, 14, 0, 41];
-const fixedPlayerTokenPositions = [27, 14, 0, 41];
 const playerTokenColors = ["#24d8ff", "#ff2a4f", "#39ff7a", "#ff8a1c"];
 const themeStorageKey = "poker-orbit-theme-v1";
 const cameraStorageKey = "poker-orbit-camera-offset-v2";
@@ -765,7 +764,7 @@ function createPlayerTokens() {
     token.style.setProperty("--token-color", color);
     token.setAttribute("aria-label", `Player ${index + 1} token`);
     token.innerHTML = `<span>P${index + 1}</span>`;
-    setTokenBoardPosition(token, fixedPlayerTokenPositions[index]);
+    setTokenBoardPosition(token, startingPlayerPositions[index]);
     return token;
   }));
 }
@@ -781,9 +780,8 @@ function getBoardCardPosition(index) {
   };
 }
 
-function getBoardRotationForCardIndex(index, playerIndex = turnModule.getState().currentPlayer) {
-  const tokenIndex = fixedPlayerTokenPositions[playerIndex] ?? fixedPlayerTokenPositions[0];
-  return ((tokenIndex - index) / boardSpaceCount) * 360;
+function getBoardRotationForCardIndex(index) {
+  return 180 - ((index / boardSpaceCount) * 360);
 }
 
 function getContinuousBoardRotation(targetIndex) {
@@ -1130,6 +1128,33 @@ function animateBoardClockwise(fromIndex, toIndex, delayMs = 0) {
   return delayMs + (frame * tokenStepDurationMs);
 }
 
+function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
+  const playerIndex = Number(token.dataset.token);
+  const existingTimers = tokenAnimationTimers.get(playerIndex) || [];
+  existingTimers.forEach((timer) => window.clearTimeout(timer));
+
+  const distance = (toIndex - fromIndex + boardSpaceCount) % boardSpaceCount;
+  const timers = [];
+  let moved = 0;
+  let frame = 0;
+
+  setTokenBoardPosition(token, fromIndex);
+
+  while (moved < distance) {
+    moved += Math.min(tokenStepCards, distance - moved);
+    const nextIndex = (fromIndex + moved) % boardSpaceCount;
+    frame += 1;
+    timers.push(window.setTimeout(() => {
+      setTokenBoardPosition(token, nextIndex);
+      centerBoardOnCardIndex(nextIndex, 0);
+    }, delayMs + (frame * tokenStepDurationMs)));
+  }
+
+  tokenAnimationTimers.set(playerIndex, timers);
+
+  return delayMs + (frame * tokenStepDurationMs);
+}
+
 function formatMiniCards() {
   document.querySelectorAll(".mini-card").forEach((card) => {
     const match = card.textContent.trim().match(/^(.+)([♥♦♣♠])$/);
@@ -1370,14 +1395,24 @@ function renderTurnState(turnState) {
 
   document.querySelectorAll(".player-token").forEach((token) => {
     const playerIndex = Number(token.dataset.token);
+    const targetBoardIndex = turnState.playerPositions[playerIndex];
     token.classList.toggle("active", playerIndex === turnState.currentPlayer);
-    setTokenBoardPosition(token, fixedPlayerTokenPositions[playerIndex]);
+
+    if (playerIndex === activePlayerIndex && didActiveTokenMove) {
+      return;
+    }
+
+    setTokenBoardPosition(token, targetBoardIndex);
   });
+
+  const activeToken = document.querySelector(`.player-token[data-token="${activePlayerIndex}"]`);
 
   let tokenMoveDelay = 0;
 
   if (didActiveTokenMove) {
-    tokenMoveDelay = animateBoardClockwise(previousActiveBoardIndex, activeBoardIndex, 0);
+    tokenMoveDelay = activeToken
+      ? animateTokenWithBoard(activeToken, previousActiveBoardIndex, activeBoardIndex, 0)
+      : animateBoardClockwise(previousActiveBoardIndex, activeBoardIndex, 0);
     applyBoardViewMode(turnState, activeBoardIndex, { centerBoard: false });
     scheduleLandingCardAnimation(activeBoardIndex, tokenMoveDelay + 540);
   } else {
