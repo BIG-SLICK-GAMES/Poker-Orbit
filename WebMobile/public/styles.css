@@ -897,7 +897,7 @@ h2 {
 
 .player-token {
   position: absolute;
-  width: clamp(18px, 4.6cqw, 34px);
+  width: clamp(16px, 4cqw, 30px);
   aspect-ratio: 1;
   display: grid;
   place-items: center;

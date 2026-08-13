@@ -1095,7 +1095,7 @@ function setTokenBoardPosition(token, boardIndex) {
 
 function getTokenInnerRingPosition(index) {
   const angle = (index / boardSpaceCount) * Math.PI * 2 - Math.PI / 2;
-  const radius = 36.8;
+  const radius = 41.2;
 
   return {
     x: 50 + Math.cos(angle) * radius,
