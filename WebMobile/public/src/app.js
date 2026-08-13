@@ -11,6 +11,7 @@ import { MASTER_CONTROL } from "./master-control.js";
 const shell = document.querySelector("#appShell");
 const screens = new Map([...document.querySelectorAll("[data-screen]")].map((screen) => [screen.dataset.screen, screen]));
 const boardCardRing = document.querySelector("#boardCardRing");
+const boardSlotRing = document.querySelector("#boardSlotRing");
 const boardStage = document.querySelector("#boardStage");
 const boardRotator = document.querySelector("#boardRotator");
 const perspectiveTable = document.querySelector("#perspectiveTable");
@@ -621,6 +622,16 @@ function registerServiceWorker() {
 
 function createBoardCards() {
   const cards = buildBoardDeck();
+  boardSlotRing?.replaceChildren(...Array.from({ length: boardSpaceCount }, (_, index) => {
+    const position = getBoardCardPosition(index);
+    const slot = document.createElement("span");
+    slot.className = "board-slot";
+    slot.style.left = `${position.x}%`;
+    slot.style.top = `${position.y}%`;
+    slot.style.setProperty("--tile-rotation", `${position.rotation}deg`);
+    return slot;
+  }));
+
   boardCardRing.replaceChildren(...cards.map((card, index) => {
     const position = getBoardCardPosition(index);
     const tile = document.createElement("button");

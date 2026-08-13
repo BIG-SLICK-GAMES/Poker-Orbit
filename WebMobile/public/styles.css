@@ -653,6 +653,21 @@ h2 {
   inset: 0;
   display: grid;
   place-items: center;
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(from -1deg, rgba(255, 138, 28, 0.9) 0deg 3deg, transparent 3deg 13.333deg),
+    repeating-conic-gradient(from 3deg, rgba(36, 216, 255, 0.68) 0deg 5deg, transparent 5deg 20deg),
+    radial-gradient(circle at 50% 50%, rgba(7, 35, 71, 0.94) 0 21%, transparent 21.4%),
+    radial-gradient(circle at 50% 50%, transparent 0 28%, rgba(15, 57, 100, 0.96) 28.4% 36%, transparent 36.4%),
+    radial-gradient(circle at 50% 50%, transparent 0 43%, rgba(7, 39, 80, 0.98) 43.4% 49%, transparent 49.4%),
+    radial-gradient(circle at 50% 50%, transparent 0 55%, rgba(5, 29, 61, 0.98) 55.4% 70%, transparent 70.5%),
+    radial-gradient(circle at 50% 50%, rgba(12, 44, 84, 0.98), rgba(1, 8, 22, 0.98) 72%, rgba(0, 3, 12, 0.98));
+  box-shadow:
+    inset 0 0 0 clamp(2px, 0.5cqw, 5px) rgba(36, 216, 255, 0.36),
+    inset 0 0 0 clamp(14px, 3.2cqw, 28px) rgba(2, 10, 25, 0.56),
+    inset 0 0 60px rgba(36, 216, 255, 0.2),
+    0 0 28px rgba(36, 216, 255, 0.38),
+    0 0 36px rgba(255, 138, 28, 0.16);
   transform: rotateZ(var(--player-rotation, 0deg));
   transform-origin: 50% 50%;
   transform-style: preserve-3d;
@@ -661,19 +676,37 @@ h2 {
   transition: none;
 }
 
-.board-art {
+.board-rotator::before,
+.board-rotator::after {
+  content: "";
   position: absolute;
-  inset: 0;
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: contain;
-  filter:
-    drop-shadow(0 0 16px rgba(36, 216, 255, 0.32))
-    drop-shadow(0 0 18px rgba(255, 138, 28, 0.18));
+  border-radius: 50%;
   pointer-events: none;
-  user-select: none;
+}
+
+.board-rotator::before {
+  inset: 8%;
+  z-index: 1;
+  background:
+    repeating-conic-gradient(from 0deg, rgba(36, 216, 255, 0.96) 0deg 7deg, transparent 7deg 30deg),
+    repeating-conic-gradient(from 12deg, rgba(255, 138, 28, 0.94) 0deg 4deg, transparent 4deg 36deg),
+    radial-gradient(circle at 50% 50%, transparent 0 37%, rgba(36, 216, 255, 0.62) 37.2% 37.7%, transparent 38% 52%, rgba(255, 138, 28, 0.58) 52.3% 52.9%, transparent 53.2%);
+  filter:
+    drop-shadow(0 0 7px rgba(36, 216, 255, 0.84))
+    drop-shadow(0 0 8px rgba(255, 138, 28, 0.4));
+  opacity: 0.96;
+}
+
+.board-rotator::after {
+  inset: 27%;
+  z-index: 2;
+  border: 1px solid rgba(36, 216, 255, 0.72);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(10, 43, 83, 0.96), rgba(3, 20, 45, 0.98) 72%),
+    repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.08) 0deg 2deg, transparent 2deg 7deg);
+  box-shadow:
+    inset 0 0 24px rgba(36, 216, 255, 0.24),
+    0 0 12px rgba(36, 216, 255, 0.46);
 }
 
 .board-card-ring {
@@ -683,10 +716,44 @@ h2 {
   pointer-events: auto;
 }
 
+.board-slot-ring {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.board-slot,
 .board-card {
   position: absolute;
-  width: clamp(23px, 4.95cqw, 42px);
-  height: clamp(43px, 8.9cqw, 76px);
+  width: clamp(26px, 5.6cqw, 48px);
+  height: clamp(48px, 9.9cqw, 86px);
+  transform:
+    translate(-50%, -50%)
+    translate(var(--control-x), var(--control-y))
+    rotate(var(--tile-rotation))
+    rotate(var(--control-rotation))
+    translateZ(22px)
+    scale(var(--control-scale));
+  transform-origin: center;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.board-slot {
+  border: 1px solid rgba(36, 216, 255, 0.94);
+  border-radius: 7px;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(36, 216, 255, 0.32), transparent 42%),
+    linear-gradient(180deg, rgba(7, 54, 94, 0.76), rgba(1, 12, 30, 0.72));
+  box-shadow:
+    inset 0 0 0 1px rgba(118, 234, 255, 0.22),
+    inset 0 0 18px rgba(36, 216, 255, 0.22),
+    0 0 8px rgba(36, 216, 255, 0.6),
+    0 0 14px rgba(36, 216, 255, 0.28);
+}
+
+.board-card {
   display: grid;
   place-items: center;
   gap: 1px;
@@ -710,10 +777,7 @@ h2 {
     rotate(var(--control-rotation))
     translateZ(28px)
     scale(var(--control-scale))
-    scale(0.72);
-  transform-origin: center;
-  backface-visibility: hidden;
-  will-change: transform;
+    scale(0.78);
 }
 
 .board-card strong {
