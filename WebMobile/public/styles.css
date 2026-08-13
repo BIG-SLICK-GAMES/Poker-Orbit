@@ -3602,7 +3602,8 @@ body[data-theme] .dice-pip {
 }
 
 /* Console art overlay: coordinates are percentages of the supplied 1752x990 frame. */
-.hand-panel {
+.hand-panel.console-panel,
+body[data-theme] .hand-panel.console-panel {
   position: relative;
   width: 100%;
   min-height: clamp(242px, 31cqh, 330px);
@@ -3613,14 +3614,17 @@ body[data-theme] .dice-pip {
   border-radius: 0;
   background: transparent;
   box-shadow: none;
+  clip-path: none;
 }
 
-.hand-panel::before,
-.hand-panel::after {
+.hand-panel.console-panel::before,
+.hand-panel.console-panel::after,
+body[data-theme] .hand-panel.console-panel::before,
+body[data-theme] .hand-panel.console-panel::after {
   content: none;
 }
 
-.console-art {
+.hand-panel.console-panel .console-art {
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -3632,7 +3636,7 @@ body[data-theme] .dice-pip {
   user-select: none;
 }
 
-.turn-strip {
+.hand-panel.console-panel .turn-strip {
   position: absolute;
   z-index: 2;
   left: 4.2%;
@@ -3651,7 +3655,7 @@ body[data-theme] .dice-pip {
     0 1px 0 rgba(0, 0, 0, 0.9);
 }
 
-.slot-reel {
+.hand-panel.console-panel .slot-reel {
   position: absolute;
   z-index: 2;
   inset: 0;
@@ -3666,22 +3670,22 @@ body[data-theme] .dice-pip {
   pointer-events: none;
 }
 
-.slot-reel > * {
+.hand-panel.console-panel .slot-reel > * {
   pointer-events: auto;
 }
 
-.doubles-lamp,
-.rp-meter,
-.slot-machine,
-.slot-roll-btn,
-.bonus-slots,
-.economy-strip,
-.card-hand {
+.hand-panel.console-panel .doubles-lamp,
+.hand-panel.console-panel .rp-meter,
+.hand-panel.console-panel .slot-machine,
+.hand-panel.console-panel .slot-roll-btn,
+.hand-panel.console-panel .bonus-slots,
+.hand-panel.console-panel .economy-strip,
+.hand-panel.console-panel .card-hand {
   position: absolute;
   margin: 0;
 }
 
-.doubles-lamp {
+.hand-panel.console-panel .doubles-lamp {
   left: 5.2%;
   top: 15.6%;
   width: 12.6%;
@@ -3695,7 +3699,7 @@ body[data-theme] .dice-pip {
   box-shadow: none;
 }
 
-.rp-meter {
+.hand-panel.console-panel .rp-meter {
   left: 5.2%;
   top: 27%;
   width: 12.6%;
@@ -3711,7 +3715,7 @@ body[data-theme] .dice-pip {
   box-shadow: none;
 }
 
-.rp-meter span {
+.hand-panel.console-panel .rp-meter span {
   height: auto;
   aspect-ratio: 1;
   align-self: center;
@@ -3720,7 +3724,7 @@ body[data-theme] .dice-pip {
   font-size: clamp(0.48rem, 1.25cqw, 0.68rem);
 }
 
-.rp-meter strong {
+.hand-panel.console-panel .rp-meter strong {
   color: #ffffff;
   font-size: clamp(1rem, 4.2cqw, 1.7rem);
   text-shadow:
@@ -3728,7 +3732,7 @@ body[data-theme] .dice-pip {
     0 2px 0 rgba(0, 0, 0, 0.85);
 }
 
-.slot-machine {
+.hand-panel.console-panel .slot-machine {
   left: 20%;
   top: 16.4%;
   width: 23.9%;
@@ -3745,7 +3749,7 @@ body[data-theme] .dice-pip {
   box-shadow: none;
 }
 
-.slot-window {
+.hand-panel.console-panel .slot-window {
   width: 100%;
   max-width: none;
   aspect-ratio: 1;
@@ -3765,7 +3769,7 @@ body[data-theme] .dice-pip {
     0 0 12px rgba(36, 216, 255, 0.18);
 }
 
-.slot-roll-btn {
+.hand-panel.console-panel .slot-roll-btn {
   left: 45.2%;
   top: 15.7%;
   width: 15.2%;
@@ -3786,12 +3790,12 @@ body[data-theme] .dice-pip {
   box-shadow: none;
 }
 
-.slot-roll-btn:active {
+.hand-panel.console-panel .slot-roll-btn:active {
   transform: scale(0.96);
   box-shadow: none;
 }
 
-.bonus-slots {
+.hand-panel.console-panel .bonus-slots {
   left: 62%;
   top: 16.1%;
   width: 34.2%;
@@ -3806,7 +3810,7 @@ body[data-theme] .dice-pip {
   box-shadow: none;
 }
 
-.bonus-slot {
+.hand-panel.console-panel .bonus-slot {
   width: 100%;
   height: 100%;
   min-height: 0;
@@ -3817,7 +3821,7 @@ body[data-theme] .dice-pip {
   box-shadow: none;
 }
 
-.economy-strip {
+.hand-panel.console-panel .economy-strip {
   z-index: 2;
   left: 4.2%;
   top: 47.4%;
@@ -3829,8 +3833,8 @@ body[data-theme] .dice-pip {
   pointer-events: none;
 }
 
-.chip-bank,
-.owned-count {
+.hand-panel.console-panel .chip-bank,
+.hand-panel.console-panel .owned-count {
   min-height: 0;
   height: 100%;
   border: 0;
@@ -3839,14 +3843,14 @@ body[data-theme] .dice-pip {
   box-shadow: none;
 }
 
-.chip-bank span,
-.owned-count span {
+.hand-panel.console-panel .chip-bank span,
+.hand-panel.console-panel .owned-count span {
   color: rgba(191, 244, 255, 0.74);
   font-size: clamp(0.5rem, 1.4cqw, 0.72rem);
 }
 
-.chip-bank strong,
-.owned-count strong {
+.hand-panel.console-panel .chip-bank strong,
+.hand-panel.console-panel .owned-count strong {
   color: #ffffff;
   font-size: clamp(1rem, 3.6cqw, 1.58rem);
   text-shadow:
@@ -3854,7 +3858,7 @@ body[data-theme] .dice-pip {
     0 2px 0 rgba(0, 0, 0, 0.9);
 }
 
-.card-hand {
+.hand-panel.console-panel .card-hand {
   z-index: 2;
   left: 3.8%;
   top: 67.2%;
@@ -3872,13 +3876,13 @@ body[data-theme] .dice-pip {
   box-shadow: none;
 }
 
-.empty-hand {
+.hand-panel.console-panel .empty-hand {
   min-height: 50%;
   border-color: rgba(36, 216, 255, 0.34);
   color: rgba(191, 244, 255, 0.68);
 }
 
-.mini-card {
+.hand-panel.console-panel .mini-card {
   width: clamp(42px, 10.2cqw, 68px);
   height: 90%;
   max-height: none;
