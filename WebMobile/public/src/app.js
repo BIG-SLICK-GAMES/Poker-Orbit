@@ -4,7 +4,6 @@ import { createSlotReelModule } from "./slot-reel.js";
 import { createCardAnimationModule } from "./card-animation.js";
 import { createPurchaseAuctionModule, getRankPurchasePrice } from "./purchase-auction.js";
 import { createOwnershipHighlightModule } from "./ownership-highlights.js";
-import { createBoardModelLayer } from "./board-model.js";
 import { getBonusIconSrc } from "./bonus-icons.js";
 import { buildBonusSlotPrizes } from "./bonus-slot-prizes.js";
 import { MASTER_CONTROL } from "./master-control.js";
@@ -12,7 +11,6 @@ import { MASTER_CONTROL } from "./master-control.js";
 const shell = document.querySelector("#appShell");
 const screens = new Map([...document.querySelectorAll("[data-screen]")].map((screen) => [screen.dataset.screen, screen]));
 const boardCardRing = document.querySelector("#boardCardRing");
-const boardModelLayer = document.querySelector("#boardModelLayer");
 const boardStage = document.querySelector("#boardStage");
 const boardRotator = document.querySelector("#boardRotator");
 const perspectiveTable = document.querySelector("#perspectiveTable");
@@ -211,10 +209,6 @@ const playerBonuses = Array.from({ length: 4 }, () => []);
 
 createBoardCards();
 createPlayerTokens();
-createBoardModelLayer({
-  root: boardModelLayer,
-  modelUrl: "./assets/models/poker-orbit-board.glb"
-});
 formatMiniCards();
 applyMasterControl();
 turnModule.subscribe(renderTurnState);
