@@ -999,9 +999,11 @@ function scheduleNextTurn(delayMs = 0) {
   }, Math.max(0, delayMs));
 }
 
-function applyBoardViewMode(turnState, boardIndex = turnState.playerPositions[turnState.currentPlayer]) {
+function applyBoardViewMode(turnState, boardIndex = turnState.playerPositions[turnState.currentPlayer], options = {}) {
   const presetName = "tableWide";
-  centerBoardOnCardIndex(boardIndex, 0);
+  if (options.centerBoard !== false) {
+    centerBoardOnCardIndex(boardIndex, 0);
+  }
   cameraModule.setPreset(presetName, turnState, boardIndex);
 
   if (viewToggleButton) {
@@ -1374,7 +1376,7 @@ function renderTurnState(turnState) {
 
   if (didActiveTokenMove) {
     tokenMoveDelay = animateBoardClockwise(previousActiveBoardIndex, activeBoardIndex, 0);
-    applyBoardViewMode(turnState, activeBoardIndex);
+    applyBoardViewMode(turnState, activeBoardIndex, { centerBoard: false });
     scheduleLandingCardAnimation(activeBoardIndex, tokenMoveDelay + 540);
   } else {
     centerBoardOnCardIndex(activeBoardIndex, 0);
