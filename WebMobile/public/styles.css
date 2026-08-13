@@ -3640,7 +3640,7 @@ body[data-theme] .hand-panel.console-panel::after {
   position: absolute;
   z-index: 2;
   left: 4.2%;
-  top: 3.7%;
+  top: 2.9%;
   width: 91.6%;
   height: 9.2%;
   margin: 0;
@@ -3706,8 +3706,10 @@ body[data-theme] .hand-panel.console-panel::after {
   height: 14.2%;
   min-height: 0;
   display: grid;
-  grid-template-columns: 30% minmax(0, 1fr);
-  gap: 5%;
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: 1fr;
+  place-items: center;
+  gap: 1px;
   padding: 4%;
   border: 0;
   border-radius: 8px;
@@ -3717,16 +3719,24 @@ body[data-theme] .hand-panel.console-panel::after {
 
 .hand-panel.console-panel .rp-meter span {
   height: auto;
-  aspect-ratio: 1;
-  align-self: center;
-  background: rgba(36, 216, 255, 0.92);
-  color: #020714;
-  font-size: clamp(0.48rem, 1.25cqw, 0.68rem);
+  aspect-ratio: auto;
+  align-self: end;
+  background: transparent;
+  color: rgba(191, 244, 255, 0.78);
+  font-size: clamp(0.44rem, 1.35cqw, 0.66rem);
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(36, 216, 255, 0.64);
 }
 
 .hand-panel.console-panel .rp-meter strong {
+  align-self: start;
   color: #ffffff;
-  font-size: clamp(1rem, 4.2cqw, 1.7rem);
+  font-size: clamp(1.08rem, 4.4cqw, 1.78rem);
+  line-height: 0.98;
+  text-align: center;
   text-shadow:
     0 0 10px rgba(36, 216, 255, 0.9),
     0 2px 0 rgba(0, 0, 0, 0.85);
@@ -3757,6 +3767,8 @@ body[data-theme] .hand-panel.console-panel::after {
   aspect-ratio: auto;
   border: 0;
   border-radius: 10px;
+  display: grid;
+  place-items: center;
   background:
     radial-gradient(circle at 36% 25%, rgba(255, 255, 255, 0.58), transparent 20%),
     linear-gradient(180deg, rgba(8, 41, 75, 0.98), rgba(1, 7, 18, 0.98));
