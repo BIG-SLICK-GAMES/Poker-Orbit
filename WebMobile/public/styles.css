@@ -764,8 +764,8 @@ h2 {
 
 .board-card {
   position: absolute;
-  width: clamp(22px, 4.9cqw, 42px);
-  height: clamp(43px, 9.2cqw, 80px);
+  width: clamp(17px, 3.65cqw, 30px);
+  height: clamp(36px, 7.65cqw, 64px);
   display: grid;
   place-items: center;
   gap: 1px;
@@ -789,7 +789,7 @@ h2 {
     rotate(var(--control-rotation))
     translateZ(28px)
     scale(var(--control-scale))
-    scale(0.96);
+    scale(0.94);
   transform-origin: center;
   backface-visibility: hidden;
   will-change: transform;
