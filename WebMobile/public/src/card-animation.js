@@ -196,7 +196,7 @@ function createBonusSlotMachineElement(prize) {
       <strong>${prize.label}</strong>
       <span>${getPrizeDescription(prize)}</span>
     </aside>
-    <div class="bonus-slot-machine" data-prize="${prize.type}">
+    <div class="bonus-slot-machine slot-spinner" data-prize="${prize.type}">
       <div class="bonus-slot-sign">BONUS</div>
       <div class="bonus-slot-window" aria-hidden="true">
         ${[0, 1, 2].map((index) => `
