@@ -678,10 +678,11 @@ function createPlayerTokens() {
 
 function getBoardCardPosition(index) {
   const angle = (index / boardSpaceCount) * Math.PI * 2 - Math.PI / 2;
+  const radius = 44.1;
 
   return {
-    x: 50 + Math.cos(angle) * 39.2,
-    y: 50 + Math.sin(angle) * 39.2,
+    x: 50 + Math.cos(angle) * radius,
+    y: 50 + Math.sin(angle) * radius,
     rotation: (angle * 180 / Math.PI) + 90
   };
 }
@@ -1000,7 +1001,7 @@ function setTokenBoardPosition(token, boardIndex) {
 
 function getTokenCardContactPosition(index) {
   const angle = (index / boardSpaceCount) * Math.PI * 2 - Math.PI / 2;
-  const radius = 39.2;
+  const radius = 44.1;
 
   return {
     x: 50 + Math.cos(angle) * radius,

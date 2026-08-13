@@ -685,8 +685,8 @@ h2 {
 
 .board-card {
   position: absolute;
-  width: clamp(24px, 5.25cqw, 46px);
-  height: clamp(36px, 7.55cqw, 66px);
+  width: clamp(23px, 4.95cqw, 42px);
+  height: clamp(43px, 8.9cqw, 76px);
   display: grid;
   place-items: center;
   gap: 1px;
@@ -708,9 +708,9 @@ h2 {
     translate(var(--control-x), var(--control-y))
     rotate(var(--tile-rotation))
     rotate(var(--control-rotation))
-    translateZ(24px)
+    translateZ(28px)
     scale(var(--control-scale))
-    scale(0.78);
+    scale(0.72);
   transform-origin: center;
   backface-visibility: hidden;
   will-change: transform;
@@ -3472,10 +3472,10 @@ body[data-theme] .dice-pip {
   }
 
   .board-card {
-    width: clamp(32px, 6vw, 50px);
-    height: clamp(46px, 9vw, 74px);
-    font-size: clamp(0.5rem, 1.35vw, 0.78rem);
-    border-radius: 2px;
+    width: clamp(22px, 4.5vw, 38px);
+    height: clamp(40px, 8vw, 68px);
+    font-size: clamp(0.46rem, 1.12vw, 0.68rem);
+    border-radius: 4px;
   }
 }
 
