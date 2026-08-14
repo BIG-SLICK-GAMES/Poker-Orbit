@@ -968,6 +968,24 @@ h2 {
     scale(1.08);
 }
 
+.token-comet-particle {
+  position: absolute;
+  z-index: 4;
+  width: clamp(5px, 1.4cqw, 11px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.96) 0 20%, var(--fx-color, #24d8ff) 38%, transparent 72%);
+  filter: drop-shadow(0 0 6px var(--fx-color, #24d8ff));
+  opacity: 0;
+  transform:
+    translate(-50%, -50%)
+    translateZ(3px)
+    scale(var(--fx-scale, 1));
+  animation: token-comet-trail var(--fx-life, 520ms) ease-out var(--fx-delay, 0ms) both;
+  pointer-events: none;
+}
+
 .card-animation-layer {
   position: absolute;
   inset: 0;
@@ -1150,6 +1168,32 @@ h2 {
 
 .featured-card-flight.waiting-purchase {
   animation: card-pick-me 520ms ease-in-out infinite alternate;
+}
+
+.featured-card-flight.purchase-fx-source {
+  opacity: 0;
+}
+
+.purchase-fx-card {
+  position: absolute;
+  z-index: 36;
+  pointer-events: none;
+  border-color: color-mix(in srgb, var(--fx-color, #24d8ff) 78%, #ffffff);
+  background:
+    radial-gradient(circle at 50% 14%, rgba(255, 255, 255, 0.76), transparent 28%),
+    linear-gradient(180deg, color-mix(in srgb, var(--fx-color, #24d8ff) 34%, #fffef7), color-mix(in srgb, var(--fx-color, #24d8ff) 24%, var(--diner-cream)));
+  box-shadow:
+    0 0 0 5px color-mix(in srgb, var(--fx-color, #24d8ff) 30%, transparent),
+    0 0 22px color-mix(in srgb, var(--fx-color, #24d8ff) 92%, transparent),
+    0 0 54px color-mix(in srgb, var(--fx-color, #24d8ff) 58%, transparent),
+    0 24px 42px rgba(0, 0, 0, 0.46),
+    inset 0 0 14px color-mix(in srgb, var(--fx-color, #24d8ff) 34%, transparent),
+    inset 0 2px 0 rgba(255, 255, 255, 0.82);
+  transform-origin: center;
+}
+
+.board-card.purchase-fx-owned {
+  animation: purchased-card-spark 680ms cubic-bezier(0.16, 1.08, 0.22, 1) both;
 }
 
 .bonus-slot-icon svg {
@@ -2847,6 +2891,43 @@ body[data-theme] .dice-pip {
       0 0 30px color-mix(in srgb, var(--owner-color, #24d8ff) 54%, transparent),
       0 2px 5px rgba(0, 0, 0, 0.32),
       inset 0 1px 0 rgba(255, 255, 255, 0.62);
+  }
+}
+
+@keyframes token-comet-trail {
+  0% {
+    opacity: 0;
+    transform:
+      translate(-50%, -50%)
+      translateZ(3px)
+      scale(0.35);
+  }
+  18% {
+    opacity: 0.92;
+  }
+  100% {
+    opacity: 0;
+    transform:
+      translate(-50%, -50%)
+      translateZ(3px)
+      scale(1.7);
+  }
+}
+
+@keyframes purchased-card-spark {
+  0% {
+    filter: saturate(1) brightness(1);
+  }
+  42% {
+    filter: saturate(1.6) brightness(1.3);
+    box-shadow:
+      0 0 0 4px var(--owner-color, #24d8ff),
+      0 0 20px var(--owner-color, #24d8ff),
+      0 0 44px color-mix(in srgb, var(--owner-color, #24d8ff) 66%, transparent),
+      inset 0 0 12px color-mix(in srgb, var(--owner-color, #24d8ff) 34%, transparent);
+  }
+  100% {
+    filter: saturate(1.1) brightness(1);
   }
 }
 

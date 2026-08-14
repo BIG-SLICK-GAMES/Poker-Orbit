@@ -1,4 +1,4 @@
-export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, canSpin }) {
+export function createCardAnimationModule({ layer, onPurchase, onPurchaseFx, onPass, onSpin, canSpin }) {
   let activeAnimation = null;
   let activeCardElement = null;
 
@@ -110,15 +110,27 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
       setStatus("Bonus slots spinning");
       onSpin?.(activeCardElement, promptControls, { freeSpin: hasFreeSpin });
     });
-    purchaseButton.addEventListener("click", () => {
+    purchaseButton.addEventListener("click", async () => {
+      purchaseButton.disabled = true;
+      spinButton.disabled = true;
       const result = onPurchase?.(activeCardElement, purchaseOptions);
       if (result?.message) {
         status.textContent = result.message;
       }
 
       if (result?.success !== false) {
+        controls.classList.add("purchase-resolving");
+        await onPurchaseFx?.({
+          featuredCard: clone,
+          cardElement: activeCardElement,
+          playerIndex: result?.playerIndex || 0
+        });
         clear();
+        return;
       }
+
+      purchaseButton.disabled = false;
+      updateSpinButton();
     });
     controls.querySelector(".pass").addEventListener("click", () => {
       onPass?.(activeCardElement);

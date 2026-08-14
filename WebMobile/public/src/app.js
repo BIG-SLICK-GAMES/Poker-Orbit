@@ -4,6 +4,7 @@ import { createSlotReelModule } from "./slot-reel.js";
 import { createCardAnimationModule } from "./card-animation.js";
 import { createPurchaseAuctionModule, getRankPurchasePrice } from "./purchase-auction.js";
 import { createOwnershipHighlightModule } from "./ownership-highlights.js";
+import { createFxOverlayModule } from "./fx-overlay.js";
 import { getBonusIconSrc } from "./bonus-icons.js";
 import { buildBonusSlotPrizes } from "./bonus-slot-prizes.js";
 import { MASTER_CONTROL } from "./master-control.js";
@@ -158,9 +159,17 @@ createThemeSettings();
 const turnModule = createTurnModule(4, { boardSpaceCount, startingPositions: startingPlayerPositions });
 const cameraModule = createCameraModule({ boardStage, perspectiveTable, cameraControl: MASTER_CONTROL.camera });
 const ownershipHighlightModule = createOwnershipHighlightModule({ boardRoot: boardCardRing });
+const fxOverlayModule = createFxOverlayModule({
+  layer: cardAnimationLayer,
+  tokenLayer: playerTokenLayer,
+  getTokenPosition: getTokenInnerRingPosition,
+  playerColors: playerTokenColors,
+  boardSpaceCount
+});
 const cardAnimationModule = createCardAnimationModule({
   layer: cardAnimationLayer,
   onPurchase: purchaseBoardCard,
+  onPurchaseFx: fxOverlayModule.playPurchaseCelebration,
   onPass: passBoardCard,
   onSpin: spinForBoardCard,
   canSpin: canSpinForBoardCard
@@ -901,7 +910,7 @@ function purchaseBoardCard(cardElement, options = {}) {
   awaitingLandingDecision = false;
   scheduleNextTurn(360);
 
-  return purchaseResult;
+  return { ...purchaseResult, playerIndex };
 }
 
 function passBoardCard(cardElement) {
@@ -1161,6 +1170,7 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
 
   setTokenBoardPosition(token, fromIndex);
   token.style.setProperty("--token-move-ms", `${moveDuration}ms`);
+  fxOverlayModule.playTokenTrail({ playerIndex, fromIndex, toIndex, durationMs: moveDuration, delayMs });
 
   const timer = window.setTimeout(() => {
     setTokenBoardPosition(token, toIndex);
