@@ -1023,15 +1023,17 @@ function scheduleNextTurn(delayMs = 0) {
 }
 
 function applyBoardViewMode(turnState, boardIndex = turnState.playerPositions[turnState.currentPlayer], options = {}) {
-  const presetName = "tableWide";
+  const isWideView = boardViewMode === "wide";
+  const presetName = isWideView ? "tableWide" : "turnFocus";
   if (options.centerBoard !== false) {
     centerBoardOnCardIndex(boardIndex, 0);
   }
   cameraModule.setPreset(presetName, turnState, boardIndex);
 
   if (viewToggleButton) {
-    viewToggleButton.textContent = "Wide";
-    viewToggleButton.setAttribute("aria-pressed", "true");
+    viewToggleButton.textContent = isWideView ? "Zoom" : "Wide";
+    viewToggleButton.setAttribute("aria-pressed", String(isWideView));
+    viewToggleButton.setAttribute("aria-label", isWideView ? "Switch to active player zoom" : "Switch to wide board view");
   }
 }
 
