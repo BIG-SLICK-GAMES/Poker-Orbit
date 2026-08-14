@@ -849,8 +849,19 @@ function scheduleLandingCardAnimation(boardIndex, delayMs = 0) {
   }
 
   pendingCardAnimationTimer = window.setTimeout(() => {
-    const card = boardCardRing.querySelector(`.board-card[data-index="${boardIndex}"][data-purchase-state="available"]`);
+    const card = boardCardRing.querySelector(`.board-card[data-index="${boardIndex}"]`);
     if (!card) {
+      scheduleNextTurn(320);
+      return;
+    }
+
+    if (card.dataset.purchaseState === "purchased") {
+      resolveOwnedCardLanding(card);
+      scheduleNextTurn(520);
+      return;
+    }
+
+    if (card.dataset.purchaseState !== "available") {
       scheduleNextTurn(320);
       return;
     }
@@ -858,6 +869,19 @@ function scheduleLandingCardAnimation(boardIndex, delayMs = 0) {
     awaitingLandingDecision = true;
     cardAnimationModule.play(card);
   }, delayMs);
+}
+
+function resolveOwnedCardLanding(cardElement) {
+  const ownerIndex = Number.parseInt(cardElement.dataset.owner || "0", 10) - 1;
+  const landingPlayerIndex = turnModule.getState().currentPlayer;
+  const isOwnerBestHand = cardElement.classList.contains("best-hand")
+    && Number.parseInt(cardElement.dataset.bestHand || "0", 10) - 1 === ownerIndex;
+
+  if (!Number.isFinite(ownerIndex) || ownerIndex < 0 || ownerIndex === landingPlayerIndex || !isOwnerBestHand) {
+    return;
+  }
+
+  purchaseAuctionModule.chargePenalty(landingPlayerIndex, ownerIndex, cardElement.dataset.penalty || "0");
 }
 
 function purchaseBoardCard(cardElement, options = {}) {
@@ -1251,10 +1275,12 @@ function updateBestHandHighlights() {
 
 function getBestPokerHandCards(cards) {
   const playableCards = cards.filter((card) => rankValue(card.rank) > 0 && card.suit);
+  if (!playableCards.length) {
+    return [];
+  }
+
   if (playableCards.length < 5) {
-    return [...playableCards]
-      .sort((first, second) => rankValue(second.rank) - rankValue(first.rank))
-      .slice(0, Math.max(1, playableCards.length));
+    return getBestPartialPokerHandCards(playableCards);
   }
 
   let bestCards = [];
@@ -1284,6 +1310,23 @@ function getBestPokerHandCards(cards) {
   }
 
   return bestCards;
+}
+
+function getBestPartialPokerHandCards(cards) {
+  const groups = new Map();
+  cards.forEach((card) => {
+    const value = rankValue(card.rank);
+    groups.set(value, [...(groups.get(value) || []), card]);
+  });
+
+  const groupedCards = [...groups.entries()].sort((first, second) => {
+    if (second[1].length !== first[1].length) {
+      return second[1].length - first[1].length;
+    }
+    return second[0] - first[0];
+  });
+
+  return groupedCards[0]?.[1] || [];
 }
 
 function scorePokerHand(cards) {

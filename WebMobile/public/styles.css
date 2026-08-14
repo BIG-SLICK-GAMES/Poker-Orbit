@@ -837,6 +837,9 @@ h2 {
 
 .board-card.best-hand {
   filter: saturate(1.28) brightness(1.08);
+  background:
+    radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--owner-color, #24d8ff) 38%, #ffffff), transparent 44%),
+    linear-gradient(180deg, color-mix(in srgb, var(--owner-color, #24d8ff) 30%, #fffef7), color-mix(in srgb, var(--owner-color, #24d8ff) 18%, var(--diner-cream)));
   box-shadow:
     0 0 0 3px var(--owner-color, rgba(36, 216, 255, 0.92)),
     0 0 14px color-mix(in srgb, var(--owner-color, #24d8ff) 92%, transparent),
@@ -2677,6 +2680,12 @@ body[data-theme] .board-card.purchased {
     0 2px 5px rgba(0, 0, 0, 0.32),
     inset 0 1px 0 rgba(255, 255, 255, 0.54);
   animation: purchased-edge-pulse 1.35s ease-in-out infinite alternate;
+}
+
+body[data-theme] .board-card.best-hand {
+  background:
+    radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--owner-color, #24d8ff) 38%, #ffffff), transparent 44%),
+    linear-gradient(180deg, color-mix(in srgb, var(--owner-color, #24d8ff) 30%, #fffef7), color-mix(in srgb, var(--owner-color, #24d8ff) 18%, var(--diner-cream)));
 }
 
 body[data-theme] .hand-panel {

@@ -110,6 +110,20 @@ export function createPurchaseAuctionModule({
     return { success: true };
   }
 
+  function chargePenalty(playerIndex, ownerIndex, amount) {
+    const penalty = Math.max(0, Number.parseInt(String(amount), 10) || 0);
+    if (!penalty || playerIndex === ownerIndex) {
+      render(activePlayer);
+      return { charged: 0 };
+    }
+
+    const charged = Math.min(players[playerIndex].chips, penalty);
+    players[playerIndex].chips -= charged;
+    players[ownerIndex].chips += charged;
+    render(activePlayer);
+    return { charged };
+  }
+
   function startAuction(cardElement, playerIndex = activePlayer) {
     const card = getCardFromElement(cardElement);
     return {
@@ -161,6 +175,7 @@ export function createPurchaseAuctionModule({
 
   return {
     canPurchase,
+    chargePenalty,
     getCardPrice,
     getPlayer,
     purchase,
