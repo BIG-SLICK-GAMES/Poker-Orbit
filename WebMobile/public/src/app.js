@@ -198,7 +198,8 @@ const purchaseAuctionModule = createPurchaseAuctionModule({
   handRoot: playerCardHand,
   chipsLabel: chipBankLabel,
   cardCountLabel: ownedCardCountLabel,
-  suitIcons
+  suitIcons,
+  getBestHandCards: getBestPokerHandCards
 });
 const tokenStepDurationMs = Math.max(60, numberOrDefault(MASTER_CONTROL.gameplay?.tokenStepDurationMs, 230));
 const tokenStepCards = Math.max(1, Math.trunc(numberOrDefault(MASTER_CONTROL.gameplay?.tokenStepCards, 1)));
@@ -791,22 +792,22 @@ function getContinuousBoardRotation(targetIndex) {
   return baseRotation + rotationsFromCurrent * 360;
 }
 
-function centerBoardOnCardIndex(index, delayMs = 0) {
+function centerBoardOnCardIndex(index, delayMs = 0, durationMs) {
   window.clearTimeout(pendingBoardCenterTimer);
 
   pendingBoardCenterTimer = window.setTimeout(() => {
-    tweenBoardRotation(getContinuousBoardRotation(index));
+    tweenBoardRotation(getContinuousBoardRotation(index), durationMs);
   }, delayMs);
 }
 
-function tweenBoardRotation(targetRotation) {
+function tweenBoardRotation(targetRotation, durationOverrideMs) {
   window.cancelAnimationFrame(boardRotationAnimationFrame);
 
   const startRotation = boardRotationDegrees;
   const change = targetRotation - startRotation;
   const duration = shell.classList.contains("reduce-motion")
     ? 0
-    : Math.max(160, tokenStepDurationMs * 0.92);
+    : Math.max(160, Number.isFinite(durationOverrideMs) ? durationOverrideMs : tokenStepDurationMs * 0.92);
 
   if (!duration || Math.abs(change) < 0.001) {
     boardRotationDegrees = targetRotation;
@@ -1134,22 +1135,16 @@ function animateBoardClockwise(fromIndex, toIndex, delayMs = 0) {
   const existingTimers = tokenAnimationTimers.get("board") || [];
   existingTimers.forEach((timer) => window.clearTimeout(timer));
   const distance = (toIndex - fromIndex + boardSpaceCount) % boardSpaceCount;
-  const timers = [];
-  let moved = 0;
-  let frame = 0;
+  const moveDuration = shell.classList.contains("reduce-motion")
+    ? 0
+    : Math.min(1100, Math.max(420, distance * 80));
+  const timer = window.setTimeout(() => {
+    centerBoardOnCardIndex(toIndex, 0, moveDuration);
+  }, delayMs);
 
-  while (moved < distance) {
-    moved += Math.min(tokenStepCards, distance - moved);
-    const nextIndex = (fromIndex + moved) % boardSpaceCount;
-    frame += 1;
-    timers.push(window.setTimeout(() => {
-      centerBoardOnCardIndex(nextIndex, 0);
-    }, delayMs + (frame * tokenStepDurationMs)));
-  }
+  tokenAnimationTimers.set("board", [timer]);
 
-  tokenAnimationTimers.set("board", timers);
-
-  return delayMs + (frame * tokenStepDurationMs);
+  return delayMs + moveDuration;
 }
 
 function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
@@ -1158,25 +1153,21 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
   existingTimers.forEach((timer) => window.clearTimeout(timer));
 
   const distance = (toIndex - fromIndex + boardSpaceCount) % boardSpaceCount;
-  const timers = [];
-  let moved = 0;
-  let frame = 0;
+  const moveDuration = shell.classList.contains("reduce-motion")
+    ? 0
+    : Math.min(1100, Math.max(420, distance * 80));
 
   setTokenBoardPosition(token, fromIndex);
+  token.style.setProperty("--token-move-ms", `${moveDuration}ms`);
 
-  while (moved < distance) {
-    moved += Math.min(tokenStepCards, distance - moved);
-    const nextIndex = (fromIndex + moved) % boardSpaceCount;
-    frame += 1;
-    timers.push(window.setTimeout(() => {
-      setTokenBoardPosition(token, nextIndex);
-      centerBoardOnCardIndex(nextIndex, 0);
-    }, delayMs + (frame * tokenStepDurationMs)));
-  }
+  const timer = window.setTimeout(() => {
+    setTokenBoardPosition(token, toIndex);
+    centerBoardOnCardIndex(toIndex, 0, moveDuration);
+  }, delayMs);
 
-  tokenAnimationTimers.set(playerIndex, timers);
+  tokenAnimationTimers.set(playerIndex, [timer]);
 
-  return delayMs + (frame * tokenStepDurationMs);
+  return delayMs + moveDuration;
 }
 
 function formatMiniCards() {
@@ -1309,7 +1300,7 @@ function getBestPokerHandCards(cards) {
     }
   }
 
-  return bestCards;
+  return orderPokerHandCards(bestCards);
 }
 
 function getBestPartialPokerHandCards(cards) {
@@ -1326,7 +1317,18 @@ function getBestPartialPokerHandCards(cards) {
     return second[0] - first[0];
   });
 
-  return groupedCards[0]?.[1] || [];
+  return [...(groupedCards[0]?.[1] || [])].sort((first, second) => rankValue(second.rank) - rankValue(first.rank));
+}
+
+function orderPokerHandCards(cards) {
+  return [...cards].sort((first, second) => {
+    const firstCount = cards.filter((card) => card.rank === first.rank).length;
+    const secondCount = cards.filter((card) => card.rank === second.rank).length;
+    if (secondCount !== firstCount) {
+      return secondCount - firstCount;
+    }
+    return rankValue(second.rank) - rankValue(first.rank);
+  });
 }
 
 function scorePokerHand(cards) {

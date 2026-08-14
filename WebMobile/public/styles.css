@@ -942,8 +942,8 @@ h2 {
     translateZ(4px);
   transform-origin: center;
   transition:
-    left 150ms cubic-bezier(0.22, 0.72, 0.22, 1),
-    top 150ms cubic-bezier(0.22, 0.72, 0.22, 1),
+    left var(--token-move-ms, 150ms) cubic-bezier(0.18, 0.78, 0.18, 1),
+    top var(--token-move-ms, 150ms) cubic-bezier(0.18, 0.78, 0.18, 1),
     transform 220ms cubic-bezier(0.22, 0.72, 0.22, 1),
     filter 220ms ease,
     box-shadow 220ms ease;
@@ -2078,14 +2078,52 @@ h2 {
 }
 
 .card-hand {
-  display: flex;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
   gap: 6px;
   overflow-x: auto;
   height: clamp(70px, 17vw, 88px);
   min-height: clamp(70px, 17vw, 88px);
-  align-items: center;
   padding: 2px 2px 7px;
   -webkit-overflow-scrolling: touch;
+}
+
+.best-hand-frame,
+.owned-card-track {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.best-hand-frame {
+  padding: 2px;
+  border: 1px solid rgba(255, 138, 28, 0.48);
+  border-radius: 7px;
+  background: rgba(255, 138, 28, 0.08);
+  box-shadow: inset 0 0 12px rgba(255, 138, 28, 0.14);
+}
+
+.owned-card-track {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.best-hand-slot.empty {
+  flex: 0 0 clamp(30px, 8.8vw, 46px);
+  height: calc(100% - 6px);
+  border: 1px dashed rgba(255, 138, 28, 0.46);
+  border-radius: 7px;
+  background: rgba(3, 15, 32, 0.48);
+  box-shadow: inset 0 0 10px rgba(255, 138, 28, 0.12);
+}
+
+.mini-card.best-hand-slot {
+  border-color: rgba(255, 138, 28, 0.92);
+  box-shadow:
+    0 0 0 1px rgba(255, 138, 28, 0.62),
+    0 0 14px rgba(255, 138, 28, 0.34),
+    0 7px 14px rgba(0, 0, 0, 0.34);
 }
 
 .empty-hand {
@@ -3944,10 +3982,10 @@ body[data-theme] .hand-panel.console-panel::after {
   width: 92.4%;
   height: 26.9%;
   min-height: 0;
-  display: flex;
-  align-items: center;
-  gap: clamp(5px, 1.1cqw, 9px);
-  overflow-x: auto;
+  display: grid;
+  grid-template-rows: 50% 50%;
+  gap: 2px;
+  overflow: hidden;
   padding: 1.4% 2.2% 1.7%;
   border: 0;
   border-radius: 8px;
@@ -3961,8 +3999,27 @@ body[data-theme] .hand-panel.console-panel::after {
   color: rgba(191, 244, 255, 0.68);
 }
 
+.hand-panel.console-panel .best-hand-frame {
+  min-height: 0;
+  padding: 2px;
+  gap: clamp(3px, 0.8cqw, 7px);
+  border-color: rgba(255, 138, 28, 0.52);
+  background: rgba(255, 138, 28, 0.07);
+}
+
+.hand-panel.console-panel .owned-card-track {
+  min-height: 0;
+  gap: clamp(4px, 0.9cqw, 8px);
+  overflow-x: auto;
+}
+
 .hand-panel.console-panel .mini-card {
-  width: clamp(42px, 10.2cqw, 68px);
-  height: 90%;
+  width: clamp(30px, 7.2cqw, 48px);
+  height: calc(100% - 3px);
   max-height: none;
+}
+
+.hand-panel.console-panel .best-hand-slot.empty {
+  flex-basis: clamp(30px, 7.2cqw, 48px);
+  height: calc(100% - 3px);
 }

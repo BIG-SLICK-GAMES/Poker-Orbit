@@ -20,7 +20,8 @@ export function createPurchaseAuctionModule({
   handRoot,
   chipsLabel,
   cardCountLabel,
-  suitIcons
+  suitIcons,
+  getBestHandCards = () => []
 }) {
   const players = Array.from({ length: playerCount }, () => ({
     chips: startingChips,
@@ -144,12 +145,27 @@ export function createPurchaseAuctionModule({
     chipsLabel.textContent = formatChips(player.chips);
     cardCountLabel.textContent = String(player.cards.length);
 
-    if (!player.cards.length) {
-      handRoot.innerHTML = `<span class="empty-hand">No cards</span>`;
-      return;
+    const bestCards = getBestHandCards(player.cards);
+    const bestCardIndexes = new Set(bestCards.map((card) => card.boardIndex));
+    const bestSlots = Array.from({ length: 5 }, (_, index) => createBestHandSlot(bestCards[index]));
+    const ownedCards = player.cards.filter((card) => !bestCardIndexes.has(card.boardIndex));
+    const ownedTrack = document.createElement("div");
+    ownedTrack.className = "owned-card-track";
+
+    if (!ownedCards.length) {
+      ownedTrack.innerHTML = `<span class="empty-hand">No cards</span>`;
+    } else {
+      ownedTrack.replaceChildren(...ownedCards.map((card) => createMiniCard(card)));
     }
 
-    handRoot.replaceChildren(...player.cards.map((card) => {
+    const bestFrame = document.createElement("div");
+    bestFrame.className = "best-hand-frame";
+    bestFrame.setAttribute("aria-label", "Best poker hand");
+    bestFrame.replaceChildren(...bestSlots);
+    handRoot.replaceChildren(bestFrame, ownedTrack);
+  }
+
+  function createMiniCard(card) {
       const cardButton = document.createElement("button");
       cardButton.className = `mini-card ${card.suit === "H" || card.suit === "D" ? "red" : "black"}`;
       cardButton.type = "button";
@@ -161,7 +177,18 @@ export function createPurchaseAuctionModule({
         <em>${formatChips(card.price)}</em>
       `;
       return cardButton;
-    }));
+  }
+
+  function createBestHandSlot(card) {
+    if (!card) {
+      const emptySlot = document.createElement("span");
+      emptySlot.className = "best-hand-slot empty";
+      return emptySlot;
+    }
+
+    const slot = createMiniCard(card);
+    slot.classList.add("best-hand-slot");
+    return slot;
   }
 
   function getPlayer(playerIndex = activePlayer) {
