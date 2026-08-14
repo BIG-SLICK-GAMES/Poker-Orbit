@@ -968,22 +968,36 @@ h2 {
     scale(1.08);
 }
 
-.token-comet-particle {
+.token-comet-arc {
   position: absolute;
+  inset: 0;
   z-index: 4;
-  width: clamp(5px, 1.4cqw, 11px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, rgba(255, 255, 255, 0.96) 0 20%, var(--fx-color, #24d8ff) 38%, transparent 72%);
-  filter: drop-shadow(0 0 6px var(--fx-color, #24d8ff));
-  opacity: 0;
-  transform:
-    translate(-50%, -50%)
-    translateZ(3px)
-    scale(var(--fx-scale, 1));
-  animation: token-comet-trail var(--fx-life, 520ms) ease-out var(--fx-delay, 0ms) both;
   pointer-events: none;
+  overflow: visible;
+  transform: translateZ(2px);
+  animation: token-comet-shell var(--fx-duration, 700ms) ease-out both;
+}
+
+.token-comet-path {
+  fill: none;
+  stroke: var(--fx-color, #24d8ff);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 28 100;
+  stroke-dashoffset: 100;
+  animation: token-comet-arc var(--fx-duration, 700ms) cubic-bezier(0.15, 0.82, 0.18, 1) both;
+}
+
+.token-comet-path.glow {
+  stroke-width: 4.4;
+  opacity: 0.34;
+  filter: blur(1.4px) drop-shadow(0 0 5px var(--fx-color, #24d8ff));
+}
+
+.token-comet-path.core {
+  stroke-width: 1.15;
+  opacity: 0.94;
+  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 7px var(--fx-color, #24d8ff));
 }
 
 .card-animation-layer {
@@ -1177,6 +1191,7 @@ h2 {
 .purchase-fx-card {
   position: absolute;
   z-index: 36;
+  overflow: visible;
   pointer-events: none;
   border-color: color-mix(in srgb, var(--fx-color, #24d8ff) 78%, #ffffff);
   background:
@@ -1190,6 +1205,18 @@ h2 {
     inset 0 0 14px color-mix(in srgb, var(--fx-color, #24d8ff) 34%, transparent),
     inset 0 2px 0 rgba(255, 255, 255, 0.82);
   transform-origin: center;
+}
+
+.purchase-fx-card::before {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  z-index: -1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--fx-color, #24d8ff) 54%, #ffffff) 0 12%, transparent 54%);
+  opacity: 0.78;
+  animation: purchase-joy-aura 1680ms cubic-bezier(0.16, 0.88, 0.18, 1) both;
 }
 
 .board-card.purchase-fx-owned {
@@ -2894,23 +2921,46 @@ body[data-theme] .dice-pip {
   }
 }
 
-@keyframes token-comet-trail {
+@keyframes token-comet-shell {
   0% {
     opacity: 0;
-    transform:
-      translate(-50%, -50%)
-      translateZ(3px)
-      scale(0.35);
   }
   18% {
-    opacity: 0.92;
+    opacity: 1;
   }
   100% {
     opacity: 0;
-    transform:
-      translate(-50%, -50%)
-      translateZ(3px)
-      scale(1.7);
+  }
+}
+
+@keyframes token-comet-arc {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  72% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -30;
+  }
+}
+
+@keyframes purchase-joy-aura {
+  0% {
+    opacity: 0;
+    transform: scale(0.58);
+  }
+  22% {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+  62% {
+    opacity: 0.74;
+    transform: scale(1.26);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.64);
   }
 }
 

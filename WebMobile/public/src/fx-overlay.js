@@ -12,24 +12,34 @@ export function createFxOverlayModule({
 
     const color = playerColors[playerIndex] || "#24d8ff";
     const distance = (toIndex - fromIndex + boardSpaceCount) % boardSpaceCount;
-    const particleCount = Math.min(30, Math.max(10, distance * 3));
+    const pointCount = Math.min(80, Math.max(18, distance * 7));
+    const points = Array.from({ length: pointCount }, (_, index) => {
+      const progress = pointCount === 1 ? 1 : index / (pointCount - 1);
+      const position = getTokenPosition((fromIndex + distance * progress) % boardSpaceCount);
+      return `${position.x.toFixed(3)},${position.y.toFixed(3)}`;
+    });
 
     window.setTimeout(() => {
-      for (let index = 0; index < particleCount; index += 1) {
-        const progress = particleCount === 1 ? 1 : index / (particleCount - 1);
-        const boardIndex = (fromIndex + distance * progress) % boardSpaceCount;
-        const position = getTokenPosition(boardIndex);
-        const particle = document.createElement("span");
-        particle.className = "token-comet-particle";
-        particle.style.left = `${position.x}%`;
-        particle.style.top = `${position.y}%`;
-        particle.style.setProperty("--fx-color", color);
-        particle.style.setProperty("--fx-delay", `${progress * durationMs * 0.72}ms`);
-        particle.style.setProperty("--fx-life", `${Math.max(360, durationMs * 0.76)}ms`);
-        particle.style.setProperty("--fx-scale", String(1 - progress * 0.46));
-        tokenLayer.append(particle);
-        particle.addEventListener("animationend", () => particle.remove(), { once: true });
-      }
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      const glowPath = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      const corePath = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+
+      svg.classList.add("token-comet-arc");
+      svg.setAttribute("viewBox", "0 0 100 100");
+      svg.setAttribute("aria-hidden", "true");
+      svg.style.setProperty("--fx-color", color);
+      svg.style.setProperty("--fx-duration", `${Math.max(520, durationMs * 1.08)}ms`);
+
+      [glowPath, corePath].forEach((path) => {
+        path.setAttribute("points", points.join(" "));
+        path.setAttribute("pathLength", "100");
+      });
+      glowPath.classList.add("token-comet-path", "glow");
+      corePath.classList.add("token-comet-path", "core");
+
+      svg.append(glowPath, corePath);
+      tokenLayer.append(svg);
+      svg.addEventListener("animationend", () => svg.remove(), { once: true });
     }, delayMs);
   }
 
@@ -70,26 +80,32 @@ export function createFxOverlayModule({
           opacity: 1
         },
         {
-          transform: "translate3d(0, -38px, 120px) rotateY(180deg) rotateZ(-9deg) scale(1.18)",
-          filter: "brightness(1.45) saturate(1.5)",
+          transform: "translate3d(0, -26px, 90px) rotateY(0deg) rotateZ(-4deg) scale(1.08)",
+          filter: "brightness(1.26) saturate(1.24)",
           opacity: 1,
-          offset: 0.34
+          offset: 0.22
         },
         {
-          transform: "translate3d(16px, -22px, 160px) rotateY(360deg) rotateZ(8deg) scale(1.12)",
-          filter: "brightness(1.35) saturate(1.42)",
+          transform: "translate3d(0, -64px, 160px) rotateY(360deg) rotateZ(7deg) scale(1.24)",
+          filter: "brightness(1.54) saturate(1.58)",
           opacity: 1,
-          offset: 0.58
+          offset: 0.48
         },
         {
-          transform: `translate3d(var(--fx-exit-x), var(--fx-exit-y), 220px) rotateY(720deg) rotateZ(28deg) scale(0.62)`,
+          transform: "translate3d(-10px, -44px, 130px) rotateY(540deg) rotateZ(-6deg) scale(1.16)",
+          filter: "brightness(1.38) saturate(1.48)",
+          opacity: 1,
+          offset: 0.68
+        },
+        {
+          transform: `translate3d(var(--fx-exit-x), var(--fx-exit-y), 220px) rotateY(720deg) rotateZ(28deg) scale(0.58)`,
           filter: "brightness(1.65) saturate(1.65)",
           opacity: 0
         }
       ],
       {
-        duration: 920,
-        easing: "cubic-bezier(0.18, 0.92, 0.22, 1)",
+        duration: 1680,
+        easing: "cubic-bezier(0.16, 0.88, 0.18, 1)",
         fill: "forwards"
       }
     );

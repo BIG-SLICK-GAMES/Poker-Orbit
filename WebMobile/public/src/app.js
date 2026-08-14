@@ -219,6 +219,7 @@ let pendingBoardCenterTimer = 0;
 let boardRotationDegrees = 0;
 let boardRotationAnimationFrame = 0;
 const tokenAnimationTimers = new Map();
+const tokenAnimationFrames = new Map();
 let pendingCardAnimationTimer = 0;
 let pendingNextTurnTimer = 0;
 let awaitingLandingDecision = false;
@@ -908,7 +909,7 @@ function purchaseBoardCard(cardElement, options = {}) {
   ownershipHighlightModule.markPurchased(cardElement, playerIndex);
   updateBestHandHighlights();
   awaitingLandingDecision = false;
-  scheduleNextTurn(360);
+  scheduleNextTurn(1900);
 
   return { ...purchaseResult, playerIndex };
 }
@@ -1162,6 +1163,10 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
   const playerIndex = Number(token.dataset.token);
   const existingTimers = tokenAnimationTimers.get(playerIndex) || [];
   existingTimers.forEach((timer) => window.clearTimeout(timer));
+  const existingFrame = tokenAnimationFrames.get(playerIndex);
+  if (existingFrame) {
+    window.cancelAnimationFrame(existingFrame);
+  }
 
   const distance = (toIndex - fromIndex + boardSpaceCount) % boardSpaceCount;
   const moveDuration = shell.classList.contains("reduce-motion")
@@ -1169,11 +1174,36 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
     : Math.min(1100, Math.max(420, distance * 80));
 
   setTokenBoardPosition(token, fromIndex);
-  token.style.setProperty("--token-move-ms", `${moveDuration}ms`);
+  token.style.setProperty("--token-move-ms", "0ms");
   fxOverlayModule.playTokenTrail({ playerIndex, fromIndex, toIndex, durationMs: moveDuration, delayMs });
 
   const timer = window.setTimeout(() => {
-    setTokenBoardPosition(token, toIndex);
+    if (!moveDuration) {
+      setTokenBoardPosition(token, toIndex);
+      centerBoardOnCardIndex(toIndex, 0, moveDuration);
+      return;
+    }
+
+    const startedAt = performance.now();
+
+    const tick = (timestamp) => {
+      const elapsed = timestamp - startedAt;
+      const progress = Math.min(1, elapsed / moveDuration);
+      const easedProgress = easeInOutCubic(progress);
+      const currentIndex = fromIndex + distance * easedProgress;
+      setTokenBoardPosition(token, currentIndex);
+
+      if (progress < 1) {
+        tokenAnimationFrames.set(playerIndex, window.requestAnimationFrame(tick));
+        return;
+      }
+
+      tokenAnimationFrames.delete(playerIndex);
+      setTokenBoardPosition(token, toIndex);
+      token.style.setProperty("--token-move-ms", "150ms");
+    };
+
+    tokenAnimationFrames.set(playerIndex, window.requestAnimationFrame(tick));
     centerBoardOnCardIndex(toIndex, 0, moveDuration);
   }, delayMs);
 
