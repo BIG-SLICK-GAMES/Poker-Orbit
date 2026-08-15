@@ -23,23 +23,34 @@ export function createPurchaseCard3DModule({ layer, playerColors, suitIcons }) {
     const gltf = await loadModel();
     const layerRect = layer.getBoundingClientRect();
     const sourceRect = (featuredCard || cardElement).getBoundingClientRect();
+    const localRect = {
+      left: sourceRect.left - layerRect.left,
+      top: sourceRect.top - layerRect.top,
+      width: sourceRect.width,
+      height: sourceRect.height
+    };
     const holder = document.createElement("div");
     const canvas = document.createElement("canvas");
     holder.className = "purchase-card-3d-layer";
+    holder.style.left = `${localRect.left}px`;
+    holder.style.top = `${localRect.top}px`;
+    holder.style.width = `${localRect.width}px`;
+    holder.style.height = `${localRect.height}px`;
     holder.append(canvas);
     layer.append(holder);
 
     featuredCard?.classList.add("purchase-fx-source");
+    featuredCard?.setAttribute("aria-hidden", "true");
 
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setSize(layerRect.width, layerRect.height, false);
+    renderer.setSize(localRect.width, localRect.height, false);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.18;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(38, layerRect.width / Math.max(1, layerRect.height), 0.01, 80);
+    const camera = new THREE.PerspectiveCamera(38, localRect.width / Math.max(1, localRect.height), 0.01, 80);
     camera.position.set(0, -7.1, 2.45);
     camera.lookAt(0, 0, 0.42);
 
@@ -59,7 +70,7 @@ export function createPurchaseCard3DModule({ layer, playerColors, suitIcons }) {
     const buyerColor = new THREE.Color(playerColors[playerIndex] || "#24d8ff");
     const faceTexture = createCardFaceTexture(cardElement, suitIcons);
     applyRuntimeMaterials(model, faceTexture, buyerColor);
-    positionModelFromCard(wrap, sourceRect, layerRect);
+    positionModelInCardFrame(wrap);
 
     const mixer = new THREE.AnimationMixer(model);
     const action = mixer.clipAction(gltf.animations[0]);
@@ -103,19 +114,16 @@ export function createPurchaseCard3DModule({ layer, playerColors, suitIcons }) {
     renderer.dispose();
     holder.remove();
     featuredCard?.classList.remove("purchase-fx-source");
+    featuredCard?.removeAttribute("aria-hidden");
   }
 
   return { play };
 }
 
-function positionModelFromCard(wrap, sourceRect, layerRect) {
-  const viewHeight = 4.85;
-  const viewWidth = viewHeight * (layerRect.width / Math.max(1, layerRect.height));
-  const centerX = ((sourceRect.left + sourceRect.width / 2 - layerRect.left) / layerRect.width - 0.5) * viewWidth;
-  const centerY = -(((sourceRect.top + sourceRect.height / 2 - layerRect.top) / layerRect.height - 0.5) * viewHeight);
-  const targetHeight = Math.max(0.8, (sourceRect.height / Math.max(1, layerRect.height)) * viewHeight);
-  const scale = targetHeight / 3.18;
-  wrap.position.set(centerX, 0, centerY - 0.05);
+function positionModelInCardFrame(wrap) {
+  const scale = 0.86;
+  wrap.position.set(0, 0, 0);
+  wrap.rotation.z = Math.PI;
   wrap.scale.setScalar(scale);
   wrap.userData.baseScale = scale;
 }
@@ -182,6 +190,7 @@ function createCardFaceTexture(cardElement, suitIcons) {
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
+  texture.flipY = false;
   texture.anisotropy = 8;
   texture.needsUpdate = true;
   return texture;

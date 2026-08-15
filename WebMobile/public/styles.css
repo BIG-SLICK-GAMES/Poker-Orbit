@@ -1016,11 +1016,11 @@ h2 {
 
 .purchase-card-3d-layer {
   position: absolute;
-  inset: 0;
   z-index: 38;
   pointer-events: none;
   opacity: 1;
   transition: opacity 220ms ease;
+  overflow: visible;
 }
 
 .purchase-card-3d-layer.leaving {
