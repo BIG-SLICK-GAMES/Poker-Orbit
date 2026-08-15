@@ -7,6 +7,7 @@ const bonusIconMap = {
   "Spin Again": "spinagain.png",
   "Buy 1 Get 1 50% Off": "buy1get150.png",
   "PIC Card": "pic.png",
+  "Free Roll": "free.png",
   "100 RP": "100rp.png",
   BANKRUPTCY: "bankrupt.png",
   Shield: "shield.png"
@@ -19,6 +20,7 @@ const bonusTypeIconMap = {
   "spin-again": "spinagain.png",
   bogo: "buy1get150.png",
   pic: "pic.png",
+  "free-roll": "free.png",
   rp: "100rp.png",
   bankruptcy: "bankrupt.png",
   shield: "shield.png"
