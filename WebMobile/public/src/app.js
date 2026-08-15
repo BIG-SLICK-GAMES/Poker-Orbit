@@ -772,24 +772,20 @@ function registerServiceWorker() {
 
 function createBoardCards() {
   const cards = buildBoardDeck();
-  boardSlotRing?.replaceChildren(...Array.from({ length: boardSpaceCount }, (_, index) => {
+  boardSlotRing?.replaceChildren();
+
+  boardCardRing.replaceChildren(...cards.map((card, index) => {
     const position = getBoardCardPosition(index);
     const slot = document.createElement("span");
+    const tile = document.createElement("button");
     slot.className = "board-slot";
     slot.style.left = `${position.x}%`;
     slot.style.top = `${position.y}%`;
     slot.style.setProperty("--tile-rotation", `${position.rotation}deg`);
-    return slot;
-  }));
+    slot.dataset.index = String(index);
 
-  boardCardRing.replaceChildren(...cards.map((card, index) => {
-    const position = getBoardCardPosition(index);
-    const tile = document.createElement("button");
     tile.type = "button";
     tile.className = `board-card ${card.type || (card.suit === "H" || card.suit === "D" ? "red" : "black")}`;
-    tile.style.left = `${position.x}%`;
-    tile.style.top = `${position.y}%`;
-    tile.style.setProperty("--tile-rotation", `${position.rotation}deg`);
     tile.dataset.index = String(index);
     tile.dataset.rpCost = String(getCardRollPointCost(index));
     tile.dataset.purchaseState = isPurchasableCardIndex(index) ? "available" : "unavailable";
@@ -803,7 +799,8 @@ function createBoardCards() {
     tile.dataset.control = "boardCards";
     tile.setAttribute("aria-label", `Board card ${index + 1}: ${card.name || `${card.label} of ${suitNames[card.suit]}`}`);
     tile.innerHTML = `<span>${card.label}</span><strong>${suitIcons[card.suit] || ""}</strong>`;
-    return tile;
+    slot.append(tile);
+    return slot;
   }));
 }
 
@@ -816,7 +813,8 @@ function isPurchasableCardIndex(index) {
 }
 
 function createPlayerTokens() {
-  playerTokenLayer?.replaceChildren(...playerTokenColors.map((color, index) => {
+  playerTokenLayer?.replaceChildren();
+  playerTokenColors.forEach((color, index) => {
     const token = document.createElement("div");
     token.className = "player-token";
     token.dataset.token = String(index);
@@ -824,8 +822,7 @@ function createPlayerTokens() {
     token.setAttribute("aria-label", `Player ${index + 1} token`);
     token.innerHTML = `<span>P${index + 1}</span>`;
     setTokenBoardPosition(token, startingPlayerPositions[index]);
-    return token;
-  }));
+  });
 }
 
 function getBoardCardPosition(index) {
@@ -1173,16 +1170,37 @@ function getBoardCardCost(cardElement) {
 }
 
 function setTokenBoardPosition(token, boardIndex) {
+  const slot = getBoardSlotElement(boardIndex);
+  if (slot && token.parentElement !== slot) {
+    slot.append(token);
+  }
+
+  token.style.left = "";
+  token.style.top = "";
+  token.style.removeProperty("--token-rotation");
+  token.dataset.boardIndex = String(boardIndex);
+}
+
+function setFloatingTokenBoardPosition(token, boardIndex) {
+  if (playerTokenLayer && token.parentElement !== playerTokenLayer) {
+    playerTokenLayer.append(token);
+  }
+
   const position = getTokenInnerRingPosition(boardIndex);
   token.style.left = `${position.x}%`;
   token.style.top = `${position.y}%`;
   token.style.setProperty("--token-rotation", `${position.rotation}deg`);
-  token.dataset.boardIndex = String(boardIndex);
+  token.dataset.boardIndex = String(Math.round(boardIndex));
+}
+
+function getBoardSlotElement(boardIndex) {
+  const normalizedIndex = ((Math.round(boardIndex) % boardSpaceCount) + boardSpaceCount) % boardSpaceCount;
+  return boardCardRing.querySelector(`.board-slot[data-index="${normalizedIndex}"]`);
 }
 
 function getTokenInnerRingPosition(index) {
   const angle = (index / boardSpaceCount) * Math.PI * 2 - Math.PI / 2;
-  const radius = 34.3;
+  const radius = 44.1;
 
   return {
     x: 50 + Math.cos(angle) * radius,
@@ -1221,7 +1239,7 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
     ? 0
     : Math.min(1100, Math.max(420, distance * 80));
 
-  setTokenBoardPosition(token, fromIndex);
+  setFloatingTokenBoardPosition(token, fromIndex);
   token.style.setProperty("--token-move-ms", "0ms");
   fxOverlayModule.playTokenTrail({ playerIndex, fromIndex, toIndex, durationMs: moveDuration, delayMs });
 
@@ -1239,7 +1257,7 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
       const progress = Math.min(1, elapsed / moveDuration);
       const easedProgress = easeInOutCubic(progress);
       const currentIndex = fromIndex + distance * easedProgress;
-      setTokenBoardPosition(token, currentIndex);
+      setFloatingTokenBoardPosition(token, currentIndex);
 
       if (progress < 1) {
         tokenAnimationFrames.set(playerIndex, window.requestAnimationFrame(tick));
