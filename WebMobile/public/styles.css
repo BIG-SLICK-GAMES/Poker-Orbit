@@ -3917,7 +3917,7 @@ body[data-theme] .hand-panel.console-panel::after {
 
 .hand-panel.console-panel .rp-meter {
   left: 5.2%;
-  top: 28.6%;
+  top: calc(28.6% - 10px);
   width: 12.6%;
   height: 14.2%;
   min-height: 0;
@@ -3994,10 +3994,7 @@ body[data-theme] .hand-panel.console-panel::after {
   border: 0;
   border-radius: 10px;
   display: block;
-  background:
-    linear-gradient(90deg, rgba(36, 216, 255, 0.34), transparent 15% 85%, rgba(255, 138, 28, 0.3)),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 24% 76%, rgba(36, 216, 255, 0.16)),
-    linear-gradient(180deg, rgba(8, 41, 75, 0.98), rgba(1, 7, 18, 0.98));
+  background: transparent;
   color: #ffffff;
   font-family: Arial, Helvetica, sans-serif;
   font-size: clamp(1.42rem, 5.5cqw, 2.55rem);
@@ -4009,13 +4006,12 @@ body[data-theme] .hand-panel.console-panel::after {
   text-shadow:
     0 0 12px rgba(36, 216, 255, 0.86),
     0 2px 0 rgba(0, 0, 0, 0.86);
-  box-shadow:
-    inset 0 0 0 1px rgba(36, 216, 255, 0.22),
-    0 0 12px rgba(36, 216, 255, 0.18);
+  box-shadow: none;
 }
 
 .hand-panel.console-panel .dice-reel-strip b {
   min-height: 0;
+  place-items: center;
 }
 
 .hand-panel.console-panel .slot-window:nth-child(1),
