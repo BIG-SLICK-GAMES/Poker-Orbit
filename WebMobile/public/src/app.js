@@ -5,6 +5,7 @@ import { createCardAnimationModule } from "./card-animation.js";
 import { createPurchaseAuctionModule, getRankPurchasePrice } from "./purchase-auction.js";
 import { createOwnershipHighlightModule } from "./ownership-highlights.js";
 import { createFxOverlayModule } from "./fx-overlay.js";
+import { createPurchaseCard3DModule } from "./purchase-card-3d.js";
 import { getBonusIconSrc } from "./bonus-icons.js";
 import { buildBonusSlotPrizes } from "./bonus-slot-prizes.js";
 import { MASTER_CONTROL } from "./master-control.js";
@@ -166,14 +167,6 @@ const fxOverlayModule = createFxOverlayModule({
   playerColors: playerTokenColors,
   boardSpaceCount
 });
-const cardAnimationModule = createCardAnimationModule({
-  layer: cardAnimationLayer,
-  onPurchase: purchaseBoardCard,
-  onPurchaseFx: fxOverlayModule.playPurchaseCelebration,
-  onPass: passBoardCard,
-  onSpin: spinForBoardCard,
-  canSpin: canSpinForBoardCard
-});
 let currentLandingCost = 0;
 
 createSlotReelModule({
@@ -195,6 +188,19 @@ const suitIcons = {
   C: "\u2663",
   S: "\u2660"
 };
+const purchaseCard3DModule = createPurchaseCard3DModule({
+  layer: cardAnimationLayer,
+  playerColors: playerTokenColors,
+  suitIcons
+});
+const cardAnimationModule = createCardAnimationModule({
+  layer: cardAnimationLayer,
+  onPurchase: purchaseBoardCard,
+  onPurchaseFx: purchaseCard3DModule.play,
+  onPass: passBoardCard,
+  onSpin: spinForBoardCard,
+  canSpin: canSpinForBoardCard
+});
 const suitNames = {
   H: "Hearts",
   D: "Diamonds",
