@@ -10,9 +10,14 @@
 export const MASTER_CONTROL = {
   gameplay: {
     tokenStepCards: 1,
-    tokenStepDurationMs: 230,
+    tokenStepDurationMs: 300,
+    boardRotationDurationMs: 760,
+    boardMoveMsPerCard: 120,
+    boardMoveMinMs: 560,
+    boardMoveMaxMs: 1800,
     moveCameraSettleMs: 360,
-    endTurnBoardHoldMs: 0
+    endTurnBoardHoldMs: 0,
+    endTurnAfterCardExitMs: 500
   },
 
   camera: {

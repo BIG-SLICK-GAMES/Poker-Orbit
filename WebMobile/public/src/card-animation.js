@@ -1,4 +1,4 @@
-export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, canSpin, getPurchaseColor }) {
+export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplete, onPass, onSpin, canSpin, getPurchaseColor }) {
   let activeAnimation = null;
   let activeCardElement = null;
 
@@ -129,6 +129,7 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
         clone.classList.add("purchased-flash");
         await wait(1000);
         await flyOutPurchaseCard(clone);
+        onPurchaseComplete?.(activeCardElement);
         clear();
         return;
       }

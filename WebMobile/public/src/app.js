@@ -216,6 +216,7 @@ const suitIcons = {
 const cardAnimationModule = createCardAnimationModule({
   layer: cardAnimationLayer,
   onPurchase: purchaseBoardCard,
+  onPurchaseComplete: () => scheduleNextTurn(endTurnAfterCardExitMs),
   onPass: passBoardCard,
   onSpin: spinForBoardCard,
   canSpin: canSpinForBoardCard,
@@ -238,8 +239,13 @@ const purchaseAuctionModule = createPurchaseAuctionModule({
 });
 const tokenStepDurationMs = Math.max(60, numberOrDefault(MASTER_CONTROL.gameplay?.tokenStepDurationMs, 230));
 const tokenStepCards = Math.max(1, Math.trunc(numberOrDefault(MASTER_CONTROL.gameplay?.tokenStepCards, 1)));
+const boardRotationDurationMs = Math.max(160, numberOrDefault(MASTER_CONTROL.gameplay?.boardRotationDurationMs, 760));
+const boardMoveMsPerCard = Math.max(40, numberOrDefault(MASTER_CONTROL.gameplay?.boardMoveMsPerCard, 120));
+const boardMoveMinMs = Math.max(160, numberOrDefault(MASTER_CONTROL.gameplay?.boardMoveMinMs, 560));
+const boardMoveMaxMs = Math.max(boardMoveMinMs, numberOrDefault(MASTER_CONTROL.gameplay?.boardMoveMaxMs, 1800));
 const moveCameraSettleMs = Math.max(0, numberOrDefault(MASTER_CONTROL.gameplay?.moveCameraSettleMs, 360));
 const endTurnBoardHoldMs = Math.max(0, numberOrDefault(MASTER_CONTROL.gameplay?.endTurnBoardHoldMs, 0));
+const endTurnAfterCardExitMs = Math.max(0, numberOrDefault(MASTER_CONTROL.gameplay?.endTurnAfterCardExitMs, 500));
 let lastRenderedTurnState = null;
 let pendingBoardCenterTimer = 0;
 let boardRotationDegrees = 0;
@@ -862,7 +868,7 @@ function tweenBoardRotation(targetRotation, durationOverrideMs) {
   const change = targetRotation - startRotation;
   const duration = shell.classList.contains("reduce-motion")
     ? 0
-    : Math.max(160, Number.isFinite(durationOverrideMs) ? durationOverrideMs : tokenStepDurationMs * 0.92);
+    : Math.max(160, Number.isFinite(durationOverrideMs) ? durationOverrideMs : boardRotationDurationMs);
 
   if (!duration || Math.abs(change) < 0.001) {
     boardRotationDegrees = targetRotation;
@@ -954,7 +960,6 @@ function purchaseBoardCard(cardElement, options = {}) {
   ownershipHighlightModule.markPurchased(cardElement, playerIndex);
   updateBestHandHighlights();
   awaitingLandingDecision = false;
-  scheduleNextTurn(720);
 
   return { ...purchaseResult, playerIndex, playerColor: playerTokenColors[playerIndex] };
 }
@@ -1215,7 +1220,7 @@ function animateBoardClockwise(fromIndex, toIndex, delayMs = 0) {
   const distance = (toIndex - fromIndex + boardSpaceCount) % boardSpaceCount;
   const moveDuration = shell.classList.contains("reduce-motion")
     ? 0
-    : Math.min(1100, Math.max(420, distance * 80));
+    : Math.min(boardMoveMaxMs, Math.max(boardMoveMinMs, distance * boardMoveMsPerCard));
   const timer = window.setTimeout(() => {
     centerBoardOnCardIndex(toIndex, 0, moveDuration);
   }, delayMs);
@@ -1237,7 +1242,7 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
   const distance = (toIndex - fromIndex + boardSpaceCount) % boardSpaceCount;
   const moveDuration = shell.classList.contains("reduce-motion")
     ? 0
-    : Math.min(1100, Math.max(420, distance * 80));
+    : Math.min(boardMoveMaxMs, Math.max(boardMoveMinMs, distance * boardMoveMsPerCard));
 
   setFloatingTokenBoardPosition(token, fromIndex);
   token.style.setProperty("--token-move-ms", "0ms");

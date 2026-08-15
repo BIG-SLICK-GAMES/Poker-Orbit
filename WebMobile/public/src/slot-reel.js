@@ -1,6 +1,11 @@
 const DEFAULT_MIN = 1;
 const DEFAULT_MAX = 6;
-const SPIN_TICKS = 18;
+const SPIN_TICKS = 26;
+const SPIN_DELAYS_MS = [
+  34, 34, 36, 36, 38, 40, 42, 45,
+  50, 56, 64, 74, 86, 100, 118, 138,
+  162, 188, 218, 252, 290, 332, 376, 424, 478, 540
+];
 
 export function createSlotReelModule({ root, rollButton, externalRollButton, min = DEFAULT_MIN, max = DEFAULT_MAX, onRollComplete }) {
   const reels = [...root.querySelectorAll("[data-reel]")];
@@ -29,12 +34,11 @@ export function createSlotReelModule({ root, rollButton, externalRollButton, min
     const result = reels.map(() => randomInt(min, max));
     let tick = 0;
 
-    const timer = window.setInterval(() => {
+    const spinTick = () => {
       tick += 1;
       renderNumber(reels.map(() => randomInt(min, max)));
 
       if (tick >= SPIN_TICKS) {
-        window.clearInterval(timer);
         lastResult = result;
         renderNumber(result);
         const isDoubles = result.every((value) => value === result[0]);
@@ -48,8 +52,13 @@ export function createSlotReelModule({ root, rollButton, externalRollButton, min
         }
         spinning = false;
         onRollComplete?.({ values: [...result], total, isDoubles });
+        return;
       }
-    }, 58);
+
+      window.setTimeout(spinTick, SPIN_DELAYS_MS[Math.min(tick, SPIN_DELAYS_MS.length - 1)]);
+    };
+
+    window.setTimeout(spinTick, SPIN_DELAYS_MS[0]);
   }
 
   function renderNumber(values) {
