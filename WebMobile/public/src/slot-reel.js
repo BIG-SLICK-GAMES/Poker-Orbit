@@ -1,10 +1,8 @@
 const DEFAULT_MIN = 1;
 const DEFAULT_MAX = 6;
-const SPIN_TICKS = 15;
-const SPIN_DELAYS_MS = [
-  28, 30, 32, 35, 39,
-  46, 55, 68, 84, 104,
-  128, 158, 194, 238, 292
+const REEL_SPIN_DELAYS_MS = [
+  [28, 30, 33, 38, 45, 55, 70, 90, 118, 152, 198, 258],
+  [34, 36, 40, 47, 58, 74, 96, 126, 164, 214, 280, 360, 450]
 ];
 
 export function createSlotReelModule({ root, rollButton, externalRollButton, min = DEFAULT_MIN, max = DEFAULT_MAX, onRollComplete }) {
@@ -32,13 +30,8 @@ export function createSlotReelModule({ root, rollButton, externalRollButton, min
     }
 
     const result = reels.map(() => randomInt(min, max));
-    let tick = 0;
-
-    const spinTick = () => {
-      tick += 1;
-      renderNumber(reels.map(() => randomInt(min, max)));
-
-      if (tick >= SPIN_TICKS) {
+    Promise.all(reels.map((reel, index) => spinReelToValue(reel, index, result[index])))
+      .then(() => {
         lastResult = result;
         root.classList.remove("rolling");
         renderNumber(result);
@@ -52,34 +45,54 @@ export function createSlotReelModule({ root, rollButton, externalRollButton, min
         }
         spinning = false;
         onRollComplete?.({ values: [...result], total, isDoubles });
-        return;
-      }
-
-      window.setTimeout(spinTick, SPIN_DELAYS_MS[Math.min(tick, SPIN_DELAYS_MS.length - 1)]);
-    };
-
-    window.setTimeout(spinTick, SPIN_DELAYS_MS[0]);
+      });
   }
 
   function renderNumber(values) {
-    reels.forEach((reel, index) => {
-      const value = values[index] || min;
-      reel.dataset.value = String(value);
-      reel.setAttribute("aria-label", `Die ${index + 1}: ${value}`);
-      reel.style.setProperty("--reel-index", String(value - min));
+    reels.forEach((reel, index) => renderReelNumber(reel, values[index] || min, index));
+  }
 
-      if (!reel.querySelector(".dice-reel-strip")) {
-        reel.innerHTML = `
-          <span class="dice-reel-strip" aria-hidden="true">
-            ${Array.from({ length: max - min + 1 }, (_, numberIndex) => `<b>${numberIndex + min}</b>`).join("")}
-          </span>
-        `;
-      }
-    });
+  async function spinReelToValue(reel, reelIndex, finalValue) {
+    const delays = REEL_SPIN_DELAYS_MS[reelIndex] || REEL_SPIN_DELAYS_MS[0];
+    let previousValue = Number(reel.dataset.value || min);
+
+    for (const delay of delays) {
+      await wait(delay);
+      previousValue = nextVisibleValue(previousValue);
+      renderReelNumber(reel, previousValue, reelIndex);
+    }
+
+    const settleValues = [
+      nextVisibleValue(finalValue),
+      previousValue === finalValue ? nextVisibleValue(finalValue) : finalValue
+    ];
+
+    for (const [index, value] of settleValues.entries()) {
+      await wait(170 + (reelIndex * 70) + (index * 110));
+      renderReelNumber(reel, value, reelIndex);
+    }
+
+    await wait(210 + (reelIndex * 120));
+    renderReelNumber(reel, finalValue, reelIndex);
+  }
+
+  function renderReelNumber(reel, value, index) {
+    reel.dataset.value = String(value);
+    reel.setAttribute("aria-label", `Die ${index + 1}: ${value}`);
+    reel.innerHTML = `<span class="dice-reel-strip" aria-hidden="true"><b>${value}</b></span>`;
   }
 
   function randomInt(low, high) {
     return Math.floor(Math.random() * (high - low + 1)) + low;
+  }
+
+  function nextVisibleValue(current) {
+    const next = randomInt(min, max);
+    return next === current ? ((current - min + 1) % (max - min + 1)) + min : next;
+  }
+
+  function wait(ms) {
+    return new Promise((resolve) => window.setTimeout(resolve, ms));
   }
 
   return {
