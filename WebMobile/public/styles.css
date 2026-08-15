@@ -442,6 +442,8 @@ h2 {
   top: calc(104px + env(safe-area-inset-top, 0px));
   right: 10px;
   width: min(88cqw, 370px);
+  height: min(70cqh, 650px);
+  min-height: min(58cqh, 360px);
   max-height: min(70cqh, 650px);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
@@ -505,7 +507,7 @@ h2 {
 }
 
 .control-doc-list {
-  min-height: 0;
+  min-height: 180px;
   overflow: auto;
   display: grid;
   gap: 7px;
