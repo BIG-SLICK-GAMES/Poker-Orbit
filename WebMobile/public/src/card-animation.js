@@ -248,7 +248,7 @@ function flyOutPurchaseCard(card) {
 
 function createBonusSlotMachineElement(prize) {
   const root = document.createElement("div");
-  const symbol = getPrizeSymbol(prize);
+  const symbols = getPrizeSymbols(prize);
   let resolveDismissed;
   const dismissed = new Promise((resolve) => {
     resolveDismissed = resolve;
@@ -266,13 +266,11 @@ function createBonusSlotMachineElement(prize) {
         ${[0, 1, 2].map((index) => `
           <div class="bonus-slot-reel" style="--reel-index:${index}">
             <div class="bonus-slot-strip">
-              ${buildReelSymbols(symbol, index)}
+              ${buildReelSymbols(symbols[index], index)}
             </div>
           </div>
         `).join("")}
-        <span class="bonus-slot-win-line"></span>
       </div>
-      <span class="bonus-slot-handle"></span>
       <div class="bonus-slot-lamps" aria-hidden="true">${Array.from({ length: 7 }, () => "<i></i>").join("")}</div>
     </div>
     <strong class="bonus-slot-result">${prize.label}</strong>
@@ -361,6 +359,19 @@ function getPrizeSymbol(prize) {
   };
 
   return symbols[prize.type] || { icon: "7", label: "BONUS" };
+}
+
+function getPrizeSymbols(prize) {
+  if (prize.type !== "no-win") {
+    const symbol = getPrizeSymbol(prize);
+    return [symbol, symbol, symbol];
+  }
+
+  return [
+    { icon: "NO", label: "WIN" },
+    { icon: "RP", label: "MISS" },
+    { icon: "50", label: "TRY" }
+  ];
 }
 
 function getPrizeDescription(prize) {

@@ -6,7 +6,7 @@ import { createPurchaseAuctionModule, getRankPurchasePrice } from "./purchase-au
 import { createOwnershipHighlightModule } from "./ownership-highlights.js";
 import { createFxOverlayModule } from "./fx-overlay.js";
 import { getBonusIconSrc } from "./bonus-icons.js";
-import { buildBonusSlotPrizes } from "./bonus-slot-prizes.js";
+import { rollBonusSlotPrize } from "./bonus-slot-prizes.js";
 import { MASTER_CONTROL } from "./master-control.js";
 
 const shell = document.querySelector("#appShell");
@@ -1009,10 +1009,8 @@ function spinForBoardCard(cardElement, promptControls, options = {}) {
     }
   }
 
-  const prizes = buildBonusSlotPrizes();
-  const winningIndex = Math.floor(Math.random() * prizes.length);
   promptControls.startBonusSlotMachine({
-    prize: prizes[winningIndex],
+    prize: rollBonusSlotPrize(),
     onComplete: (prize) => applyBonusSlotPrize(prize, cardElement, promptControls)
   });
 }
