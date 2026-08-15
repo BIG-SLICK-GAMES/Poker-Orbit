@@ -4193,6 +4193,10 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
   justify-self: stretch;
 }
 
+.hand-panel.console-panel .slot-window:nth-child(1) .dice-reel-strip {
+  left: 3px;
+}
+
 .hand-panel.console-panel .slot-roll-btn {
   left: 45.2%;
   top: 15.7%;
@@ -4215,8 +4219,11 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
 }
 
 .hand-panel.console-panel .slot-roll-btn svg {
-  width: 48%;
-  height: 48%;
+  width: 64%;
+  height: 64%;
+  display: block;
+  justify-self: center;
+  align-self: center;
   fill: none;
   stroke: #ffffff;
   stroke-width: 2.2;

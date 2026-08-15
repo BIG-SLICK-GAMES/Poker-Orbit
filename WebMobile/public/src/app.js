@@ -51,7 +51,7 @@ const startingPlayerPositions = [27, 14, 0, 41];
 const playerTokenColors = ["#24d8ff", "#ff2a4f", "#39ff7a", "#ff8a1c"];
 const themeStorageKey = "poker-orbit-theme-v1";
 const cameraStorageKey = "poker-orbit-camera-offset-v3";
-const controlDocStorageKey = "poker-orbit-control-doc-v3";
+const controlDocStorageKey = "poker-orbit-control-doc-v2";
 const cameraDefaultOffset = { x: -14, y: 0 };
 const customThemeLimit = 5;
 const controlDocLabels = {
@@ -1390,6 +1390,10 @@ function mergeControlDocValues(base, source) {
       scalePercent: numberOrDefault(Number(value.scalePercent), numberOrDefault(merged[key]?.scalePercent, 100))
     };
   });
+
+  if (merged.boardCards) {
+    merged.boardCards.scalePercent = MASTER_CONTROL.boardCards.scalePercent;
+  }
 
   return merged;
 }
