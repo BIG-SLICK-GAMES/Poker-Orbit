@@ -1432,7 +1432,12 @@ h2 {
   background:
     radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.78), transparent 26%),
     linear-gradient(180deg, color-mix(in srgb, var(--owner-color, #24d8ff) 28%, #fffef7), color-mix(in srgb, var(--owner-color, #24d8ff) 18%, var(--diner-cream)));
-  animation: purchase-spin-colour-flash 640ms cubic-bezier(0.18, 0.82, 0.18, 1) both;
+  filter: brightness(1.16) saturate(1.28);
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--owner-color, #24d8ff) 24%, transparent),
+    0 0 22px color-mix(in srgb, var(--owner-color, #24d8ff) 68%, transparent),
+    0 22px 40px rgba(0, 0, 0, 0.48),
+    inset 0 0 14px color-mix(in srgb, var(--owner-color, #24d8ff) 34%, transparent);
 }
 
 .featured-card-flight.purchased-flash {
@@ -1757,11 +1762,15 @@ h2 {
 }
 
 .bonus-slot-reel.spinning .bonus-slot-strip {
-  animation: bonus-reel-spin 310ms linear infinite;
+  animation: bonus-reel-spin var(--bonus-spin-ms, 270ms) cubic-bezier(0.42, 0, 0.58, 1) infinite;
+}
+
+.bonus-slot-reel.slowing .bonus-slot-strip {
+  animation: bonus-reel-slow 620ms cubic-bezier(0.15, 0.84, 0.22, 1) infinite;
 }
 
 .bonus-slot-reel.locking .bonus-slot-strip {
-  animation: bonus-reel-lock 240ms cubic-bezier(0.08, 0.76, 0.18, 1) both;
+  animation: bonus-reel-lock var(--bonus-lock-ms, 620ms) cubic-bezier(0.08, 0.76, 0.18, 1) both;
 }
 
 .bonus-slot-reel.locked .bonus-slot-strip {
@@ -3139,41 +3148,6 @@ body[data-theme] .slot-window {
   }
 }
 
-@keyframes purchase-spin-colour-flash {
-  0% {
-    filter: brightness(1) saturate(1);
-    box-shadow:
-      0 0 0 6px rgba(255, 243, 207, 0.18),
-      0 22px 40px rgba(0, 0, 0, 0.48),
-      inset 0 2px 0 rgba(255, 255, 255, 0.76);
-  }
-  46% {
-    filter: brightness(1.85) saturate(1.72);
-    box-shadow:
-      0 0 0 8px color-mix(in srgb, var(--owner-color, #24d8ff) 52%, #ffffff),
-      0 0 26px color-mix(in srgb, var(--owner-color, #24d8ff) 96%, transparent),
-      0 0 72px color-mix(in srgb, var(--owner-color, #24d8ff) 80%, transparent),
-      0 22px 40px rgba(0, 0, 0, 0.48),
-      inset 0 0 22px color-mix(in srgb, var(--owner-color, #24d8ff) 58%, transparent);
-  }
-  78% {
-    filter: brightness(1.16) saturate(1.28);
-    box-shadow:
-      0 0 0 6px color-mix(in srgb, var(--owner-color, #24d8ff) 24%, transparent),
-      0 0 22px color-mix(in srgb, var(--owner-color, #24d8ff) 68%, transparent),
-      0 22px 40px rgba(0, 0, 0, 0.48),
-      inset 0 0 14px color-mix(in srgb, var(--owner-color, #24d8ff) 34%, transparent);
-  }
-  100% {
-    filter: brightness(1.16) saturate(1.28);
-    box-shadow:
-      0 0 0 6px color-mix(in srgb, var(--owner-color, #24d8ff) 24%, transparent),
-      0 0 22px color-mix(in srgb, var(--owner-color, #24d8ff) 68%, transparent),
-      0 22px 40px rgba(0, 0, 0, 0.48),
-      inset 0 0 14px color-mix(in srgb, var(--owner-color, #24d8ff) 34%, transparent);
-  }
-}
-
 @keyframes purchased-card-spark {
   0% {
     filter: saturate(1) brightness(1);
@@ -3332,6 +3306,21 @@ body[data-theme] .slot-window {
   to {
     transform: translateY(-700%);
     filter: blur(0);
+  }
+}
+
+@keyframes bonus-reel-slow {
+  0% {
+    transform: translateY(-720%);
+    filter: blur(1.2px);
+  }
+  56% {
+    transform: translateY(-880%);
+    filter: blur(0.7px);
+  }
+  100% {
+    transform: translateY(-960%);
+    filter: blur(0.15px);
   }
 }
 

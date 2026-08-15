@@ -309,16 +309,21 @@ async function runBonusSlotReels(reels) {
     return;
   }
 
-  reels.forEach((reel) => reel.classList.add("spinning"));
-  await wait(1480);
-
-  for (const reel of reels) {
+  await Promise.all(reels.map(async (reel, index) => {
+    reel.style.setProperty("--bonus-spin-ms", `${250 + index * 44}ms`);
+    reel.style.setProperty("--bonus-lock-ms", `${500 + index * 130}ms`);
+    await wait(index * 170);
+    reel.classList.add("spinning");
+    await wait(820 + index * 260);
     reel.classList.remove("spinning");
+    reel.classList.add("slowing");
+    await wait(360 + index * 110);
+    reel.classList.remove("slowing");
     reel.classList.add("locking");
-    await wait(240);
+    await wait(500 + index * 130);
     reel.classList.remove("locking");
     reel.classList.add("locked");
-  }
+  }));
 
   await wait(260);
 }
