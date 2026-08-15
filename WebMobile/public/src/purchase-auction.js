@@ -174,7 +174,6 @@ export function createPurchaseAuctionModule({
       cardButton.innerHTML = `
         <span>${card.rank}</span>
         <strong>${suitIcons[card.suit] || ""}</strong>
-        <em>${formatChips(card.price)}</em>
       `;
       return cardButton;
   }

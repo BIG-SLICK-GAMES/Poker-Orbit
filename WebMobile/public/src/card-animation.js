@@ -44,10 +44,13 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
     const cardPrice = Number.parseInt(cardElement.dataset.cardPrice || "0", 10) || 0;
     let purchaseOptions = {};
     let freeBonusSpins = 0;
+    let baseBonusSpinUsed = false;
 
     function updateSpinButton() {
       const hasFreeSpin = freeBonusSpins > 0;
-      spinButton.disabled = !hasFreeSpin && !canSpin?.(activeCardElement);
+      spinButton.disabled = baseBonusSpinUsed
+        ? !hasFreeSpin
+        : !hasFreeSpin && !canSpin?.(activeCardElement);
       spinButton.textContent = hasFreeSpin ? "Free Spin" : "Spin";
     }
 
@@ -104,6 +107,8 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
 
       if (hasFreeSpin) {
         freeBonusSpins -= 1;
+      } else {
+        baseBonusSpinUsed = true;
       }
 
       spinButton.disabled = true;
