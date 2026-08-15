@@ -113,6 +113,7 @@ export function createPurchaseCard3DModule({ layer, playerColors, suitIcons }) {
 function positionModelInCardFrame(wrap) {
   const scale = 0.31;
   wrap.position.set(0, 0, 0);
+  wrap.rotation.z = Math.PI;
   wrap.scale.setScalar(scale);
   wrap.userData.baseScale = scale;
 }
