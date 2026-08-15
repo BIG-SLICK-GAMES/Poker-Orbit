@@ -1298,15 +1298,14 @@ function createControlDocPanel() {
 
 function createControlDocSection(controlKey) {
   const control = getControlDocValue(controlKey);
-  const section = document.createElement("details");
+  const section = document.createElement("section");
   section.className = "control-doc-section";
   section.dataset.controlSection = controlKey;
-  section.open = true;
   section.innerHTML = `
-    <summary>
+    <div class="control-doc-heading">
       <span>${controlDocLabels[controlKey]}</span>
       <strong data-control-summary="${controlKey}">${formatControlDocSummary(control)}</strong>
-    </summary>
+    </div>
     ${createControlDocSlider(controlKey, "xPercent", "Move Left / Right", -100, 100, 1)}
     ${createControlDocSlider(controlKey, "yPercent", "Move Up / Down", -100, 100, 1)}
     ${createControlDocSlider(controlKey, "rotationPercent", "Rotate", -100, 100, 1)}
