@@ -1188,35 +1188,25 @@ h2 {
   opacity: 0;
 }
 
-.purchase-fx-card {
-  position: absolute;
-  z-index: 36;
-  overflow: visible;
-  pointer-events: none;
-  border-color: color-mix(in srgb, var(--fx-color, #24d8ff) 78%, #ffffff);
+.featured-card-flight.purchase-spinning-color {
+  border-color: color-mix(in srgb, var(--owner-color, #24d8ff) 72%, #ffffff);
   background:
-    radial-gradient(circle at 50% 14%, rgba(255, 255, 255, 0.76), transparent 28%),
-    linear-gradient(180deg, color-mix(in srgb, var(--fx-color, #24d8ff) 34%, #fffef7), color-mix(in srgb, var(--fx-color, #24d8ff) 24%, var(--diner-cream)));
-  box-shadow:
-    0 0 0 5px color-mix(in srgb, var(--fx-color, #24d8ff) 30%, transparent),
-    0 0 22px color-mix(in srgb, var(--fx-color, #24d8ff) 92%, transparent),
-    0 0 54px color-mix(in srgb, var(--fx-color, #24d8ff) 58%, transparent),
-    0 24px 42px rgba(0, 0, 0, 0.46),
-    inset 0 0 14px color-mix(in srgb, var(--fx-color, #24d8ff) 34%, transparent),
-    inset 0 2px 0 rgba(255, 255, 255, 0.82);
-  transform-origin: center;
+    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.78), transparent 26%),
+    linear-gradient(180deg, color-mix(in srgb, var(--owner-color, #24d8ff) 28%, #fffef7), color-mix(in srgb, var(--owner-color, #24d8ff) 18%, var(--diner-cream)));
+  animation: purchase-spin-colour-flash 720ms cubic-bezier(0.18, 0.82, 0.18, 1) both;
 }
 
-.purchase-fx-card::before {
-  content: "";
-  position: absolute;
-  inset: -18%;
-  z-index: -1;
-  border-radius: 50%;
+.featured-card-flight.purchased-flash {
+  border-color: var(--owner-color, #24d8ff);
   background:
-    radial-gradient(circle, color-mix(in srgb, var(--fx-color, #24d8ff) 54%, #ffffff) 0 12%, transparent 54%);
-  opacity: 0.78;
-  animation: purchase-joy-aura 1680ms cubic-bezier(0.16, 0.88, 0.18, 1) both;
+    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.72), transparent 26%),
+    linear-gradient(180deg, color-mix(in srgb, var(--owner-color, #24d8ff) 32%, #fffef7), color-mix(in srgb, var(--owner-color, #24d8ff) 24%, var(--diner-cream)));
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--owner-color, #24d8ff) 28%, transparent),
+    0 0 26px color-mix(in srgb, var(--owner-color, #24d8ff) 86%, transparent),
+    0 0 52px color-mix(in srgb, var(--owner-color, #24d8ff) 52%, transparent),
+    0 22px 40px rgba(0, 0, 0, 0.48),
+    inset 0 0 16px color-mix(in srgb, var(--owner-color, #24d8ff) 38%, transparent);
 }
 
 .board-card.purchase-fx-owned {
@@ -2961,22 +2951,30 @@ body[data-theme] .slot-window {
   }
 }
 
-@keyframes purchase-joy-aura {
+@keyframes purchase-spin-colour-flash {
   0% {
-    opacity: 0;
-    transform: scale(0.58);
+    filter: brightness(1) saturate(1);
+    box-shadow:
+      0 0 0 6px rgba(255, 243, 207, 0.18),
+      0 22px 40px rgba(0, 0, 0, 0.48),
+      inset 0 2px 0 rgba(255, 255, 255, 0.76);
   }
-  22% {
-    opacity: 0.9;
-    transform: scale(1.05);
-  }
-  62% {
-    opacity: 0.74;
-    transform: scale(1.26);
+  46% {
+    filter: brightness(1.85) saturate(1.72);
+    box-shadow:
+      0 0 0 8px color-mix(in srgb, var(--owner-color, #24d8ff) 52%, #ffffff),
+      0 0 26px color-mix(in srgb, var(--owner-color, #24d8ff) 96%, transparent),
+      0 0 72px color-mix(in srgb, var(--owner-color, #24d8ff) 80%, transparent),
+      0 22px 40px rgba(0, 0, 0, 0.48),
+      inset 0 0 22px color-mix(in srgb, var(--owner-color, #24d8ff) 58%, transparent);
   }
   100% {
-    opacity: 0;
-    transform: scale(1.64);
+    filter: brightness(1.16) saturate(1.28);
+    box-shadow:
+      0 0 0 6px color-mix(in srgb, var(--owner-color, #24d8ff) 24%, transparent),
+      0 0 22px color-mix(in srgb, var(--owner-color, #24d8ff) 68%, transparent),
+      0 22px 40px rgba(0, 0, 0, 0.48),
+      inset 0 0 14px color-mix(in srgb, var(--owner-color, #24d8ff) 34%, transparent);
   }
 }
 

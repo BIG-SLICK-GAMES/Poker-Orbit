@@ -1,4 +1,4 @@
-export function createCardAnimationModule({ layer, onPurchase, onPurchaseFx, onPass, onSpin, canSpin }) {
+export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, canSpin, getPurchaseColor }) {
   let activeAnimation = null;
   let activeCardElement = null;
 
@@ -113,22 +113,28 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseFx, onP
     purchaseButton.addEventListener("click", async () => {
       purchaseButton.disabled = true;
       spinButton.disabled = true;
+      controls.classList.add("purchase-resolving");
+      clone.classList.remove("waiting-purchase");
+      clone.style.setProperty("--owner-color", getPurchaseColor?.() || "#24d8ff");
+      clone.classList.add("purchase-spinning-color");
+      await spinPurchaseCard(clone);
       const result = onPurchase?.(activeCardElement, purchaseOptions);
       if (result?.message) {
         status.textContent = result.message;
       }
 
       if (result?.success !== false) {
-        controls.classList.add("purchase-resolving");
-        await onPurchaseFx?.({
-          featuredCard: clone,
-          cardElement: activeCardElement,
-          playerIndex: result?.playerIndex || 0
-        });
+        clone.style.setProperty("--owner-color", result?.playerColor || "#24d8ff");
+        clone.classList.remove("purchase-spinning-color");
+        clone.classList.add("purchased-flash");
+        await wait(360);
         clear();
         return;
       }
 
+      controls.classList.remove("purchase-resolving");
+      clone.classList.remove("purchase-spinning-color");
+      clone.classList.add("waiting-purchase");
       purchaseButton.disabled = false;
       updateSpinButton();
     });
@@ -192,6 +198,24 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseFx, onP
     play,
     clear
   };
+}
+
+function spinPurchaseCard(card) {
+  const baseTransform = "rotateY(0deg) rotateZ(4deg) translateZ(140px) scale(1)";
+  const animation = card.animate(
+    [
+      { transform: baseTransform, filter: "brightness(1) saturate(1)" },
+      { transform: "rotateY(180deg) rotateZ(4deg) translateZ(170px) scale(1.04)", filter: "brightness(1.82) saturate(1.62)", offset: 0.5 },
+      { transform: "rotateY(360deg) rotateZ(4deg) translateZ(140px) scale(1)", filter: "brightness(1.24) saturate(1.22)" }
+    ],
+    {
+      duration: 720,
+      easing: "cubic-bezier(0.18, 0.82, 0.18, 1)",
+      fill: "forwards"
+    }
+  );
+
+  return animation.finished.catch(() => {});
 }
 
 function createBonusSlotMachineElement(prize) {

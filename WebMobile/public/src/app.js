@@ -160,7 +160,6 @@ const turnModule = createTurnModule(4, { boardSpaceCount, startingPositions: sta
 const cameraModule = createCameraModule({ boardStage, perspectiveTable, cameraControl: MASTER_CONTROL.camera });
 const ownershipHighlightModule = createOwnershipHighlightModule({ boardRoot: boardCardRing });
 const fxOverlayModule = createFxOverlayModule({
-  layer: cardAnimationLayer,
   tokenLayer: playerTokenLayer,
   getTokenPosition: getTokenInnerRingPosition,
   playerColors: playerTokenColors,
@@ -192,7 +191,8 @@ const cardAnimationModule = createCardAnimationModule({
   onPurchase: purchaseBoardCard,
   onPass: passBoardCard,
   onSpin: spinForBoardCard,
-  canSpin: canSpinForBoardCard
+  canSpin: canSpinForBoardCard,
+  getPurchaseColor: () => playerTokenColors[turnModule.getState().currentPlayer]
 });
 const suitNames = {
   H: "Hearts",
@@ -908,9 +908,9 @@ function purchaseBoardCard(cardElement, options = {}) {
   ownershipHighlightModule.markPurchased(cardElement, playerIndex);
   updateBestHandHighlights();
   awaitingLandingDecision = false;
-  scheduleNextTurn(1900);
+  scheduleNextTurn(720);
 
-  return { ...purchaseResult, playerIndex };
+  return { ...purchaseResult, playerIndex, playerColor: playerTokenColors[playerIndex] };
 }
 
 function passBoardCard(cardElement) {
