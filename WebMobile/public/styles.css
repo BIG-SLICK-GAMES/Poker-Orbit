@@ -1016,11 +1016,16 @@ h2 {
 
 .purchase-card-3d-layer {
   position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 270%;
+  height: 270%;
   z-index: 38;
   pointer-events: none;
   opacity: 1;
   transition: opacity 220ms ease;
   overflow: visible;
+  transform: translate(-50%, -50%);
 }
 
 .purchase-card-3d-layer.leaving {
@@ -1203,7 +1208,19 @@ h2 {
   animation: card-pick-me 520ms ease-in-out infinite alternate;
 }
 
-.featured-card-flight.purchase-fx-source {
+.featured-card-flight.purchase-fx-source:not(.purchase-3d-host) {
+  opacity: 0;
+}
+
+.featured-card-flight.purchase-3d-host {
+  overflow: visible;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  opacity: 1;
+}
+
+.featured-card-flight.purchase-3d-host > :not(.purchase-card-3d-layer) {
   opacity: 0;
 }
 
