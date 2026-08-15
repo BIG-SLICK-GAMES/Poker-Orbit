@@ -40,13 +40,40 @@ const cameraYControl = document.querySelector("#cameraYControl");
 const cameraXValue = document.querySelector("#cameraXValue");
 const cameraYValue = document.querySelector("#cameraYValue");
 const cameraResetButton = document.querySelector("#cameraResetButton");
+const controlDocToggle = document.querySelector("#controlDocToggle");
+const controlDocPanel = document.querySelector("#controlDocPanel");
+const controlDocClose = document.querySelector("#controlDocClose");
+const controlDocList = document.querySelector("#controlDocList");
+const controlDocSave = document.querySelector("#controlDocSave");
+const controlDocReset = document.querySelector("#controlDocReset");
 const boardSpaceCount = 54;
 const startingPlayerPositions = [27, 14, 0, 41];
 const playerTokenColors = ["#24d8ff", "#ff2a4f", "#39ff7a", "#ff8a1c"];
 const themeStorageKey = "poker-orbit-theme-v1";
 const cameraStorageKey = "poker-orbit-camera-offset-v2";
+const controlDocStorageKey = "poker-orbit-control-doc-v1";
 const cameraDefaultOffset = { x: -14, y: 0 };
 const customThemeLimit = 5;
+const controlDocLabels = {
+  gameTopbar: "Top Bar",
+  perspectiveTable: "Camera Table Layer",
+  orbitBoard: "Board Position",
+  boardCardRing: "Card Ring",
+  boardCards: "Individual Cards",
+  playerTokens: "Player Tokens",
+  handPanel: "Bottom Console",
+  turnStrip: "Turn Label",
+  slotReel: "Roll Console Layer",
+  doublesLamp: "Doubles Lamp",
+  rollPointsMeter: "Roll Points Display",
+  diceReels: "Dice Number Reels",
+  rollButton: "Roll Button",
+  bonusSlots: "Bonus Slots",
+  economyStrip: "Chips And Cards",
+  playerCardHand: "Owned Card Area"
+};
+const controlDocOrder = Object.keys(controlDocLabels);
+let controlDocValues = loadSavedControlDoc();
 const themePresets = {
   diner: {
     label: "Neon Control",
@@ -233,6 +260,7 @@ createBoardCards();
 createPlayerTokens();
 formatMiniCards();
 applyMasterControl();
+createControlDocPanel();
 applyCameraOffset();
 turnModule.subscribe(renderTurnState);
 registerServiceWorker();
@@ -271,6 +299,27 @@ cameraYControl?.addEventListener("input", (event) => {
 cameraResetButton?.addEventListener("click", () => {
   cameraOffset = { ...cameraDefaultOffset };
   applyCameraOffset({ persist: true });
+});
+
+controlDocToggle?.addEventListener("click", () => {
+  setControlDocOpen(controlDocPanel?.hidden !== false);
+});
+
+controlDocClose?.addEventListener("click", () => {
+  setControlDocOpen(false);
+});
+
+controlDocSave?.addEventListener("click", () => {
+  saveControlDoc();
+  flashControlDocStatus("Saved");
+});
+
+controlDocReset?.addEventListener("click", () => {
+  controlDocValues = cloneControlDocDefaults();
+  applyMasterControl();
+  syncControlDocInputs();
+  saveControlDoc();
+  flashControlDocStatus("Reset");
 });
 
 endTurnButton?.addEventListener("click", () => {
@@ -1225,7 +1274,7 @@ function formatMiniCards() {
 
 function applyMasterControl() {
   document.querySelectorAll("[data-control]").forEach((element) => {
-    const control = MASTER_CONTROL[element.dataset.control];
+    const control = getControlDocValue(element.dataset.control);
 
     if (!control) {
       return;
@@ -1236,6 +1285,171 @@ function applyMasterControl() {
     element.style.setProperty("--control-rotation", `${numberOrDefault(control.rotationPercent, 0) * 3.6}deg`);
     element.style.setProperty("--control-scale", String(numberOrDefault(control.scalePercent, 100) / 100));
   });
+}
+
+function createControlDocPanel() {
+  if (!controlDocList) {
+    return;
+  }
+
+  controlDocList.replaceChildren(...controlDocOrder.map(createControlDocSection));
+  syncControlDocInputs();
+}
+
+function createControlDocSection(controlKey) {
+  const control = getControlDocValue(controlKey);
+  const section = document.createElement("details");
+  section.className = "control-doc-section";
+  section.dataset.controlSection = controlKey;
+  section.open = ["orbitBoard", "boardCards", "playerTokens", "diceReels", "rollPointsMeter"].includes(controlKey);
+  section.innerHTML = `
+    <summary>
+      <span>${controlDocLabels[controlKey]}</span>
+      <strong data-control-summary="${controlKey}">${formatControlDocSummary(control)}</strong>
+    </summary>
+    ${createControlDocSlider(controlKey, "xPercent", "Move Left / Right", -100, 100, 1)}
+    ${createControlDocSlider(controlKey, "yPercent", "Move Up / Down", -100, 100, 1)}
+    ${createControlDocSlider(controlKey, "rotationPercent", "Rotate", -100, 100, 1)}
+    ${createControlDocSlider(controlKey, "scalePercent", "Scale", 20, 260, 1)}
+  `;
+
+  section.querySelectorAll("[data-control-field]").forEach((input) => {
+    input.addEventListener("input", () => {
+      const nextValue = Number(input.value);
+      const targetControl = getControlDocValue(controlKey);
+      targetControl[input.dataset.controlField] = nextValue;
+      applyMasterControl();
+      syncControlDocReadout(input);
+      syncControlDocSummary(controlKey);
+    });
+  });
+
+  return section;
+}
+
+function createControlDocSlider(controlKey, field, label, min, max, step) {
+  return `
+    <label class="control-doc-row">
+      <span>${label}</span>
+      <input type="range" min="${min}" max="${max}" step="${step}" value="0" data-control-key="${controlKey}" data-control-field="${field}">
+      <strong data-control-readout="${controlKey}:${field}">0</strong>
+    </label>
+  `;
+}
+
+function loadSavedControlDoc() {
+  const defaults = cloneControlDocDefaults();
+
+  try {
+    const stored = JSON.parse(localStorage.getItem(controlDocStorageKey) || "null");
+    if (!stored || typeof stored !== "object") {
+      return defaults;
+    }
+
+    return mergeControlDocValues(defaults, stored);
+  } catch {
+    return defaults;
+  }
+}
+
+function cloneControlDocDefaults() {
+  return mergeControlDocValues({}, MASTER_CONTROL);
+}
+
+function mergeControlDocValues(base, source) {
+  const merged = { ...base };
+  Object.entries(source || {}).forEach(([key, value]) => {
+    if (!value || typeof value !== "object" || key === "gameplay" || key === "camera") {
+      return;
+    }
+
+    merged[key] = {
+      xPercent: numberOrDefault(Number(value.xPercent), numberOrDefault(merged[key]?.xPercent, 0)),
+      yPercent: numberOrDefault(Number(value.yPercent), numberOrDefault(merged[key]?.yPercent, 0)),
+      rotationPercent: numberOrDefault(Number(value.rotationPercent), numberOrDefault(merged[key]?.rotationPercent, 0)),
+      scalePercent: numberOrDefault(Number(value.scalePercent), numberOrDefault(merged[key]?.scalePercent, 100))
+    };
+  });
+
+  return merged;
+}
+
+function getControlDocValue(controlKey) {
+  if (!controlKey) {
+    return null;
+  }
+
+  if (!controlDocValues[controlKey]) {
+    const fallback = MASTER_CONTROL[controlKey] || {};
+    controlDocValues[controlKey] = {
+      xPercent: numberOrDefault(Number(fallback.xPercent), 0),
+      yPercent: numberOrDefault(Number(fallback.yPercent), 0),
+      rotationPercent: numberOrDefault(Number(fallback.rotationPercent), 0),
+      scalePercent: numberOrDefault(Number(fallback.scalePercent), 100)
+    };
+  }
+
+  return controlDocValues[controlKey];
+}
+
+function syncControlDocInputs() {
+  controlDocList?.querySelectorAll("[data-control-field]").forEach((input) => {
+    const control = getControlDocValue(input.dataset.controlKey);
+    input.value = String(numberOrDefault(control[input.dataset.controlField], input.dataset.controlField === "scalePercent" ? 100 : 0));
+    syncControlDocReadout(input);
+  });
+
+  controlDocOrder.forEach(syncControlDocSummary);
+}
+
+function syncControlDocReadout(input) {
+  const readout = controlDocList?.querySelector(`[data-control-readout="${input.dataset.controlKey}:${input.dataset.controlField}"]`);
+  if (!readout) {
+    return;
+  }
+
+  const value = Number(input.value);
+  readout.textContent = input.dataset.controlField === "scalePercent"
+    ? `${value}%`
+    : input.dataset.controlField === "rotationPercent"
+      ? `${value}%`
+      : `${value}%`;
+}
+
+function syncControlDocSummary(controlKey) {
+  const summary = controlDocList?.querySelector(`[data-control-summary="${controlKey}"]`);
+  if (summary) {
+    summary.textContent = formatControlDocSummary(getControlDocValue(controlKey));
+  }
+}
+
+function formatControlDocSummary(control) {
+  return `X ${numberOrDefault(control?.xPercent, 0)} / Y ${numberOrDefault(control?.yPercent, 0)} / S ${numberOrDefault(control?.scalePercent, 100)}%`;
+}
+
+function setControlDocOpen(isOpen) {
+  if (!controlDocPanel || !controlDocToggle) {
+    return;
+  }
+
+  controlDocPanel.hidden = !isOpen;
+  controlDocToggle.setAttribute("aria-expanded", String(isOpen));
+}
+
+function saveControlDoc() {
+  localStorage.setItem(controlDocStorageKey, JSON.stringify(controlDocValues));
+}
+
+function flashControlDocStatus(message) {
+  if (!controlDocSave) {
+    return;
+  }
+
+  const originalText = controlDocSave.textContent;
+  controlDocSave.textContent = message;
+  window.setTimeout(() => {
+    controlDocSave.textContent = originalText;
+  }, 900);
 }
 
 function numberOrDefault(value, fallback) {

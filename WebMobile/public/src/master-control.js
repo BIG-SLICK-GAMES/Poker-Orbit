@@ -89,6 +89,7 @@ export const MASTER_CONTROL = {
   orbitBoard: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   boardCardRing: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   boardCards: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 160 },
+  playerTokens: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   outerRing: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   innerRing: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   tableCenter: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
@@ -97,6 +98,15 @@ export const MASTER_CONTROL = {
   seatP3: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   seatP4: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   handPanel: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
+  turnStrip: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
+  slotReel: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
+  doublesLamp: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
+  rollPointsMeter: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
+  diceReels: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
+  rollButton: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
+  bonusSlots: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
+  economyStrip: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
+  playerCardHand: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   playerCards: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   gameActions: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 }
 };

@@ -29,9 +29,9 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
 
     controls.className = "featured-card-actions";
     controls.hidden = true;
-    controls.style.left = `${targetLeft}px`;
+    controls.style.left = "50%";
     controls.style.top = `${targetTop + targetHeight + 14}px`;
-    controls.style.width = `${targetWidth}px`;
+    controls.style.width = `${Math.min(360, Math.max(targetWidth, frameRect.width * 0.64))}px`;
     controls.innerHTML = `
       <button class="featured-card-action spin" type="button">Spin</button>
       <button class="featured-card-action purchase" type="button">Purchase</button>
@@ -127,7 +127,8 @@ export function createCardAnimationModule({ layer, onPurchase, onPass, onSpin, c
         clone.style.setProperty("--owner-color", result?.playerColor || "#24d8ff");
         clone.classList.remove("purchase-spinning-color");
         clone.classList.add("purchased-flash");
-        await wait(360);
+        await wait(1000);
+        await flyOutPurchaseCard(clone);
         clear();
         return;
       }
@@ -205,12 +206,37 @@ function spinPurchaseCard(card) {
   const animation = card.animate(
     [
       { transform: baseTransform, filter: "brightness(1) saturate(1)" },
-      { transform: "rotateY(180deg) rotateZ(4deg) translateZ(170px) scale(1.04)", filter: "brightness(1.82) saturate(1.62)", offset: 0.5 },
-      { transform: "rotateY(360deg) rotateZ(4deg) translateZ(140px) scale(1)", filter: "brightness(1.24) saturate(1.22)" }
+      { transform: "rotateY(180deg) rotateZ(4deg) translateZ(142px) scale(1)", filter: "brightness(1.82) saturate(1.62)", offset: 0.5 },
+      { transform: "rotateY(360deg) rotateZ(4deg) translateZ(140px) scale(1)", filter: "brightness(1.16) saturate(1.28)" }
     ],
     {
-      duration: 720,
+      duration: 640,
       easing: "cubic-bezier(0.18, 0.82, 0.18, 1)",
+      fill: "forwards"
+    }
+  );
+
+  return animation.finished.catch(() => {});
+}
+
+function flyOutPurchaseCard(card) {
+  const animation = card.animate(
+    [
+      {
+        transform: "rotateY(360deg) rotateZ(4deg) translateZ(140px) scale(1)",
+        opacity: 1,
+        filter: "brightness(1.16) saturate(1.28)"
+      },
+      {
+        transform: "translate3d(34vw, -34vh, 0) rotateY(360deg) rotateZ(14deg) translateZ(172px) scale(0.62)",
+        opacity: 0,
+        filter: "brightness(1.32) saturate(1.4)",
+        offset: 1
+      }
+    ],
+    {
+      duration: 520,
+      easing: "cubic-bezier(0.22, 0.72, 0.18, 1)",
       fill: "forwards"
     }
   );
