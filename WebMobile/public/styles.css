@@ -4197,6 +4197,10 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
   left: 3px;
 }
 
+.hand-panel.console-panel .slot-window:nth-child(2) .dice-reel-strip {
+  left: -0.5em;
+}
+
 .hand-panel.console-panel .slot-roll-btn {
   left: 45.2%;
   top: 15.7%;

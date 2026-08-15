@@ -47,6 +47,7 @@ const controlDocList = document.querySelector("#controlDocList");
 const controlDocSave = document.querySelector("#controlDocSave");
 const controlDocReset = document.querySelector("#controlDocReset");
 const boardSpaceCount = 54;
+const boardCardRadiusPercent = 41.2;
 const startingPlayerPositions = [27, 14, 0, 41];
 const playerTokenColors = ["#24d8ff", "#ff2a4f", "#39ff7a", "#ff8a1c"];
 const themeStorageKey = "poker-orbit-theme-v1";
@@ -833,7 +834,7 @@ function createPlayerTokens() {
 
 function getBoardCardPosition(index) {
   const angle = (index / boardSpaceCount) * Math.PI * 2 - Math.PI / 2;
-  const radius = 44.1;
+  const radius = boardCardRadiusPercent;
 
   return {
     x: 50 + Math.cos(angle) * radius,
@@ -1203,7 +1204,7 @@ function getBoardSlotElement(boardIndex) {
 
 function getTokenInnerRingPosition(index) {
   const angle = (index / boardSpaceCount) * Math.PI * 2 - Math.PI / 2;
-  const radius = 44.1;
+  const radius = boardCardRadiusPercent;
 
   return {
     x: 50 + Math.cos(angle) * radius,

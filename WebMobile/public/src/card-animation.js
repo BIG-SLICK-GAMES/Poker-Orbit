@@ -121,6 +121,7 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
       controls.classList.add("purchase-resolving");
       clone.classList.remove("waiting-purchase");
       clone.style.setProperty("--owner-color", getPurchaseColor?.() || "#24d8ff");
+      await popPurchaseCard(clone);
       clone.classList.add("purchase-spinning-color");
       await spinPurchaseCard(clone);
       const result = onPurchase?.(activeCardElement, purchaseOptions);
@@ -205,6 +206,44 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
     play,
     clear
   };
+}
+
+function popPurchaseCard(card) {
+  card.style.transformOrigin = "50% 50%";
+  const animation = card.animate(
+    [
+      {
+        transform: "translateZ(96px) rotateZ(4deg) rotateY(0deg) scale(1)",
+        filter: "brightness(1) saturate(1)"
+      },
+      {
+        transform: "translateZ(132px) translateY(-12px) rotateZ(2deg) rotateY(0deg) scale(1.07)",
+        filter: "brightness(1.2) saturate(1.12)",
+        offset: 0.26
+      },
+      {
+        transform: "translateZ(104px) translateY(3px) rotateZ(5deg) rotateY(0deg) scale(0.985)",
+        filter: "brightness(1.05) saturate(1.04)",
+        offset: 0.48
+      },
+      {
+        transform: "translateZ(110px) rotateZ(4deg) rotateY(0deg) scale(1.015)",
+        filter: "brightness(1.08) saturate(1.06)",
+        offset: 0.7
+      },
+      {
+        transform: "translateZ(96px) rotateZ(4deg) rotateY(0deg) scale(1)",
+        filter: "brightness(1) saturate(1)"
+      }
+    ],
+    {
+      duration: 920,
+      easing: "cubic-bezier(0.16, 0.82, 0.18, 1)",
+      fill: "forwards"
+    }
+  );
+
+  return animation.finished.catch(() => {});
 }
 
 function spinPurchaseCard(card) {
