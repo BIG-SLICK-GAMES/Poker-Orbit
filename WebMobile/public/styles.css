@@ -951,8 +951,8 @@ h2 {
 
 .board-slot {
   position: absolute;
-  width: clamp(46px, 10.1cqw, 86px);
-  height: clamp(52px, 11.4cqw, 96px);
+  width: clamp(24px, 5.2cqw, 50px);
+  height: clamp(42px, 9.6cqw, 86px);
   pointer-events: auto;
   transform:
     translate(-50%, -50%)
