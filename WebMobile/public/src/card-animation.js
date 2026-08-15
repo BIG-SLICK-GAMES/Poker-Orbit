@@ -213,32 +213,37 @@ function popPurchaseCard(card) {
   const animation = card.animate(
     [
       {
-        transform: "translateZ(96px) rotateZ(4deg) rotateY(0deg) scale(1)",
+        transform: "translateZ(96px) rotateZ(4deg) rotateY(0deg) scaleX(1) scaleY(1)",
         filter: "brightness(1) saturate(1)"
       },
       {
-        transform: "translateZ(132px) translateY(-12px) rotateZ(2deg) rotateY(0deg) scale(1.07)",
-        filter: "brightness(1.2) saturate(1.12)",
-        offset: 0.26
-      },
-      {
-        transform: "translateZ(104px) translateY(3px) rotateZ(5deg) rotateY(0deg) scale(0.985)",
-        filter: "brightness(1.05) saturate(1.04)",
-        offset: 0.48
-      },
-      {
-        transform: "translateZ(110px) rotateZ(4deg) rotateY(0deg) scale(1.015)",
+        transform: "translateZ(96px) rotateZ(4deg) rotateY(0deg) scaleX(1.1) scaleY(0.9)",
         filter: "brightness(1.08) saturate(1.06)",
-        offset: 0.7
+        offset: 0.12
       },
       {
-        transform: "translateZ(96px) rotateZ(4deg) rotateY(0deg) scale(1)",
-        filter: "brightness(1) saturate(1)"
+        transform: "translateZ(128px) translateY(-10px) rotateZ(3deg) rotateY(0deg) scaleX(0.92) scaleY(1.12)",
+        filter: "brightness(1.24) saturate(1.12)",
+        offset: 0.28
+      },
+      {
+        transform: "translateZ(118px) translateY(-10px) rotateZ(4deg) rotateY(0deg) scaleX(1.03) scaleY(0.98)",
+        filter: "brightness(1.1) saturate(1.08)",
+        offset: 0.45
+      },
+      {
+        transform: "translateZ(118px) translateY(-10px) rotateZ(4deg) rotateY(0deg) scaleX(1) scaleY(1)",
+        filter: "brightness(1.04) saturate(1.04)",
+        offset: 0.72
+      },
+      {
+        transform: "translateZ(118px) translateY(-10px) rotateZ(4deg) rotateY(0deg) scaleX(1) scaleY(1)",
+        filter: "brightness(1.04) saturate(1.04)"
       }
     ],
     {
-      duration: 920,
-      easing: "cubic-bezier(0.16, 0.82, 0.18, 1)",
+      duration: 780,
+      easing: "cubic-bezier(0.16, 0.9, 0.18, 1)",
       fill: "forwards"
     }
   );
@@ -248,12 +253,12 @@ function popPurchaseCard(card) {
 
 function spinPurchaseCard(card) {
   card.style.transformOrigin = "50% 50%";
-  const baseTransform = "translateZ(96px) rotateZ(4deg) rotateY(0deg) scale(1)";
+  const baseTransform = "translateZ(118px) translateY(-10px) rotateZ(4deg) rotateY(0deg) scale(1)";
   const animation = card.animate(
     [
       { transform: baseTransform, filter: "brightness(1) saturate(1)" },
-      { transform: "translateZ(96px) rotateZ(4deg) rotateY(180deg) scale(1)", filter: "brightness(1.82) saturate(1.62)", offset: 0.5 },
-      { transform: "translateZ(96px) rotateZ(4deg) rotateY(360deg) scale(1)", filter: "brightness(1.16) saturate(1.28)" }
+      { transform: "translateZ(118px) translateY(-10px) rotateZ(4deg) rotateY(180deg) scale(1)", filter: "brightness(1.82) saturate(1.62)", offset: 0.5 },
+      { transform: "translateZ(118px) translateY(-10px) rotateZ(4deg) rotateY(360deg) scale(1)", filter: "brightness(1.16) saturate(1.28)" }
     ],
     {
       duration: 640,
@@ -269,7 +274,7 @@ function flyOutPurchaseCard(card) {
   const animation = card.animate(
     [
       {
-        transform: "translateZ(96px) rotateZ(4deg) rotateY(360deg) scale(1)",
+        transform: "translateZ(118px) translateY(-10px) rotateZ(4deg) rotateY(360deg) scale(1)",
         opacity: 1,
         filter: "brightness(1.16) saturate(1.28)"
       },
