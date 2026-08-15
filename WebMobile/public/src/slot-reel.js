@@ -1,10 +1,10 @@
 const DEFAULT_MIN = 1;
 const DEFAULT_MAX = 6;
-const SPIN_TICKS = 26;
+const SPIN_TICKS = 15;
 const SPIN_DELAYS_MS = [
-  34, 34, 36, 36, 38, 40, 42, 45,
-  50, 56, 64, 74, 86, 100, 118, 138,
-  162, 188, 218, 252, 290, 332, 376, 424, 478, 540
+  28, 30, 32, 35, 39,
+  46, 55, 68, 84, 104,
+  128, 158, 194, 238, 292
 ];
 
 export function createSlotReelModule({ root, rollButton, externalRollButton, min = DEFAULT_MIN, max = DEFAULT_MAX, onRollComplete }) {
@@ -40,12 +40,12 @@ export function createSlotReelModule({ root, rollButton, externalRollButton, min
 
       if (tick >= SPIN_TICKS) {
         lastResult = result;
+        root.classList.remove("rolling");
         renderNumber(result);
         const isDoubles = result.every((value) => value === result[0]);
         const total = result.reduce((sum, value) => sum + value, 0);
         root.classList.toggle("doubles-hit", isDoubles);
         doublesLamp.setAttribute("aria-pressed", String(isDoubles));
-        root.classList.remove("rolling");
         rollButton.disabled = false;
         if (externalRollButton) {
           externalRollButton.disabled = false;

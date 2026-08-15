@@ -203,12 +203,13 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
 }
 
 function spinPurchaseCard(card) {
-  const baseTransform = "rotateY(0deg) rotateZ(4deg) translateZ(140px) scale(1)";
+  card.style.transformOrigin = "50% 50%";
+  const baseTransform = "translateZ(96px) rotateZ(4deg) rotateY(0deg) scale(1)";
   const animation = card.animate(
     [
       { transform: baseTransform, filter: "brightness(1) saturate(1)" },
-      { transform: "rotateY(180deg) rotateZ(4deg) translateZ(140px) scale(1)", filter: "brightness(1.82) saturate(1.62)", offset: 0.5 },
-      { transform: "rotateY(360deg) rotateZ(4deg) translateZ(140px) scale(1)", filter: "brightness(1.16) saturate(1.28)" }
+      { transform: "translateZ(96px) rotateZ(4deg) rotateY(180deg) scale(1)", filter: "brightness(1.82) saturate(1.62)", offset: 0.5 },
+      { transform: "translateZ(96px) rotateZ(4deg) rotateY(360deg) scale(1)", filter: "brightness(1.16) saturate(1.28)" }
     ],
     {
       duration: 640,
@@ -224,12 +225,12 @@ function flyOutPurchaseCard(card) {
   const animation = card.animate(
     [
       {
-        transform: "rotateY(360deg) rotateZ(4deg) translateZ(140px) scale(1)",
+        transform: "translateZ(96px) rotateZ(4deg) rotateY(360deg) scale(1)",
         opacity: 1,
         filter: "brightness(1.16) saturate(1.28)"
       },
       {
-        transform: "translate3d(34vw, -34vh, 0) rotateY(360deg) rotateZ(14deg) translateZ(172px) scale(0.62)",
+        transform: "translate3d(34vw, -34vh, 0) translateZ(128px) rotateZ(14deg) rotateY(360deg) scale(0.62)",
         opacity: 0,
         filter: "brightness(1.32) saturate(1.4)",
         offset: 1
