@@ -57,7 +57,15 @@ export function createSlotReelModule({ root, rollButton, externalRollButton, min
       const value = values[index] || min;
       reel.dataset.value = String(value);
       reel.setAttribute("aria-label", `Die ${index + 1}: ${value}`);
-      reel.textContent = String(value);
+      reel.style.setProperty("--reel-index", String(value - min));
+
+      if (!reel.querySelector(".dice-reel-strip")) {
+        reel.innerHTML = `
+          <span class="dice-reel-strip" aria-hidden="true">
+            ${Array.from({ length: max - min + 1 }, (_, numberIndex) => `<b>${numberIndex + min}</b>`).join("")}
+          </span>
+        `;
+      }
     });
   }
 

@@ -31,7 +31,7 @@ export const MASTER_CONTROL = {
     */
     turnFocus: {
       followsToken: false,
-      cameraLeftRightPercent: 0,
+      cameraLeftRightPercent: -10,
       cameraUpDownPercent: 0,
       cameraZoomPercent: 100,
       cameraRollPercent: 0,
@@ -39,7 +39,7 @@ export const MASTER_CONTROL = {
       tableUpDownPercent: -129,
       tableSizePercent: 200,
       mobile: {
-        cameraLeftRightPercent: 0,
+        cameraLeftRightPercent: -10,
         cameraUpDownPercent: 0,
         cameraZoomPercent: 100,
         tablePitchDegrees: 52,
