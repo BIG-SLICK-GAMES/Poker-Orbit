@@ -106,7 +106,14 @@
               <div class="slot-window" data-reel>1</div>
               <div class="slot-window" data-reel>1</div>
             </div>
-            <button class="slot-roll-btn" id="slotRollButton" data-control="rollButton" type="button">ROLL</button>
+            <button class="slot-roll-btn" id="slotRollButton" data-control="rollButton" type="button" aria-label="Roll dice">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M7.2 7.4A6.8 6.8 0 0 1 18 9.2"></path>
+                <path d="M18 5.8v3.4h-3.4"></path>
+                <path d="M16.8 16.6A6.8 6.8 0 0 1 6 14.8"></path>
+                <path d="M6 18.2v-3.4h3.4"></path>
+              </svg>
+            </button>
             <div class="bonus-slots" id="playerBonusSlots" data-control="bonusSlots" aria-label="Held bonuses">
               <span class="bonus-slot" data-bonus-slot></span>
               <span class="bonus-slot" data-bonus-slot></span>

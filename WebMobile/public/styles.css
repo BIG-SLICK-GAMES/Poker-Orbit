@@ -801,7 +801,7 @@ h2 {
 }
 
 .board-stage[data-camera-mode="table-wide"] .perspective-table {
-  width: min(132cqw, 96cqh, 1320px);
+  width: min(220cqw, 160cqh, 1720px);
 }
 
 .perspective-table::after {
@@ -3483,7 +3483,7 @@ body[data-theme] .slot-window {
   }
 
   .board-stage[data-camera-mode="table-wide"] .perspective-table {
-    width: min(136cqw, 82cqh, 820px);
+    width: min(232cqw, 134cqh, 1260px);
   }
 
   .board-stage[data-camera-mode="turn-focus"] {
@@ -3790,7 +3790,7 @@ body[data-theme] .slot-window {
   }
 
   .board-stage[data-camera-mode="table-wide"] .perspective-table {
-    width: min(136cqw, 82cqh, 820px);
+    width: min(232cqw, 134cqh, 1260px);
   }
 
   .board-stage[data-camera-mode="turn-focus"] {
@@ -3908,14 +3908,15 @@ body[data-theme] .slot-window {
   }
 
   .board-stage[data-camera-mode="table-wide"] .perspective-table {
-    width: min(96cqw, 106cqh, 1180px);
+    width: min(154cqw, 170cqh, 1560px);
   }
 
   .board-card {
-    width: clamp(14px, 2.8vw, 22px);
-    height: clamp(28px, 5.7vw, 44px);
+    inset: 3px;
+    width: auto;
+    height: auto;
     font-size: clamp(0.42rem, 0.96vw, 0.62rem);
-    border-radius: 4px;
+    border-radius: 1px;
   }
 }
 
@@ -4181,6 +4182,14 @@ body[data-theme] .hand-panel.console-panel::after {
   box-shadow: none;
 }
 
+body[data-theme] .hand-panel.console-panel .rp-meter,
+body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
+.hand-panel.console-panel .slot-reel.spin-ready .rp-meter {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 .hand-panel.console-panel .rp-meter span {
   position: absolute;
   left: 8%;
@@ -4203,6 +4212,8 @@ body[data-theme] .hand-panel.console-panel::after {
 
 .hand-panel.console-panel .rp-meter strong {
   align-self: start;
+  border: 0;
+  background: transparent;
   color: #ffffff;
   font-size: clamp(1.08rem, 4.4cqw, 1.78rem);
   line-height: 0.98;
@@ -4210,6 +4221,7 @@ body[data-theme] .hand-panel.console-panel::after {
   text-shadow:
     0 0 10px rgba(36, 216, 255, 0.9),
     0 2px 0 rgba(0, 0, 0, 0.85);
+  box-shadow: none;
 }
 
 .hand-panel.console-panel .slot-machine {
@@ -4287,6 +4299,19 @@ body[data-theme] .hand-panel.console-panel::after {
     0 0 12px rgba(36, 216, 255, 0.92),
     0 2px 0 rgba(0, 0, 0, 0.9);
   box-shadow: none;
+}
+
+.hand-panel.console-panel .slot-roll-btn svg {
+  width: 48%;
+  height: 48%;
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter:
+    drop-shadow(0 0 6px rgba(36, 216, 255, 0.92))
+    drop-shadow(0 2px 0 rgba(0, 0, 0, 0.74));
 }
 
 .hand-panel.console-panel .slot-roll-btn:active {

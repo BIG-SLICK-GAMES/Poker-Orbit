@@ -206,7 +206,7 @@ function spinPurchaseCard(card) {
   const animation = card.animate(
     [
       { transform: baseTransform, filter: "brightness(1) saturate(1)" },
-      { transform: "rotateY(180deg) rotateZ(4deg) translateZ(142px) scale(1)", filter: "brightness(1.82) saturate(1.62)", offset: 0.5 },
+      { transform: "rotateY(180deg) rotateZ(4deg) translateZ(140px) scale(1)", filter: "brightness(1.82) saturate(1.62)", offset: 0.5 },
       { transform: "rotateY(360deg) rotateZ(4deg) translateZ(140px) scale(1)", filter: "brightness(1.16) saturate(1.28)" }
     ],
     {

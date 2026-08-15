@@ -35,9 +35,9 @@ export function createCameraModule({ boardStage, perspectiveTable, cameraControl
       cameraUpDownPercent: 0,
       cameraZoomPercent: 100,
       cameraRollPercent: 0,
-      tablePitchDegrees: 58,
+      tablePitchDegrees: 66,
       tableUpDownPercent: 0,
-      tableSizePercent: 100,
+      tableSizePercent: 116,
       label: "Wide table camera"
     }
   };
