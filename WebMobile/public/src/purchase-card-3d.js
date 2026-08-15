@@ -66,7 +66,7 @@ export function createPurchaseCard3DModule({ layer, playerColors, suitIcons }) {
     action.reset();
     action.setLoop(THREE.LoopOnce, 1);
     action.clampWhenFinished = true;
-    action.timeScale = 0.72;
+    action.timeScale = 1;
     action.play();
 
     await new Promise((resolve) => {
