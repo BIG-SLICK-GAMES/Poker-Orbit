@@ -1301,7 +1301,7 @@ function createControlDocSection(controlKey) {
   const section = document.createElement("details");
   section.className = "control-doc-section";
   section.dataset.controlSection = controlKey;
-  section.open = ["orbitBoard", "boardCards", "playerTokens", "diceReels", "rollPointsMeter"].includes(controlKey);
+  section.open = true;
   section.innerHTML = `
     <summary>
       <span>${controlDocLabels[controlKey]}</span>
