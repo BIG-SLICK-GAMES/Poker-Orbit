@@ -1391,8 +1391,12 @@ function mergeControlDocValues(base, source) {
     };
   });
 
+  if (merged.boardCardRing) {
+    merged.boardCardRing = { ...MASTER_CONTROL.boardCardRing };
+  }
+
   if (merged.boardCards) {
-    merged.boardCards.scalePercent = MASTER_CONTROL.boardCards.scalePercent;
+    merged.boardCards = { ...MASTER_CONTROL.boardCards };
   }
 
   return merged;
