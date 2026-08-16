@@ -266,9 +266,28 @@ function popPurchaseCard(card) {
 
   window.setTimeout(() => {
     card.classList.add("sold-stamped");
+    triggerSoldImpact(card);
   }, 900);
 
   return animation.finished.catch(() => {});
+}
+
+function triggerSoldImpact(card) {
+  const shell = card.closest(".app-shell");
+  const reduceMotion = shell?.classList.contains("reduce-motion");
+
+  if (!reduceMotion && navigator.vibrate) {
+    navigator.vibrate([45, 28, 70]);
+  }
+
+  if (!shell || reduceMotion) {
+    return;
+  }
+
+  shell.classList.remove("sold-impact-shake");
+  void shell.offsetWidth;
+  shell.classList.add("sold-impact-shake");
+  window.setTimeout(() => shell.classList.remove("sold-impact-shake"), 420);
 }
 
 function spinPurchaseCard(card) {
