@@ -222,37 +222,37 @@ function popPurchaseCard(card) {
         offset: 0.14
       },
       {
-        transform: "translateZ(172px) translateY(-42px) rotateZ(-2deg) rotateY(0deg) scaleX(0.86) scaleY(1.2)",
+        transform: "translateZ(174px) translateY(-44px) rotateZ(3deg) rotateY(0deg) scaleX(0.88) scaleY(1.18)",
         filter: "brightness(1.32) saturate(1.18)",
-        offset: 0.32
+        offset: 0.3
       },
       {
-        transform: "translateZ(154px) translateY(-34px) rotateZ(6deg) rotateY(0deg) scaleX(1.07) scaleY(0.95)",
+        transform: "translateZ(164px) translateY(-40px) rotateZ(4deg) rotateY(0deg) scaleX(1.04) scaleY(0.97)",
         filter: "brightness(1.12) saturate(1.1)",
-        offset: 0.44
+        offset: 0.42
       },
       {
-        transform: "translateZ(162px) translateY(-36px) rotateZ(4deg) rotateY(0deg) scaleX(0.98) scaleY(1.03)",
+        transform: "translateZ(166px) translateY(-40px) rotateZ(4deg) rotateY(0deg) scaleX(1) scaleY(1)",
         filter: "brightness(1.08) saturate(1.08)",
         offset: 0.54
       },
       {
-        transform: "translateZ(162px) translateY(-36px) rotateZ(3.4deg) rotateY(0deg) scaleX(1.012) scaleY(0.992)",
+        transform: "translateZ(166px) translateX(-3px) translateY(-40px) rotateZ(3.8deg) rotateY(0deg) scaleX(1) scaleY(1)",
         filter: "brightness(1.06) saturate(1.06)",
         offset: 0.68
       },
       {
-        transform: "translateZ(162px) translateY(-36px) rotateZ(4.4deg) rotateY(0deg) scaleX(0.996) scaleY(1.004)",
+        transform: "translateZ(168px) translateX(3px) translateY(-43px) rotateZ(4.2deg) rotateY(0deg) scaleX(1) scaleY(1)",
         filter: "brightness(1.06) saturate(1.06)",
         offset: 0.84
       },
       {
-        transform: "translateZ(162px) translateY(-36px) rotateZ(4deg) rotateY(0deg) scaleX(1) scaleY(1)",
+        transform: "translateZ(166px) translateX(0) translateY(-40px) rotateZ(4deg) rotateY(0deg) scaleX(1) scaleY(1)",
         filter: "brightness(1.06) saturate(1.06)"
       }
     ],
     {
-      duration: 1380,
+      duration: 1500,
       easing: "cubic-bezier(0.18, 1.18, 0.22, 1)",
       fill: "forwards"
     }
@@ -263,15 +263,15 @@ function popPurchaseCard(card) {
 
 function spinPurchaseCard(card) {
   card.style.transformOrigin = "50% 50%";
-  const baseTransform = "translateZ(162px) translateY(-36px) rotateZ(4deg) rotateY(0deg) scale(1)";
+  const baseTransform = "translateZ(166px) translateX(0) translateY(-40px) rotateZ(4deg) rotateY(0deg) scale(1)";
   const animation = card.animate(
     [
       { transform: baseTransform, filter: "brightness(1.06) saturate(1.06)" },
-      { transform: "translateZ(162px) translateY(-36px) rotateZ(1deg) rotateY(-16deg) scaleX(1.04) scaleY(0.98)", filter: "brightness(1.14) saturate(1.12)", offset: 0.12 },
-      { transform: "translateZ(162px) translateY(-36px) rotateZ(5deg) rotateY(155deg) scaleX(0.94) scaleY(1.05)", filter: "brightness(1.9) saturate(1.72)", offset: 0.42 },
-      { transform: "translateZ(162px) translateY(-36px) rotateZ(4deg) rotateY(356deg) scaleX(1.04) scaleY(0.97)", filter: "brightness(1.42) saturate(1.42)", offset: 0.74 },
-      { transform: "translateZ(162px) translateY(-36px) rotateZ(4deg) rotateY(372deg) scaleX(0.98) scaleY(1.02)", filter: "brightness(1.24) saturate(1.34)", offset: 0.88 },
-      { transform: "translateZ(162px) translateY(-36px) rotateZ(4deg) rotateY(360deg) scale(1)", filter: "brightness(1.16) saturate(1.28)" }
+      { transform: "translateZ(166px) translateX(0) translateY(-40px) rotateZ(1deg) rotateY(-16deg) scaleX(1.04) scaleY(0.98)", filter: "brightness(1.14) saturate(1.12)", offset: 0.12 },
+      { transform: "translateZ(166px) translateX(0) translateY(-40px) rotateZ(5deg) rotateY(155deg) scaleX(0.94) scaleY(1.05)", filter: "brightness(1.9) saturate(1.72)", offset: 0.42 },
+      { transform: "translateZ(166px) translateX(0) translateY(-40px) rotateZ(4deg) rotateY(356deg) scaleX(1.04) scaleY(0.97)", filter: "brightness(1.42) saturate(1.42)", offset: 0.74 },
+      { transform: "translateZ(166px) translateX(0) translateY(-40px) rotateZ(4deg) rotateY(372deg) scaleX(0.98) scaleY(1.02)", filter: "brightness(1.24) saturate(1.34)", offset: 0.88 },
+      { transform: "translateZ(166px) translateX(0) translateY(-40px) rotateZ(4deg) rotateY(360deg) scale(1)", filter: "brightness(1.16) saturate(1.28)" }
     ],
     {
       duration: 920,
@@ -287,20 +287,20 @@ function flyOutPurchaseCard(card) {
   const animation = card.animate(
     [
       {
-        transform: "translateZ(162px) translateY(-36px) rotateZ(4deg) rotateY(360deg) scale(1)",
+        transform: "translateZ(166px) translateX(0) translateY(-40px) rotateZ(4deg) rotateY(360deg) scale(1)",
         opacity: 1,
         filter: "brightness(1.16) saturate(1.28)"
       },
       {
-        transform: "translate3d(34vw, -34vh, 0) translateZ(128px) rotateZ(14deg) rotateY(360deg) scale(0.62)",
+        transform: "translate3d(34vw, -34vh, 0) translateZ(128px) rotateZ(18deg) rotateY(720deg) scale(0.58)",
         opacity: 0,
         filter: "brightness(1.32) saturate(1.4)",
         offset: 1
       }
     ],
     {
-      duration: 520,
-      easing: "cubic-bezier(0.22, 0.72, 0.18, 1)",
+      duration: 980,
+      easing: "cubic-bezier(0.18, 0.72, 0.2, 1)",
       fill: "forwards"
     }
   );

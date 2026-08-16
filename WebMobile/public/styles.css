@@ -4211,7 +4211,7 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
 }
 
 .hand-panel.console-panel .slot-roll-btn {
-  left: 45.2%;
+  left: calc(45.2% - 2px);
   top: 15.7%;
   width: 15.2%;
   height: 26.5%;
