@@ -142,6 +142,7 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
 
       controls.classList.remove("purchase-resolving");
       clone.classList.remove("purchase-spinning-color");
+      clone.classList.remove("sold-stamped");
       clone.classList.add("waiting-purchase");
       purchaseButton.disabled = false;
       updateSpinButton();
@@ -209,6 +210,11 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
 }
 
 function popPurchaseCard(card) {
+  if (!card.querySelector(".sold-stamp")) {
+    card.insertAdjacentHTML("beforeend", `<span class="sold-stamp" aria-hidden="true">SOLD</span>`);
+  }
+
+  card.classList.remove("sold-stamped");
   card.style.transformOrigin = "50% 50%";
   const animation = card.animate(
     [
@@ -257,6 +263,10 @@ function popPurchaseCard(card) {
       fill: "forwards"
     }
   );
+
+  window.setTimeout(() => {
+    card.classList.add("sold-stamped");
+  }, 900);
 
   return animation.finished.catch(() => {});
 }
