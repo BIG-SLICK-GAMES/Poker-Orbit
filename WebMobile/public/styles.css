@@ -4448,9 +4448,9 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
 .hand-panel.console-panel .card-hand {
   z-index: 2;
   left: 3.8%;
-  top: 67.2%;
+  top: 65.8%;
   width: 92.4%;
-  height: 26.9%;
+  height: 28.4%;
   min-height: 0;
   display: flex;
   align-items: center;
@@ -4484,7 +4484,7 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
 }
 
 .hand-panel.console-panel .mini-card {
-  width: clamp(50px, 12.4cqw, 82px);
-  height: 90%;
+  width: clamp(54px, 13.2cqw, 88px);
+  height: 98%;
   max-height: none;
 }
