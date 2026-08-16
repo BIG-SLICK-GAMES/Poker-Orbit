@@ -1326,6 +1326,7 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
       return;
     }
 
+    token.classList.add("token-speed-blur");
     const startedAt = performance.now();
 
     const tick = (timestamp) => {
@@ -1343,6 +1344,7 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
       tokenAnimationFrames.delete(playerIndex);
       setTokenBoardPosition(token, toIndex);
       token.style.setProperty("--token-move-ms", "150ms");
+      token.classList.remove("token-speed-blur");
     };
 
     tokenAnimationFrames.set(playerIndex, window.requestAnimationFrame(tick));

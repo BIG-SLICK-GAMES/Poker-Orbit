@@ -22,21 +22,23 @@ export function createFxOverlayModule({
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       const glowPath = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
       const corePath = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      const headPath = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
 
       svg.classList.add("token-comet-arc");
       svg.setAttribute("viewBox", "0 0 100 100");
       svg.setAttribute("aria-hidden", "true");
       svg.style.setProperty("--fx-color", color);
-      svg.style.setProperty("--fx-duration", `${Math.max(520, durationMs * 1.08)}ms`);
+      svg.style.setProperty("--fx-duration", `${Math.max(460, durationMs * 0.92)}ms`);
 
-      [glowPath, corePath].forEach((path) => {
+      [glowPath, corePath, headPath].forEach((path) => {
         path.setAttribute("points", points.join(" "));
         path.setAttribute("pathLength", "100");
       });
       glowPath.classList.add("token-comet-path", "glow");
       corePath.classList.add("token-comet-path", "core");
+      headPath.classList.add("token-comet-path", "head");
 
-      svg.append(glowPath, corePath);
+      svg.append(glowPath, corePath, headPath);
       tokenLayer.append(svg);
       svg.addEventListener("animationend", () => svg.remove(), { once: true });
     }, delayMs);

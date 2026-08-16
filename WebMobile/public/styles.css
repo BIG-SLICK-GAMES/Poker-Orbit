@@ -1407,6 +1407,19 @@ h2 {
     scale(1.08);
 }
 
+.player-token.token-speed-blur {
+  filter:
+    blur(0.7px)
+    saturate(1.75)
+    brightness(1.35)
+    drop-shadow(0 0 10px var(--token-color))
+    drop-shadow(0 0 22px color-mix(in srgb, var(--token-color) 80%, transparent));
+}
+
+.player-token.token-speed-blur span {
+  opacity: 0.72;
+}
+
 .token-comet-arc {
   position: absolute;
   inset: 0;
@@ -1422,21 +1435,33 @@ h2 {
   stroke: var(--fx-color, #24d8ff);
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 28 100;
+  stroke-dasharray: 18 100;
   stroke-dashoffset: 100;
   animation: token-comet-arc var(--fx-duration, 700ms) cubic-bezier(0.15, 0.82, 0.18, 1) both;
 }
 
 .token-comet-path.glow {
-  stroke-width: 4.4;
-  opacity: 0.34;
-  filter: blur(1.4px) drop-shadow(0 0 5px var(--fx-color, #24d8ff));
+  stroke-width: 5.8;
+  opacity: 0.46;
+  filter: blur(2.1px) drop-shadow(0 0 10px var(--fx-color, #24d8ff));
 }
 
 .token-comet-path.core {
-  stroke-width: 1.15;
-  opacity: 0.94;
-  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 7px var(--fx-color, #24d8ff));
+  stroke-width: 1.8;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 10px var(--fx-color, #24d8ff));
+}
+
+.token-comet-path.head {
+  stroke-width: 3.1;
+  stroke-dasharray: 3 100;
+  opacity: 1;
+  filter:
+    blur(0.3px)
+    drop-shadow(0 0 4px #ffffff)
+    drop-shadow(0 0 14px var(--fx-color, #24d8ff))
+    drop-shadow(0 0 26px var(--fx-color, #24d8ff));
+  animation-name: token-comet-head;
 }
 
 .card-animation-layer {
@@ -3375,11 +3400,23 @@ body[data-theme] .slot-window {
   0% {
     stroke-dashoffset: 100;
   }
-  72% {
-    stroke-dashoffset: 0;
+  78% {
+    stroke-dashoffset: -5;
   }
   100% {
-    stroke-dashoffset: -30;
+    stroke-dashoffset: -38;
+  }
+}
+
+@keyframes token-comet-head {
+  0% {
+    stroke-dashoffset: 104;
+  }
+  78% {
+    stroke-dashoffset: 1;
+  }
+  100% {
+    stroke-dashoffset: -18;
   }
 }
 
