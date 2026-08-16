@@ -2881,20 +2881,23 @@ h2 {
   accent-color: var(--diner-mint);
 }
 
-.setting-row.camera-settings {
+.setting-row.camera-settings,
+.setting-row.bot-player-settings {
   display: grid;
   gap: 10px;
   min-height: 0;
 }
 
-.camera-control-row {
+.camera-control-row,
+.bot-player-control-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(150px, 1.2fr) minmax(72px, auto);
   align-items: center;
   gap: 10px;
 }
 
-.camera-control-row span {
+.camera-control-row span,
+.bot-player-control-row span {
   min-width: 0;
   color: var(--diner-cream);
   font-size: 0.78rem;
@@ -2902,11 +2905,13 @@ h2 {
   text-transform: uppercase;
 }
 
-.camera-control-row input[type="range"] {
+.camera-control-row input[type="range"],
+.bot-player-control-row input[type="range"] {
   width: 100%;
 }
 
-.camera-control-row strong {
+.camera-control-row strong,
+.bot-player-control-row strong {
   color: #ffe985;
   font-size: 0.72rem;
   text-align: right;

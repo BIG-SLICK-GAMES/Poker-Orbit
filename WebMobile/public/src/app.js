@@ -44,6 +44,9 @@ const cameraYControl = document.querySelector("#cameraYControl");
 const cameraXValue = document.querySelector("#cameraXValue");
 const cameraYValue = document.querySelector("#cameraYValue");
 const cameraResetButton = document.querySelector("#cameraResetButton");
+const botPlayersControl = document.querySelector("#botPlayersControl");
+const botPlayersValue = document.querySelector("#botPlayersValue");
+const botPlayersSectionSummary = document.querySelector("#botPlayersSectionSummary");
 const controlDocToggle = document.querySelector("#controlDocToggle");
 const controlDocPanel = document.querySelector("#controlDocPanel");
 const controlDocClose = document.querySelector("#controlDocClose");
@@ -58,6 +61,7 @@ const themeStorageKey = "poker-orbit-theme-v1";
 const cameraStorageKey = "poker-orbit-camera-offset-v3";
 const controlDocStorageKey = "poker-orbit-control-doc-v2";
 const playerThemeOverlayStorageKey = "poker-orbit-player-theme-overlay-v1";
+const botPlayersStorageKey = "poker-orbit-bot-players-v1";
 const cameraDefaultOffset = { x: -14, y: 0 };
 const customThemeLimit = 5;
 const controlDocLabels = {
@@ -185,6 +189,7 @@ let savedCustomThemes = [];
 let activeThemeName = "diner";
 let activeCustomThemeId = "";
 let cameraOffset = loadSavedCameraOffset();
+let botPlayerCount = loadBotPlayerCount();
 
 loadSavedTheme();
 createThemeSettings();
@@ -288,6 +293,7 @@ formatMiniCards();
 applyMasterControl();
 createControlDocPanel();
 applyCameraOffset();
+applyBotPlayerSettings();
 if (playerThemeOverlayToggle) {
   playerThemeOverlayToggle.checked = playerThemeOverlayEnabled;
 }
@@ -334,6 +340,11 @@ cameraYControl?.addEventListener("input", (event) => {
 cameraResetButton?.addEventListener("click", () => {
   cameraOffset = { ...cameraDefaultOffset };
   applyCameraOffset({ persist: true });
+});
+
+botPlayersControl?.addEventListener("input", (event) => {
+  botPlayerCount = clampBotPlayerCount(Number(event.target.value));
+  applyBotPlayerSettings({ persist: true });
 });
 
 controlDocToggle?.addEventListener("click", () => {
@@ -436,6 +447,39 @@ function loadPlayerThemeOverlayEnabled() {
 
 function savePlayerThemeOverlayEnabled() {
   localStorage.setItem(playerThemeOverlayStorageKey, playerThemeOverlayEnabled ? "on" : "off");
+}
+
+function loadBotPlayerCount() {
+  return clampBotPlayerCount(Number(localStorage.getItem(botPlayersStorageKey) || "3"));
+}
+
+function clampBotPlayerCount(value) {
+  if (!Number.isFinite(value)) {
+    return 3;
+  }
+
+  return Math.max(1, Math.min(3, Math.trunc(value)));
+}
+
+function applyBotPlayerSettings({ persist = false } = {}) {
+  const label = `${botPlayerCount} ${botPlayerCount === 1 ? "Bot" : "Bots"}`;
+  shell.dataset.botPlayers = String(botPlayerCount);
+
+  if (botPlayersControl) {
+    botPlayersControl.value = String(botPlayerCount);
+  }
+
+  if (botPlayersValue) {
+    botPlayersValue.textContent = label;
+  }
+
+  if (botPlayersSectionSummary) {
+    botPlayersSectionSummary.textContent = label;
+  }
+
+  if (persist) {
+    localStorage.setItem(botPlayersStorageKey, String(botPlayerCount));
+  }
 }
 
 function applyCameraOffset({ persist = false } = {}) {
