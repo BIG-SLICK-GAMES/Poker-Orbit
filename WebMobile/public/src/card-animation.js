@@ -224,32 +224,32 @@ function popPurchaseCard(card) {
         offset: 0.14
       },
       {
-        transform: "translateZ(174px) translateY(-44px) rotateZ(3deg) rotateY(0deg) scaleX(0.88) scaleY(1.18)",
+        transform: "translateZ(228px) translateY(-10px) rotateZ(3deg) rotateY(0deg) scaleX(0.9) scaleY(1.16)",
         filter: "brightness(1.32) saturate(1.18)",
         offset: 0.3
       },
       {
-        transform: "translateZ(164px) translateY(-40px) rotateZ(4deg) rotateY(0deg) scaleX(1.04) scaleY(0.97)",
+        transform: "translateZ(214px) translateY(-8px) rotateZ(4deg) rotateY(0deg) scaleX(1.04) scaleY(0.97)",
         filter: "brightness(1.12) saturate(1.1)",
         offset: 0.42
       },
       {
-        transform: "translateZ(166px) translateY(-40px) rotateZ(4deg) rotateY(0deg) scaleX(1) scaleY(1)",
+        transform: "translateZ(216px) translateY(-8px) rotateZ(4deg) rotateY(0deg) scaleX(1) scaleY(1)",
         filter: "brightness(1.08) saturate(1.08)",
         offset: 0.54
       },
       {
-        transform: "translateZ(166px) translateX(-3px) translateY(-40px) rotateZ(3.8deg) rotateY(0deg) scaleX(1) scaleY(1)",
+        transform: "translateZ(218px) translateX(-2px) translateY(-7px) rotateZ(3.8deg) rotateY(0deg) scaleX(1) scaleY(1)",
         filter: "brightness(1.06) saturate(1.06)",
         offset: 0.68
       },
       {
-        transform: "translateZ(168px) translateX(3px) translateY(-43px) rotateZ(4.2deg) rotateY(0deg) scaleX(1) scaleY(1)",
+        transform: "translateZ(220px) translateX(2px) translateY(-9px) rotateZ(4.2deg) rotateY(0deg) scaleX(1) scaleY(1)",
         filter: "brightness(1.06) saturate(1.06)",
         offset: 0.84
       },
       {
-        transform: "translateZ(166px) translateX(0) translateY(-40px) rotateZ(4deg) rotateY(0deg) scaleX(1) scaleY(1)",
+        transform: "translateZ(216px) translateX(0) translateY(-8px) rotateZ(4deg) rotateY(0deg) scaleX(1) scaleY(1)",
         filter: "brightness(1.06) saturate(1.06)"
       }
     ],
@@ -288,15 +288,15 @@ function triggerSoldImpact(card) {
 
 function spinPurchaseCard(card) {
   card.style.transformOrigin = "50% 50%";
-  const baseTransform = "translateZ(166px) translateX(0) translateY(-40px) rotateZ(4deg) rotateY(0deg) scale(1)";
+  const baseTransform = "translateZ(216px) translateX(0) translateY(-8px) rotateZ(4deg) rotateY(0deg) scale(1)";
   const animation = card.animate(
     [
       { transform: baseTransform, filter: "brightness(1.06) saturate(1.06)" },
-      { transform: "translateZ(166px) translateX(0) translateY(-40px) rotateZ(1deg) rotateY(-16deg) scaleX(1.04) scaleY(0.98)", filter: "brightness(1.14) saturate(1.12)", offset: 0.12 },
-      { transform: "translateZ(166px) translateX(0) translateY(-40px) rotateZ(5deg) rotateY(155deg) scaleX(0.94) scaleY(1.05)", filter: "brightness(1.9) saturate(1.72)", offset: 0.42 },
-      { transform: "translateZ(166px) translateX(0) translateY(-40px) rotateZ(4deg) rotateY(356deg) scaleX(1.04) scaleY(0.97)", filter: "brightness(1.42) saturate(1.42)", offset: 0.74 },
-      { transform: "translateZ(166px) translateX(0) translateY(-40px) rotateZ(4deg) rotateY(372deg) scaleX(0.98) scaleY(1.02)", filter: "brightness(1.24) saturate(1.34)", offset: 0.88 },
-      { transform: "translateZ(166px) translateX(0) translateY(-40px) rotateZ(4deg) rotateY(360deg) scale(1)", filter: "brightness(1.16) saturate(1.28)" }
+      { transform: "translateZ(218px) translateX(0) translateY(-8px) rotateZ(1deg) rotateY(-16deg) scaleX(1.04) scaleY(0.98)", filter: "brightness(1.14) saturate(1.12)", offset: 0.12 },
+      { transform: "translateZ(224px) translateX(0) translateY(-8px) rotateZ(5deg) rotateY(155deg) scaleX(0.94) scaleY(1.05)", filter: "brightness(1.9) saturate(1.72)", offset: 0.42 },
+      { transform: "translateZ(218px) translateX(0) translateY(-8px) rotateZ(4deg) rotateY(356deg) scaleX(1.04) scaleY(0.97)", filter: "brightness(1.42) saturate(1.42)", offset: 0.74 },
+      { transform: "translateZ(216px) translateX(0) translateY(-8px) rotateZ(4deg) rotateY(372deg) scaleX(0.98) scaleY(1.02)", filter: "brightness(1.24) saturate(1.34)", offset: 0.88 },
+      { transform: "translateZ(216px) translateX(0) translateY(-8px) rotateZ(4deg) rotateY(360deg) scale(1)", filter: "brightness(1.16) saturate(1.28)" }
     ],
     {
       duration: 920,
@@ -312,7 +312,7 @@ function flyOutPurchaseCard(card) {
   const animation = card.animate(
     [
       {
-        transform: "translateZ(166px) translateX(0) translateY(-40px) rotateZ(4deg) rotateY(360deg) scale(1)",
+        transform: "translateZ(216px) translateX(0) translateY(-8px) rotateZ(4deg) rotateY(360deg) scale(1)",
         opacity: 1,
         filter: "brightness(1.16) saturate(1.28)"
       },
@@ -360,7 +360,6 @@ function createBonusSlotMachineElement(prize) {
       </div>
       <div class="bonus-slot-lamps" aria-hidden="true">${Array.from({ length: 7 }, () => "<i></i>").join("")}</div>
     </div>
-    <strong class="bonus-slot-result">${prize.label}</strong>
   `;
   const closeButton = root.querySelector(".bonus-prize-close");
   closeButton.disabled = true;

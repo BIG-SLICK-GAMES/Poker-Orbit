@@ -1890,34 +1890,6 @@ h2 {
 .bonus-slot-lamps i:nth-child(7) { --lamp-index: 7; }
 }
 
-.bonus-slot-result {
-  position: absolute;
-  left: 50%;
-  bottom: 9%;
-  min-width: 46%;
-  padding: 6px 10px;
-  border: 2px solid rgba(255, 243, 207, 0.86);
-  border-radius: 7px;
-  background:
-    linear-gradient(180deg, rgba(36, 216, 255, 0.22), transparent 44%),
-    linear-gradient(180deg, rgba(255, 138, 28, 0.94), rgba(1, 7, 18, 0.98));
-  color: #ffffff;
-  font-size: clamp(0.76rem, 3cqw, 1.05rem);
-  font-weight: 900;
-  line-height: 1;
-  text-align: center;
-  text-transform: uppercase;
-  opacity: 0;
-  transform: translateX(-50%) scale(0.7);
-  box-shadow:
-    0 4px 0 rgba(38, 26, 22, 0.82),
-    0 12px 18px rgba(0, 0, 0, 0.34);
-}
-
-.bonus-slot-overlay.resolved .bonus-slot-result {
-  animation: bonus-slot-result-pop 260ms cubic-bezier(0.18, 1.28, 0.22, 1) both;
-}
-
 .hand-panel {
   position: relative;
   isolation: isolate;
@@ -3332,21 +3304,6 @@ body[data-theme] .slot-window {
   to {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.82) translateY(16px);
-  }
-}
-
-@keyframes bonus-slot-result-pop {
-  0% {
-    opacity: 0;
-    transform: translateX(-50%) scale(0.58);
-  }
-  68% {
-    opacity: 1;
-    transform: translateX(-50%) scale(1.12);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(-50%) scale(1);
   }
 }
 
