@@ -4194,6 +4194,7 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
   font-size: clamp(1.62rem, 7.2cqw, 2.7rem);
   line-height: 0.98;
   text-align: center;
+  transform: translateY(-3px);
   text-shadow:
     0 0 10px rgba(36, 216, 255, 0.9),
     0 2px 0 rgba(0, 0, 0, 0.85);
@@ -4261,11 +4262,11 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
 }
 
 .hand-panel.console-panel .slot-window:nth-child(1) .dice-reel-strip {
-  left: 2px;
+  left: 3px;
 }
 
 .hand-panel.console-panel .slot-window:nth-child(2) .dice-reel-strip {
-  left: calc(-0.28em + 1px);
+  left: calc(-0.28em + 2px);
 }
 
 .hand-panel.console-panel .slot-roll-btn {
