@@ -9,10 +9,10 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
 
     activeCardElement = cardElement;
     const frameRect = getFrameRect(layer);
-    const targetWidth = Math.min(218, Math.max(172, frameRect.width * 0.52));
+    const targetWidth = Math.min(131, Math.max(103, frameRect.width * 0.31));
     const targetHeight = targetWidth * 1.46;
     const targetLeft = (frameRect.width - targetWidth) / 2;
-    const targetTop = Math.max(72, (frameRect.height - targetHeight) * 0.34);
+    const targetTop = Math.max(20, (frameRect.height - targetHeight) * 0.16);
     const entryLeft = frameRect.width + 28;
     const controls = document.createElement("div");
     const clone = cardElement.cloneNode(true);
@@ -66,7 +66,6 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
       await runBonusSlotReels(slotOverlay.reels);
       slotOverlay.root.classList.add("resolved");
       slotOverlay.closeButton.disabled = false;
-      setStatus(prize.label);
       onComplete?.(prize);
       await slotOverlay.dismissed;
       slotOverlay.root.classList.add("leaving");
@@ -87,12 +86,10 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
         purchaseOptions = { ...purchaseOptions, discountPercent };
         const discountedPrice = Math.ceil(cardPrice * ((100 - discountPercent) / 100));
         purchaseButton.textContent = `Buy ${discountedPrice.toLocaleString("en-US")}`;
-        setStatus(`${discountPercent}% off this card`);
       },
       setPurchaseFree() {
         purchaseOptions = { ...purchaseOptions, free: true };
         purchaseButton.textContent = "Claim Free";
-        setStatus("This card is free");
       },
       setSpinEnabled: updateSpinButton,
       setStatus,
@@ -112,7 +109,6 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
       }
 
       spinButton.disabled = true;
-      setStatus("Bonus slots spinning");
       onSpin?.(activeCardElement, promptControls, { freeSpin: hasFreeSpin });
     });
     purchaseButton.addEventListener("click", async () => {
@@ -499,10 +495,6 @@ function getFeaturedCardMarkup(cardElement) {
 
   return `
     <div class="featured-card-face">
-      <div class="featured-card-corner">
-        <span>${rank}</span>
-        <strong>${getSuitIcon(suit)}</strong>
-      </div>
       <div class="featured-card-main">
         <span>${rank}</span>
         <strong>${getSuitIcon(suit)}</strong>

@@ -990,17 +990,20 @@ h2 {
   display: grid;
   place-items: center;
   gap: 1px;
-  padding: 1px;
-  border: 1px solid rgba(36, 216, 255, 0.8);
-  border-radius: 1px;
+  padding: 2px;
+  border: 1px solid rgba(38, 26, 22, 0.72);
+  border-radius: 3px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(202, 247, 255, 0.94)) content-box;
+    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.64), transparent 27%),
+    linear-gradient(180deg, #fffef7, var(--diner-cream));
   color: var(--ink);
-  font-size: clamp(0.46rem, 1.18cqw, 0.72rem);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.78rem, 1.95cqw, 1.08rem);
   font-weight: 900;
   line-height: 1;
   box-shadow:
-    0 0 8px rgba(36, 216, 255, 0.44),
+    0 0 0 2px rgba(255, 243, 207, 0.14),
+    0 0 8px rgba(36, 216, 255, 0.34),
     0 2px 5px rgba(0, 0, 0, 0.38),
     inset 0 1px 0 rgba(255, 255, 255, 0.72);
   transform:
@@ -1012,9 +1015,26 @@ h2 {
   will-change: transform;
 }
 
-.board-card strong {
-  font-size: 1.55em;
-  line-height: 0.82;
+.board-card-face {
+  display: grid;
+  place-items: center;
+  gap: 1px;
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.52), transparent 44%),
+    radial-gradient(circle at 50% 76%, rgba(36, 216, 255, 0.12), transparent 48%);
+}
+
+.board-card-rank {
+  font-size: 1.18em;
+  font-weight: 950;
+}
+
+.board-card-suit {
+  font-size: 2.2em;
+  line-height: 0.72;
 }
 
 .board-card.red {
@@ -1364,40 +1384,20 @@ h2 {
   animation: sold-stamp-hit 520ms cubic-bezier(0.14, 1.22, 0.2, 1) both;
 }
 
-.featured-card-corner {
-  position: absolute;
-  left: 8px;
-  top: 7px;
-  display: grid;
-  place-items: center;
-  gap: 1px;
-  line-height: 0.86;
-}
-
-.featured-card-corner span {
-  font-size: 0.92rem;
-  font-weight: 900;
-}
-
-.featured-card-corner strong {
-  font-size: 1.1rem;
-  line-height: 0.8;
-}
-
 .featured-card-main {
   display: grid;
   place-items: center;
   align-self: center;
-  padding-top: 14px;
+  padding-top: 2px;
 }
 
 .featured-card-main span {
-  font-size: clamp(1.5rem, 8cqw, 2.45rem);
+  font-size: clamp(1.72rem, 10cqw, 2.8rem);
   font-weight: 900;
 }
 
 .featured-card-main strong {
-  font-size: clamp(2.3rem, 12cqw, 3.85rem);
+  font-size: clamp(2.8rem, 15cqw, 4.6rem);
   line-height: 0.82;
 }
 
@@ -2450,14 +2450,17 @@ h2 {
   display: grid;
   place-items: center;
   gap: 2px;
-  border-radius: 8px;
-  border: 1px solid rgba(38, 26, 22, 0.18);
+  border-radius: 5px;
+  border: 1px solid rgba(38, 26, 22, 0.5);
   background:
+    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.64), transparent 27%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.44), transparent 44%),
     linear-gradient(180deg, #fffef6, var(--diner-cream));
   color: var(--ink);
   font-weight: 900;
   line-height: 1;
   box-shadow:
+    0 0 0 2px rgba(255, 243, 207, 0.12),
     0 2px 0 rgba(255, 255, 255, 0.45),
     0 8px 18px rgba(0, 0, 0, 0.32);
 }
@@ -3006,6 +3009,7 @@ body[data-theme] .ring.inner {
 body[data-theme] .board-card,
 body[data-theme] .mini-card {
   background:
+    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.64), transparent 27%),
     linear-gradient(180deg, #fffef7, var(--diner-cream));
   border-color: color-mix(in srgb, var(--diner-ink) 62%, transparent);
 }
@@ -3918,8 +3922,8 @@ body[data-theme] .slot-window {
     inset: 3px;
     width: auto;
     height: auto;
-    font-size: clamp(0.42rem, 0.96vw, 0.62rem);
-    border-radius: 1px;
+    font-size: clamp(0.72rem, 1.58vw, 1rem);
+    border-radius: 3px;
   }
 }
 
@@ -4288,11 +4292,11 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
 }
 
 .hand-panel.console-panel .slot-window:nth-child(1) .dice-reel-strip {
-  left: 1px;
+  left: 2px;
 }
 
 .hand-panel.console-panel .slot-window:nth-child(2) .dice-reel-strip {
-  left: -0.28em;
+  left: calc(-0.28em + 1px);
 }
 
 .hand-panel.console-panel .slot-roll-btn {

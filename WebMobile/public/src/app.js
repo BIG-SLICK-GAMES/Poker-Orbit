@@ -805,7 +805,12 @@ function createBoardCards() {
     tile.dataset.multiplier = getCardHandMultiplier(card.label);
     tile.dataset.control = "boardCards";
     tile.setAttribute("aria-label", `Board card ${index + 1}: ${card.name || `${card.label} of ${suitNames[card.suit]}`}`);
-    tile.innerHTML = `<span>${card.label}</span><strong>${suitIcons[card.suit] || ""}</strong>`;
+    tile.innerHTML = `
+      <span class="board-card-face" aria-hidden="true">
+        <span class="board-card-rank">${card.label}</span>
+        <strong class="board-card-suit">${suitIcons[card.suit] || ""}</strong>
+      </span>
+    `;
     slot.append(tile);
     return slot;
   }));
@@ -998,11 +1003,9 @@ function spinForBoardCard(cardElement, promptControls, options = {}) {
         promptControls.setSpinEnabled();
         return;
       }
-      promptControls.setStatus("Free Roll bonus used");
     } else if (turnModule.spendCurrentPlayerRollPoints(spinCost)) {
       paidBonusSpinUsedThisTurn = true;
     } else if (consumeBonusSpinCard(playerIndex)) {
-      promptControls.setStatus("Free Roll bonus used");
     } else {
       promptControls.setStatus(`Need ${spinCost} RP`);
       promptControls.setSpinEnabled();
@@ -1026,43 +1029,30 @@ function applyBonusSlotPrize(prize, cardElement, promptControls) {
       break;
     case "spin-again":
       promptControls.grantFreeSpin();
-      promptControls.setStatus("Spin again won");
       break;
     case "bogo":
       addBonusToCurrentPlayer("Buy 1 Get 1 50% Off");
-      promptControls.setStatus("Bonus saved");
       break;
     case "pic":
       addBonusToCurrentPlayer("PIC");
-      promptControls.setStatus("PIC saved");
       break;
     case "free-roll":
       addBonusToCurrentPlayer("Free Roll");
-      promptControls.setStatus("Free Roll saved");
       break;
     case "rp":
       turnModule.addCurrentPlayerRollPoints(100);
-      promptControls.setStatus("100 RP added");
       break;
     case "bankruptcy":
       turnModule.clearCurrentPlayerRollPoints();
-      promptControls.setStatus("All RP lost");
       break;
     case "shield":
       addBonusToCurrentPlayer("Shield");
-      promptControls.setStatus("Shield saved");
       break;
     case "steal":
       addBonusToCurrentPlayer("Steal");
-      promptControls.setStatus("Steal saved");
       break;
     default:
-      promptControls.setStatus("No win");
       break;
-  }
-
-  if (prize.type === "no-win") {
-    promptControls.setStatus("No win");
   }
 
   currentLandingCost = getBoardCardCost(cardElement);
