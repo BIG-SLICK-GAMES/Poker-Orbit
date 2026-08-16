@@ -1,6 +1,7 @@
 export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplete, onPass, onSpin, canSpin, getPurchaseColor }) {
   let activeAnimation = null;
   let activeCardElement = null;
+  const purchaseCardOffsetY = 50;
 
   function play(cardElement) {
     if (!cardElement || activeAnimation) {
@@ -12,7 +13,7 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
     const targetWidth = Math.min(131, Math.max(103, frameRect.width * 0.31));
     const targetHeight = targetWidth * 1.46;
     const targetLeft = (frameRect.width - targetWidth) / 2;
-    const targetTop = Math.max(20, (frameRect.height - targetHeight) * 0.16);
+    const targetTop = Math.max(20, (frameRect.height - targetHeight) * 0.16) + purchaseCardOffsetY;
     const entryLeft = frameRect.width + 28;
     const controls = document.createElement("div");
     const clone = cardElement.cloneNode(true);

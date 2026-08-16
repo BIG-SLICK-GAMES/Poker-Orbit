@@ -3407,6 +3407,18 @@ body[data-theme] .slot-window {
 }
 
 @media (max-width: 520px) {
+  body {
+    padding: 0;
+  }
+
+  .app-shell {
+    width: 100vw;
+    width: 100dvw;
+    height: 100vh;
+    height: 100dvh;
+    aspect-ratio: auto;
+  }
+
   .screen {
     padding: 5px;
   }
