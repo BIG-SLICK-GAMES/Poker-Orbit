@@ -6,6 +6,7 @@ import { createPurchaseAuctionModule, getRankPurchasePrice } from "./purchase-au
 import { createOwnershipHighlightModule } from "./ownership-highlights.js";
 import { createFxOverlayModule } from "./fx-overlay.js";
 import { createPlayerThemeOverlayModule } from "./player-theme-overlay.js";
+import { createOpponentHudModule } from "./opponent-hud.js";
 import { getBonusIconSrc } from "./bonus-icons.js";
 import { rollBonusSlotPrize } from "./bonus-slot-prizes.js";
 import { MASTER_CONTROL } from "./master-control.js";
@@ -20,6 +21,7 @@ const boardRotator = document.querySelector("#boardRotator");
 const perspectiveTable = document.querySelector("#perspectiveTable");
 const playerTokenLayer = document.querySelector("#playerTokenLayer");
 const cardAnimationLayer = document.querySelector("#cardAnimationLayer");
+const opponentHudRoot = document.querySelector("#opponentHud");
 const currentTurnLabel = document.querySelector("#currentTurnLabel");
 const rollPointsLabel = document.querySelector("#rollPointsLabel");
 const landingCostLabel = document.querySelector("#landingCostLabel");
@@ -246,6 +248,14 @@ const purchaseAuctionModule = createPurchaseAuctionModule({
   cardCountLabel: ownedCardCountLabel,
   suitIcons,
   getBestHandCards: getBestPokerHandCards
+});
+const opponentHudModule = createOpponentHudModule({
+  root: opponentHudRoot,
+  playerColors: playerTokenColors,
+  boardSpaceCount,
+  getPlayer: (playerIndex) => purchaseAuctionModule.getPlayer(playerIndex),
+  getBestCards: getBestPokerHandCards,
+  suitIcons
 });
 const tokenStepDurationMs = Math.max(60, numberOrDefault(MASTER_CONTROL.gameplay?.tokenStepDurationMs, 230));
 const tokenStepCards = Math.max(1, Math.trunc(numberOrDefault(MASTER_CONTROL.gameplay?.tokenStepCards, 1)));
@@ -976,6 +986,7 @@ function resolveOwnedCardLanding(cardElement) {
   }
 
   purchaseAuctionModule.chargePenalty(landingPlayerIndex, ownerIndex, cardElement.dataset.penalty || "0");
+  opponentHudModule.update(turnModule.getState());
 }
 
 function purchaseBoardCard(cardElement, options = {}) {
@@ -991,6 +1002,7 @@ function purchaseBoardCard(cardElement, options = {}) {
 
   ownershipHighlightModule.markPurchased(cardElement, playerIndex);
   updateBestHandHighlights();
+  opponentHudModule.update(turnModule.getState());
   awaitingLandingDecision = false;
 
   return { ...purchaseResult, playerIndex, playerColor: playerTokenColors[playerIndex] };
@@ -1735,6 +1747,7 @@ function renderTurnState(turnState) {
   rollPointsLabel.textContent = String(currentRollPoints);
   landingCostLabel.textContent = `Spin cost ${currentLandingCost} RP`;
   playerThemeOverlayModule.update(turnState);
+  opponentHudModule.update(turnState);
   purchaseAuctionModule.setActivePlayer(activePlayerIndex);
   renderBonusSlots(activePlayerIndex);
   slotReelRoot.classList.toggle("spin-ready", (!paidBonusSpinUsedThisTurn && currentRollPoints >= currentLandingCost) || hasBonusSpinCard(activePlayerIndex));
