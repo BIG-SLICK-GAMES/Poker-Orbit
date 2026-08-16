@@ -1314,6 +1314,7 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
   const moveDuration = shell.classList.contains("reduce-motion")
     ? 0
     : Math.min(boardMoveMaxMs, Math.max(boardMoveMinMs, distance * boardMoveMsPerCard));
+  let lastLitCardIndex = -1;
 
   setFloatingTokenBoardPosition(token, fromIndex);
   token.style.setProperty("--token-move-ms", "0ms");
@@ -1335,6 +1336,11 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
       const easedProgress = easeInOutCubic(progress);
       const currentIndex = fromIndex + distance * easedProgress;
       setFloatingTokenBoardPosition(token, currentIndex);
+      const litCardIndex = normalizeBoardIndex(Math.round(currentIndex));
+      if (litCardIndex !== lastLitCardIndex) {
+        lastLitCardIndex = litCardIndex;
+        flashBoardCardPass(litCardIndex, playerTokenColors[playerIndex] || "#24d8ff");
+      }
 
       if (progress < 1) {
         tokenAnimationFrames.set(playerIndex, window.requestAnimationFrame(tick));
@@ -1354,6 +1360,24 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
   tokenAnimationTimers.set(playerIndex, [timer]);
 
   return delayMs + moveDuration;
+}
+
+function flashBoardCardPass(boardIndex, color) {
+  const slot = getBoardSlotElement(boardIndex);
+  const card = slot?.querySelector(".board-card");
+  if (!card) {
+    return;
+  }
+
+  card.style.setProperty("--pass-color", color);
+  card.classList.remove("pass-lit");
+  void card.offsetWidth;
+  card.classList.add("pass-lit");
+  window.setTimeout(() => card.classList.remove("pass-lit"), 360);
+}
+
+function normalizeBoardIndex(boardIndex) {
+  return ((boardIndex % boardSpaceCount) + boardSpaceCount) % boardSpaceCount;
 }
 
 function formatMiniCards() {

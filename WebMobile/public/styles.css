@@ -1264,6 +1264,10 @@ h2 {
   animation: best-hand-pulse 980ms ease-in-out infinite alternate;
 }
 
+.board-card.pass-lit {
+  animation: board-card-pass-light 360ms cubic-bezier(0.12, 0.88, 0.18, 1) both;
+}
+
 .board-card.purchased::after {
   content: "P" attr(data-owner);
   position: absolute;
@@ -3434,6 +3438,31 @@ body[data-theme] .slot-window {
   }
   100% {
     filter: saturate(1.1) brightness(1);
+  }
+}
+
+@keyframes board-card-pass-light {
+  0% {
+    filter: saturate(1) brightness(1);
+    box-shadow:
+      0 0 0 2px color-mix(in srgb, var(--pass-color, #24d8ff) 72%, transparent),
+      0 0 10px color-mix(in srgb, var(--pass-color, #24d8ff) 80%, transparent),
+      0 2px 5px rgba(0, 0, 0, 0.38),
+      inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  }
+  42% {
+    filter: saturate(1.75) brightness(1.42);
+    box-shadow:
+      0 0 0 4px color-mix(in srgb, var(--pass-color, #24d8ff) 84%, transparent),
+      0 0 16px var(--pass-color, #24d8ff),
+      0 0 34px color-mix(in srgb, var(--pass-color, #24d8ff) 72%, transparent),
+      0 0 58px color-mix(in srgb, var(--pass-color, #24d8ff) 42%, transparent),
+      0 5px 10px rgba(0, 0, 0, 0.42),
+      inset 0 0 12px color-mix(in srgb, var(--pass-color, #24d8ff) 38%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  }
+  100% {
+    filter: saturate(1.05) brightness(1);
   }
 }
 
