@@ -20,8 +20,10 @@ export function createPurchaseAuctionModule({
   handRoot,
   chipsLabel,
   cardCountLabel,
+  bestHandLabel,
   suitIcons,
-  getBestHandCards = () => []
+  getBestHandCards = () => [],
+  getBestHandName = () => "No Cards"
 }) {
   const players = Array.from({ length: playerCount }, () => ({
     chips: startingChips,
@@ -143,25 +145,38 @@ export function createPurchaseAuctionModule({
   function render(playerIndex = activePlayer) {
     const player = players[playerIndex];
     chipsLabel.textContent = formatChips(player.chips);
-    cardCountLabel.textContent = String(player.cards.length);
+    if (cardCountLabel) {
+      cardCountLabel.textContent = String(player.cards.length);
+    }
+    if (bestHandLabel) {
+      bestHandLabel.textContent = getBestHandName(player.cards);
+    }
 
-    const bestCards = getBestHandCards(player.cards);
-    const bestCardIndexes = new Set(bestCards.map((card) => card.boardIndex));
-    const ownedCards = player.cards.filter((card) => !bestCardIndexes.has(card.boardIndex));
-    const handCards = [
-      ...bestCards.map((card) => createMiniCard(card, { best: true })),
-      ...ownedCards.map((card) => createMiniCard(card))
-    ];
+    const bestCards = getBestHandCards(player.cards).slice(0, 5);
+    const handSlots = Array.from({ length: 5 }, (_, index) => createHandSlot(bestCards[index], index));
 
     const bestFrame = document.createElement("div");
     bestFrame.className = "best-hand-frame";
     bestFrame.setAttribute("aria-label", "Best poker hand");
-    if (handCards.length) {
-      bestFrame.replaceChildren(...handCards);
-    } else {
-      bestFrame.innerHTML = `<span class="empty-hand">No cards</span>`;
-    }
+    bestFrame.replaceChildren(...handSlots);
     handRoot.replaceChildren(bestFrame);
+  }
+
+  function createHandSlot(card, index) {
+    const slot = document.createElement("span");
+    slot.className = "hand-card-slot";
+    slot.dataset.slot = String(index + 1);
+
+    if (!card) {
+      slot.classList.add("empty");
+      slot.setAttribute("aria-label", `Empty best hand card slot ${index + 1}`);
+      return slot;
+    }
+
+    slot.classList.add("filled");
+    slot.setAttribute("aria-label", `Best hand card ${index + 1}: ${card.name}`);
+    slot.append(createMiniCard(card, { best: true }));
+    return slot;
   }
 
   function createMiniCard(card, options = {}) {

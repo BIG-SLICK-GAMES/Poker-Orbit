@@ -46,12 +46,12 @@
         </div>
 
         <div class="table-list">
-          <button class="table-tile featured" data-go="game" type="button">
+          <button class="table-tile featured" data-go="setup" type="button">
             <span>Orbit Table</span>
             <strong>Casual Match</strong>
             <em>2-4 players</em>
           </button>
-          <button class="table-tile" data-go="game" type="button">
+          <button class="table-tile" data-go="setup" type="button">
             <span>Quick Play</span>
             <strong>Fast Round</strong>
             <em>Low stakes</em>
@@ -61,6 +61,39 @@
             <strong>Coming Soon</strong>
             <em>Season table</em>
           </button>
+        </div>
+      </section>
+
+      <section class="screen setup-screen" data-screen="setup" aria-labelledby="setupTitle">
+        <header class="screen-header">
+          <div>
+            <p class="eyebrow">Table Setup</p>
+            <h2 id="setupTitle">Choose Your Token</h2>
+          </div>
+          <button class="icon-btn" data-go="lobby" type="button" aria-label="Back to lobby">‹</button>
+        </header>
+
+        <div class="setup-stage" aria-label="Pre-game setup">
+          <div class="setup-orbit" aria-hidden="true">
+            <span class="setup-token-preview" id="setupTokenPreview"></span>
+          </div>
+          <section class="setup-card">
+            <span>Player Colour</span>
+            <div class="setup-color-grid" id="setupColorGrid" aria-label="Choose player colour">
+              <button type="button" data-player-color="0" aria-label="Bright blue token"></button>
+              <button type="button" data-player-color="1" aria-label="Red token"></button>
+              <button type="button" data-player-color="2" aria-label="Green token"></button>
+              <button type="button" data-player-color="3" aria-label="Orange token"></button>
+            </div>
+          </section>
+          <section class="setup-card">
+            <label for="setupBotPlayersControl">Bot Players</label>
+            <div class="setup-bot-row">
+              <input id="setupBotPlayersControl" type="range" min="1" max="3" step="1" value="3">
+              <strong id="setupBotPlayersValue">3 Bots</strong>
+            </div>
+          </section>
+          <button class="primary-btn setup-start-btn" id="setupStartButton" type="button">Start Game</button>
         </div>
       </section>
 
@@ -122,17 +155,44 @@
             </div>
           </section>
           <div class="economy-strip" data-control="economyStrip" aria-label="Player economy">
+            <div class="best-hand-display">
+              <span>Best Hand</span>
+              <strong id="bestHandLabel">No Cards</strong>
+            </div>
             <div class="chip-bank">
               <span>Chips</span>
               <strong id="chipBankLabel">10,000</strong>
             </div>
-            <div class="owned-count">
-              <span>Cards</span>
-              <strong id="ownedCardCountLabel">0</strong>
-            </div>
           </div>
-          <div class="card-hand" id="playerCardHand" data-control="playerCardHand" aria-label="Player owned cards">
+          <div class="card-hand" id="playerCardHand" data-control="playerCardHand" role="button" tabindex="0" aria-label="Open card management">
             <span class="empty-hand">No cards</span>
+          </div>
+          <div class="card-manager-modal" id="cardManagerModal" role="dialog" aria-modal="true" aria-labelledby="cardManagerTitle" hidden>
+            <div class="card-manager-panel">
+              <header class="card-manager-header">
+                <div>
+                  <span id="cardManagerPlayer">Player 1</span>
+                  <h3 id="cardManagerTitle">Card Management</h3>
+                </div>
+                <button type="button" id="cardManagerClose" aria-label="Close card management">X</button>
+              </header>
+              <section class="card-manager-summary" aria-label="Card summary">
+                <div>
+                  <span>Best Hand</span>
+                  <strong id="cardManagerBestHand">No Cards</strong>
+                </div>
+                <div>
+                  <span>Chips</span>
+                  <strong id="cardManagerChips">10,000</strong>
+                </div>
+                <div>
+                  <span>Cards</span>
+                  <strong id="cardManagerCount">0</strong>
+                </div>
+              </section>
+              <section class="card-manager-best" id="cardManagerBestSlots" aria-label="Best hand cards"></section>
+              <section class="card-manager-index" id="cardManagerIndex" aria-label="Owned card index"></section>
+            </div>
           </div>
         </section>
 

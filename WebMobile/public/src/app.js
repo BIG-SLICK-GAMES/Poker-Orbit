@@ -33,7 +33,15 @@ const viewToggleButton = document.querySelector("#viewToggleButton");
 const endTurnButton = document.querySelector("#endTurnButton");
 const playerCardHand = document.querySelector("#playerCardHand");
 const chipBankLabel = document.querySelector("#chipBankLabel");
-const ownedCardCountLabel = document.querySelector("#ownedCardCountLabel");
+const bestHandLabel = document.querySelector("#bestHandLabel");
+const cardManagerModal = document.querySelector("#cardManagerModal");
+const cardManagerClose = document.querySelector("#cardManagerClose");
+const cardManagerPlayer = document.querySelector("#cardManagerPlayer");
+const cardManagerBestHand = document.querySelector("#cardManagerBestHand");
+const cardManagerChips = document.querySelector("#cardManagerChips");
+const cardManagerCount = document.querySelector("#cardManagerCount");
+const cardManagerBestSlots = document.querySelector("#cardManagerBestSlots");
+const cardManagerIndex = document.querySelector("#cardManagerIndex");
 const themeSettings = document.querySelector("#themeSettings");
 const playerThemeOverlayToggle = document.querySelector("#playerThemeOverlayToggle");
 const settingsPreviewTheme = document.querySelector("#settingsPreviewTheme");
@@ -47,6 +55,11 @@ const cameraResetButton = document.querySelector("#cameraResetButton");
 const botPlayersControl = document.querySelector("#botPlayersControl");
 const botPlayersValue = document.querySelector("#botPlayersValue");
 const botPlayersSectionSummary = document.querySelector("#botPlayersSectionSummary");
+const setupColorGrid = document.querySelector("#setupColorGrid");
+const setupTokenPreview = document.querySelector("#setupTokenPreview");
+const setupBotPlayersControl = document.querySelector("#setupBotPlayersControl");
+const setupBotPlayersValue = document.querySelector("#setupBotPlayersValue");
+const setupStartButton = document.querySelector("#setupStartButton");
 const controlDocToggle = document.querySelector("#controlDocToggle");
 const controlDocPanel = document.querySelector("#controlDocPanel");
 const controlDocClose = document.querySelector("#controlDocClose");
@@ -56,12 +69,14 @@ const controlDocReset = document.querySelector("#controlDocReset");
 const boardSpaceCount = 54;
 const boardCardRadiusPercent = 41.2;
 const startingPlayerPositions = [27, 14, 0, 41];
-const playerTokenColors = ["#24d8ff", "#ff2a4f", "#39ff7a", "#ff8a1c"];
+const basePlayerTokenColors = ["#24d8ff", "#ff2a4f", "#39ff7a", "#ff8a1c"];
+const playerTokenColors = [...basePlayerTokenColors];
 const themeStorageKey = "poker-orbit-theme-v1";
 const cameraStorageKey = "poker-orbit-camera-offset-v3";
 const controlDocStorageKey = "poker-orbit-control-doc-v2";
 const playerThemeOverlayStorageKey = "poker-orbit-player-theme-overlay-v1";
 const botPlayersStorageKey = "poker-orbit-bot-players-v1";
+const playerColorStorageKey = "poker-orbit-player-color-v1";
 const cameraDefaultOffset = { x: -14, y: 0 };
 const customThemeLimit = 5;
 const controlDocLabels = {
@@ -190,7 +205,9 @@ let activeThemeName = "diner";
 let activeCustomThemeId = "";
 let cameraOffset = loadSavedCameraOffset();
 let botPlayerCount = loadBotPlayerCount();
+let selectedPlayerColorIndex = loadPlayerColorIndex();
 
+applyPlayerColorChoice(selectedPlayerColorIndex);
 loadSavedTheme();
 createThemeSettings();
 
@@ -219,6 +236,7 @@ createSlotReelModule({
   max: 6,
   onRollComplete: ({ total }) => {
     window.clearTimeout(pendingNextTurnTimer);
+    window.clearTimeout(pendingBotTurnTimer);
     awaitingLandingDecision = false;
     animateRollPointsGain(total);
     turnModule.completeCurrentRoll(total);
@@ -250,9 +268,10 @@ const purchaseAuctionModule = createPurchaseAuctionModule({
   startingChips: 10000,
   handRoot: playerCardHand,
   chipsLabel: chipBankLabel,
-  cardCountLabel: ownedCardCountLabel,
+  bestHandLabel,
   suitIcons,
-  getBestHandCards: getBestPokerHandCards
+  getBestHandCards: getBestPokerHandCards,
+  getBestHandName: getBestPokerHandName
 });
 const opponentHudModule = createOpponentHudModule({
   root: opponentHudRoot,
@@ -279,6 +298,8 @@ const tokenAnimationTimers = new Map();
 const tokenAnimationFrames = new Map();
 let pendingCardAnimationTimer = 0;
 let pendingNextTurnTimer = 0;
+let pendingBotTurnTimer = 0;
+let pendingBotDecisionTimer = 0;
 let awaitingLandingDecision = false;
 let suppressNextTurnFocus = false;
 let boardViewMode = "zoom";
@@ -347,6 +368,25 @@ botPlayersControl?.addEventListener("input", (event) => {
   applyBotPlayerSettings({ persist: true });
 });
 
+setupBotPlayersControl?.addEventListener("input", (event) => {
+  botPlayerCount = clampBotPlayerCount(Number(event.target.value));
+  applyBotPlayerSettings({ persist: true });
+});
+
+setupColorGrid?.addEventListener("click", (event) => {
+  const colorButton = event.target.closest("[data-player-color]");
+  if (!colorButton) {
+    return;
+  }
+
+  selectedPlayerColorIndex = clampPlayerColorIndex(Number(colorButton.dataset.playerColor));
+  applyPlayerColorChoice(selectedPlayerColorIndex, { persist: true, refreshTokens: true });
+});
+
+setupStartButton?.addEventListener("click", () => {
+  showScreen("game");
+});
+
 controlDocToggle?.addEventListener("click", () => {
   setControlDocOpen(controlDocPanel?.hidden !== false);
 });
@@ -374,6 +414,33 @@ endTurnButton?.addEventListener("click", () => {
   window.setTimeout(() => {
     turnModule.nextTurn();
   }, endTurnBoardHoldMs);
+});
+
+playerCardHand?.addEventListener("click", () => {
+  openCardManager();
+});
+
+playerCardHand?.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    openCardManager();
+  }
+});
+
+cardManagerClose?.addEventListener("click", () => {
+  closeCardManager();
+});
+
+cardManagerModal?.addEventListener("click", (event) => {
+  if (event.target === cardManagerModal) {
+    closeCardManager();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && cardManagerModal?.hidden === false) {
+    closeCardManager();
+  }
 });
 
 function showScreen(name) {
@@ -453,12 +520,52 @@ function loadBotPlayerCount() {
   return clampBotPlayerCount(Number(localStorage.getItem(botPlayersStorageKey) || "3"));
 }
 
+function loadPlayerColorIndex() {
+  return clampPlayerColorIndex(Number(localStorage.getItem(playerColorStorageKey) || "0"));
+}
+
 function clampBotPlayerCount(value) {
   if (!Number.isFinite(value)) {
     return 3;
   }
 
   return Math.max(1, Math.min(3, Math.trunc(value)));
+}
+
+function clampPlayerColorIndex(value) {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+
+  return Math.max(0, Math.min(basePlayerTokenColors.length - 1, Math.trunc(value)));
+}
+
+function applyPlayerColorChoice(colorIndex, { persist = false, refreshTokens = false } = {}) {
+  const selectedColor = basePlayerTokenColors[clampPlayerColorIndex(colorIndex)];
+  const orderedColors = [
+    selectedColor,
+    ...basePlayerTokenColors.filter((color) => color !== selectedColor)
+  ];
+
+  playerTokenColors.splice(0, playerTokenColors.length, ...orderedColors);
+  setupTokenPreview?.style.setProperty("--setup-token-color", selectedColor);
+  setupColorGrid?.querySelectorAll("[data-player-color]").forEach((button) => {
+    const buttonColor = basePlayerTokenColors[clampPlayerColorIndex(Number(button.dataset.playerColor))];
+    button.style.setProperty("--setup-color", buttonColor);
+    button.classList.toggle("active", buttonColor === selectedColor);
+    button.setAttribute("aria-pressed", String(buttonColor === selectedColor));
+  });
+
+  if (refreshTokens) {
+    createPlayerTokens();
+    updateBestHandHighlights();
+    playerThemeOverlayModule.update(turnModule.getState());
+    opponentHudModule.update(turnModule.getState());
+  }
+
+  if (persist) {
+    localStorage.setItem(playerColorStorageKey, String(clampPlayerColorIndex(colorIndex)));
+  }
 }
 
 function applyBotPlayerSettings({ persist = false } = {}) {
@@ -475,6 +582,14 @@ function applyBotPlayerSettings({ persist = false } = {}) {
 
   if (botPlayersSectionSummary) {
     botPlayersSectionSummary.textContent = label;
+  }
+
+  if (setupBotPlayersControl) {
+    setupBotPlayersControl.value = String(botPlayerCount);
+  }
+
+  if (setupBotPlayersValue) {
+    setupBotPlayersValue.textContent = label;
   }
 
   if (persist) {
@@ -990,6 +1105,7 @@ function easeInOutCubic(progress) {
 
 function scheduleLandingCardAnimation(boardIndex, delayMs = 0) {
   window.clearTimeout(pendingCardAnimationTimer);
+  window.clearTimeout(pendingBotDecisionTimer);
 
   if (!isPurchasableCardIndex(boardIndex)) {
     scheduleNextTurn(delayMs + 320);
@@ -1015,8 +1131,54 @@ function scheduleLandingCardAnimation(boardIndex, delayMs = 0) {
     }
 
     awaitingLandingDecision = true;
+    if (isBotPlayer(turnModule.getState().currentPlayer)) {
+      scheduleBotCardDecision(card);
+      return;
+    }
+
     cardAnimationModule.play(card);
   }, delayMs);
+}
+
+function scheduleBotTurn(turnState) {
+  window.clearTimeout(pendingBotTurnTimer);
+
+  if (!isBotPlayer(turnState.currentPlayer) || awaitingLandingDecision || currentScreen !== "game") {
+    return;
+  }
+
+  pendingBotTurnTimer = window.setTimeout(() => {
+    const latestTurnState = turnModule.getState();
+    if (!isBotPlayer(latestTurnState.currentPlayer) || awaitingLandingDecision || currentScreen !== "game") {
+      return;
+    }
+
+    slotRollButton?.click();
+  }, 780);
+}
+
+function scheduleBotCardDecision(cardElement) {
+  window.clearTimeout(pendingBotDecisionTimer);
+
+  pendingBotDecisionTimer = window.setTimeout(() => {
+    const playerIndex = turnModule.getState().currentPlayer;
+    if (!isBotPlayer(playerIndex)) {
+      cardAnimationModule.play(cardElement);
+      return;
+    }
+
+    if (purchaseAuctionModule.canPurchase(cardElement, playerIndex)) {
+      purchaseBoardCard(cardElement);
+      scheduleNextTurn(760);
+      return;
+    }
+
+    passBoardCard(cardElement);
+  }, 620);
+}
+
+function isBotPlayer(playerIndex) {
+  return playerIndex > 0 && playerIndex <= botPlayerCount;
 }
 
 function resolveOwnedCardLanding(cardElement) {
@@ -1166,6 +1328,95 @@ function applyBoardViewMode(turnState, boardIndex = turnState.playerPositions[tu
     viewToggleButton.setAttribute("aria-pressed", String(isWideView));
     viewToggleButton.setAttribute("aria-label", isWideView ? "Switch to active player zoom" : "Switch to wide board view");
   }
+}
+
+function openCardManager() {
+  if (!cardManagerModal) {
+    return;
+  }
+
+  renderCardManager();
+  cardManagerModal.hidden = false;
+}
+
+function closeCardManager() {
+  if (cardManagerModal) {
+    cardManagerModal.hidden = true;
+  }
+}
+
+function renderCardManager(playerIndex = turnModule.getState().currentPlayer) {
+  const player = purchaseAuctionModule.getPlayer(playerIndex);
+  const bestCards = getBestPokerHandCards(player.cards).slice(0, 5);
+  const bestIndexes = new Set(bestCards.map((card) => card.boardIndex));
+
+  if (cardManagerPlayer) {
+    cardManagerPlayer.textContent = `Player ${playerIndex + 1}`;
+  }
+  if (cardManagerBestHand) {
+    cardManagerBestHand.textContent = getBestPokerHandName(player.cards);
+  }
+  if (cardManagerChips) {
+    cardManagerChips.textContent = formatGameNumber(player.chips);
+  }
+  if (cardManagerCount) {
+    cardManagerCount.textContent = String(player.cards.length);
+  }
+
+  cardManagerBestSlots?.replaceChildren(...Array.from({ length: 5 }, (_, index) => {
+    const card = bestCards[index];
+    const slot = document.createElement("span");
+    slot.className = `manager-best-slot${card ? " filled" : " empty"}`;
+    if (card) {
+      slot.innerHTML = getCardFaceMarkup(card);
+    }
+    return slot;
+  }));
+
+  if (!cardManagerIndex) {
+    return;
+  }
+
+  if (!player.cards.length) {
+    cardManagerIndex.innerHTML = `<p class="card-manager-empty">No cards owned yet.</p>`;
+    return;
+  }
+
+  const orderedCards = [
+    ...bestCards,
+    ...player.cards.filter((card) => !bestIndexes.has(card.boardIndex))
+  ];
+
+  cardManagerIndex.replaceChildren(...orderedCards.map((card) => {
+    const row = document.createElement("article");
+    row.className = `manager-card-row ${card.suit === "H" || card.suit === "D" ? "red" : "black"}`;
+    row.classList.toggle("best", bestIndexes.has(card.boardIndex));
+    row.innerHTML = `
+      <div class="manager-card-face">${getCardFaceMarkup(card)}</div>
+      <div class="manager-card-copy">
+        <strong>${card.name}</strong>
+        <span>${bestIndexes.has(card.boardIndex) ? "Best hand card" : "Owned card"}</span>
+      </div>
+      <dl class="manager-card-stats">
+        <div><dt>Cost</dt><dd>${formatGameNumber(card.price)}</dd></div>
+        <div><dt>Sell</dt><dd>${formatGameNumber(card.sellPrice)}</dd></div>
+        <div><dt>Penalty</dt><dd>${formatGameNumber(card.penalty)}</dd></div>
+        <div><dt>Hand</dt><dd>${card.multiplier}</dd></div>
+      </dl>
+    `;
+    return row;
+  }));
+}
+
+function getCardFaceMarkup(card) {
+  return `
+    <span>${card.rank}</span>
+    <strong>${suitIcons[card.suit] || ""}</strong>
+  `;
+}
+
+function formatGameNumber(value) {
+  return Number(value || 0).toLocaleString("en-US");
 }
 
 function addBonusToCurrentPlayer(label) {
@@ -1685,6 +1936,82 @@ function getBestPokerHandCards(cards) {
   return orderPokerHandCards(bestCards);
 }
 
+function getBestPokerHandName(cards) {
+  const playableCards = cards.filter((card) => rankValue(card.rank) > 0 && card.suit);
+  if (!playableCards.length) {
+    return "No Cards";
+  }
+
+  if (playableCards.length < 5) {
+    return getPartialPokerHandName(playableCards);
+  }
+
+  let bestScore = null;
+
+  for (let first = 0; first < playableCards.length - 4; first += 1) {
+    for (let second = first + 1; second < playableCards.length - 3; second += 1) {
+      for (let third = second + 1; third < playableCards.length - 2; third += 1) {
+        for (let fourth = third + 1; fourth < playableCards.length - 1; fourth += 1) {
+          for (let fifth = fourth + 1; fifth < playableCards.length; fifth += 1) {
+            const score = scorePokerHand([
+              playableCards[first],
+              playableCards[second],
+              playableCards[third],
+              playableCards[fourth],
+              playableCards[fifth]
+            ]);
+            if (!bestScore || comparePokerScores(score, bestScore) > 0) {
+              bestScore = score;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return getPokerHandNameFromScore(bestScore);
+}
+
+function getPartialPokerHandName(cards) {
+  const counts = new Map();
+  cards.forEach((card) => {
+    const value = rankValue(card.rank);
+    counts.set(value, (counts.get(value) || 0) + 1);
+  });
+
+  const countValues = [...counts.values()].sort((first, second) => second - first);
+  if (countValues[0] >= 4) {
+    return "Four of a Kind";
+  }
+  if (countValues[0] >= 3) {
+    return "Three of a Kind";
+  }
+  if (countValues[0] === 2 && countValues[1] === 2) {
+    return "Two Pair";
+  }
+  if (countValues[0] === 2) {
+    return "Pair";
+  }
+
+  return "High Card";
+}
+
+function getPokerHandNameFromScore(score) {
+  const names = [
+    "High Card",
+    "Pair",
+    "Two Pair",
+    "Three of a Kind",
+    "Straight",
+    "Flush",
+    "Full House",
+    "Four of a Kind",
+    "Straight Flush"
+  ];
+
+  return names[score?.[0] || 0] || "High Card";
+}
+
 function getBestPartialPokerHandCards(cards) {
   const groups = new Map();
   cards.forEach((card) => {
@@ -1799,6 +2126,7 @@ function rankValue(rank) {
 function renderTurnState(turnState) {
   const activePlayerIndex = turnState.currentPlayer;
   const activeBoardIndex = turnState.playerPositions[activePlayerIndex];
+  const isInitialRender = !lastRenderedTurnState;
   currentLandingCost = getCardRollPointCost(activeBoardIndex);
   const currentRollPoints = turnState.playerRollPoints[activePlayerIndex];
   const previousActiveBoardIndex = lastRenderedTurnState?.playerPositions?.[activePlayerIndex];
@@ -1813,12 +2141,15 @@ function renderTurnState(turnState) {
   }
 
   perspectiveTable.dataset.currentPlayer = String(turnState.currentPlayerNumber);
-  currentTurnLabel.textContent = `Player ${turnState.currentPlayerNumber} turn`;
+  currentTurnLabel.textContent = `Player ${turnState.currentPlayerNumber}${isBotPlayer(activePlayerIndex) ? " bot" : ""} turn`;
   rollPointsLabel.textContent = String(currentRollPoints);
   landingCostLabel.textContent = `Spin cost ${currentLandingCost} RP`;
   playerThemeOverlayModule.update(turnState);
   opponentHudModule.update(turnState);
   purchaseAuctionModule.setActivePlayer(activePlayerIndex);
+  if (cardManagerModal?.hidden === false) {
+    renderCardManager(activePlayerIndex);
+  }
   renderBonusSlots(activePlayerIndex);
   slotReelRoot.classList.toggle("spin-ready", (!paidBonusSpinUsedThisTurn && currentRollPoints >= currentLandingCost) || hasBonusSpinCard(activePlayerIndex));
 
@@ -1852,6 +2183,12 @@ function renderTurnState(turnState) {
     } else if (!lastRenderedTurnState || didActiveTurnChange) {
       applyBoardViewMode(turnState, activeBoardIndex);
     }
+  }
+
+  if (!didActiveTokenMove && (isInitialRender || didActiveTurnChange)) {
+    scheduleBotTurn(turnState);
+  } else if (!isBotPlayer(activePlayerIndex)) {
+    window.clearTimeout(pendingBotTurnTimer);
   }
 
   lastRenderedTurnState = {
