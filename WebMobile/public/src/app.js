@@ -5,6 +5,7 @@ import { createCardAnimationModule } from "./card-animation.js";
 import { createPurchaseAuctionModule, getRankPurchasePrice } from "./purchase-auction.js";
 import { createOwnershipHighlightModule } from "./ownership-highlights.js";
 import { createFxOverlayModule } from "./fx-overlay.js";
+import { createPlayerThemeOverlayModule } from "./player-theme-overlay.js";
 import { getBonusIconSrc } from "./bonus-icons.js";
 import { rollBonusSlotPrize } from "./bonus-slot-prizes.js";
 import { MASTER_CONTROL } from "./master-control.js";
@@ -32,6 +33,7 @@ const playerCardHand = document.querySelector("#playerCardHand");
 const chipBankLabel = document.querySelector("#chipBankLabel");
 const ownedCardCountLabel = document.querySelector("#ownedCardCountLabel");
 const themeSettings = document.querySelector("#themeSettings");
+const playerThemeOverlayToggle = document.querySelector("#playerThemeOverlayToggle");
 const settingsPreviewTheme = document.querySelector("#settingsPreviewTheme");
 const themeSectionSummary = document.querySelector("#themeSectionSummary");
 const cameraSectionSummary = document.querySelector("#cameraSectionSummary");
@@ -53,6 +55,7 @@ const playerTokenColors = ["#24d8ff", "#ff2a4f", "#39ff7a", "#ff8a1c"];
 const themeStorageKey = "poker-orbit-theme-v1";
 const cameraStorageKey = "poker-orbit-camera-offset-v3";
 const controlDocStorageKey = "poker-orbit-control-doc-v2";
+const playerThemeOverlayStorageKey = "poker-orbit-player-theme-overlay-v1";
 const cameraDefaultOffset = { x: -14, y: 0 };
 const customThemeLimit = 5;
 const controlDocLabels = {
@@ -193,6 +196,12 @@ const fxOverlayModule = createFxOverlayModule({
   playerColors: playerTokenColors,
   boardSpaceCount
 });
+let playerThemeOverlayEnabled = loadPlayerThemeOverlayEnabled();
+const playerThemeOverlayModule = createPlayerThemeOverlayModule({
+  shell,
+  playerColors: playerTokenColors,
+  enabled: playerThemeOverlayEnabled
+});
 let currentLandingCost = 0;
 
 createSlotReelModule({
@@ -269,6 +278,9 @@ formatMiniCards();
 applyMasterControl();
 createControlDocPanel();
 applyCameraOffset();
+if (playerThemeOverlayToggle) {
+  playerThemeOverlayToggle.checked = playerThemeOverlayEnabled;
+}
 turnModule.subscribe(renderTurnState);
 registerServiceWorker();
 
@@ -291,6 +303,12 @@ viewToggleButton?.addEventListener("click", () => {
 
 document.querySelector("#reducedMotionToggle").addEventListener("change", (event) => {
   shell.classList.toggle("reduce-motion", event.target.checked);
+});
+
+playerThemeOverlayToggle?.addEventListener("change", (event) => {
+  playerThemeOverlayEnabled = event.target.checked;
+  savePlayerThemeOverlayEnabled();
+  playerThemeOverlayModule.setEnabled(playerThemeOverlayEnabled);
 });
 
 cameraXControl?.addEventListener("input", (event) => {
@@ -400,6 +418,14 @@ function loadSavedCameraOffset() {
   }
 
   return { ...cameraDefaultOffset };
+}
+
+function loadPlayerThemeOverlayEnabled() {
+  return localStorage.getItem(playerThemeOverlayStorageKey) !== "off";
+}
+
+function savePlayerThemeOverlayEnabled() {
+  localStorage.setItem(playerThemeOverlayStorageKey, playerThemeOverlayEnabled ? "on" : "off");
 }
 
 function applyCameraOffset({ persist = false } = {}) {
@@ -1708,6 +1734,7 @@ function renderTurnState(turnState) {
   currentTurnLabel.textContent = `Player ${turnState.currentPlayerNumber} turn`;
   rollPointsLabel.textContent = String(currentRollPoints);
   landingCostLabel.textContent = `Spin cost ${currentLandingCost} RP`;
+  playerThemeOverlayModule.update(turnState);
   purchaseAuctionModule.setActivePlayer(activePlayerIndex);
   renderBonusSlots(activePlayerIndex);
   slotReelRoot.classList.toggle("spin-ready", (!paidBonusSpinUsedThisTurn && currentRollPoints >= currentLandingCost) || hasBonusSpinCard(activePlayerIndex));

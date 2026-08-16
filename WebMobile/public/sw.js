@@ -1,4 +1,4 @@
-const CACHE_NAME = "poker-orbit-mobile-v179";
+const CACHE_NAME = "poker-orbit-mobile-v180";
 const APP_SHELL = [
   "/",
   "/index.html",
@@ -13,6 +13,7 @@ const APP_SHELL = [
   "/src/fx-overlay.js",
   "/src/master-control.js",
   "/src/ownership-highlights.js",
+  "/src/player-theme-overlay.js",
   "/src/purchase-auction.js",
   "/src/slot-reel.js",
   "/src/turn.js",
