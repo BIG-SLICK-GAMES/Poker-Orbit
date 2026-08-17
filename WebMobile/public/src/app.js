@@ -32,6 +32,7 @@ const playerBonusSlots = document.querySelector("#playerBonusSlots");
 const viewToggleButton = document.querySelector("#viewToggleButton");
 const endTurnButton = document.querySelector("#endTurnButton");
 const playerCardHand = document.querySelector("#playerCardHand");
+const cardManagerOpen = document.querySelector("#cardManagerOpen");
 const chipBankLabel = document.querySelector("#chipBankLabel");
 const bestHandLabel = document.querySelector("#bestHandLabel");
 const cardManagerModal = document.querySelector("#cardManagerModal");
@@ -416,15 +417,8 @@ endTurnButton?.addEventListener("click", () => {
   }, endTurnBoardHoldMs);
 });
 
-playerCardHand?.addEventListener("click", () => {
+cardManagerOpen?.addEventListener("click", () => {
   openCardManager();
-});
-
-playerCardHand?.addEventListener("keydown", (event) => {
-  if (event.key === "Enter" || event.key === " ") {
-    event.preventDefault();
-    openCardManager();
-  }
 });
 
 cardManagerClose?.addEventListener("click", () => {

@@ -132,7 +132,6 @@
               <span class="visually-hidden">Doubles</span>
             </div>
             <div class="rp-meter" data-control="rollPointsMeter">
-              <span>Roll Points</span>
               <strong id="rollPointsLabel">0</strong>
             </div>
             <span class="visually-hidden" id="landingCostLabel">Spin cost 1 RP</span>
@@ -155,17 +154,23 @@
             </div>
           </section>
           <div class="economy-strip" data-control="economyStrip" aria-label="Player economy">
-            <div class="best-hand-display">
-              <span>Best Hand</span>
-              <strong id="bestHandLabel">No Cards</strong>
-            </div>
+            <div class="best-hand-display" aria-label="Best hand display"></div>
             <div class="chip-bank">
-              <span>Chips</span>
               <strong id="chipBankLabel">10,000</strong>
             </div>
           </div>
-          <div class="card-hand" id="playerCardHand" data-control="playerCardHand" role="button" tabindex="0" aria-label="Open card management">
-            <span class="empty-hand">No cards</span>
+          <div class="card-hand" data-control="playerCardHand" aria-label="Best hand cards">
+            <button class="card-manager-open" id="cardManagerOpen" type="button" aria-label="Open card management">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <rect x="5" y="3" width="10" height="14" rx="1.8"></rect>
+                <rect x="9" y="7" width="10" height="14" rx="1.8"></rect>
+                <path d="M8 7h4"></path>
+                <path d="M12 11h4"></path>
+              </svg>
+            </button>
+            <div class="best-hand-slots" id="playerCardHand">
+              <span class="empty-hand">No cards</span>
+            </div>
           </div>
           <div class="card-manager-modal" id="cardManagerModal" role="dialog" aria-modal="true" aria-labelledby="cardManagerTitle" hidden>
             <div class="card-manager-panel">

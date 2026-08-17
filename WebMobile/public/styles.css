@@ -2324,7 +2324,7 @@ h2 {
   height: 42px;
   justify-self: stretch;
   display: grid;
-  grid-template-columns: 24px minmax(0, 1fr);
+  grid-template-columns: 1fr;
   align-items: center;
   gap: 4px;
   padding: 4px 6px;
@@ -2684,20 +2684,62 @@ h2 {
   text-shadow: 0 2px 0 #020908;
 }
 
+.chip-bank:has(> strong:only-child) {
+  grid-template-columns: 1fr;
+}
+
+.chip-bank:has(> strong:only-child) strong {
+  text-align: center;
+}
+
 .card-hand {
-  display: flex;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
   gap: 6px;
-  overflow-x: auto;
+  overflow: hidden;
   height: clamp(70px, 17vw, 88px);
   min-height: clamp(70px, 17vw, 88px);
   align-items: center;
   padding: 2px 2px 7px;
   -webkit-overflow-scrolling: touch;
-  cursor: pointer;
   appearance: none;
   color: inherit;
   font: inherit;
   text-align: left;
+}
+
+.best-hand-slots {
+  min-width: 0;
+  height: 100%;
+  display: grid;
+}
+
+.card-manager-open {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 138, 28, 0.76);
+  border-radius: 7px;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.18), transparent 34%),
+    linear-gradient(180deg, rgba(255, 138, 28, 0.34), rgba(4, 10, 23, 0.68));
+  color: #ffffff;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 0 14px rgba(255, 138, 28, 0.28);
+}
+
+.card-manager-open svg {
+  width: 62%;
+  height: 62%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 8px rgba(36, 216, 255, 0.65));
 }
 
 .best-hand-frame {
@@ -4556,7 +4598,7 @@ body[data-theme] .hand-panel.console-panel::after {
   height: 14.2%;
   min-height: 0;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: 1fr;
   grid-template-columns: 1fr;
   place-items: center;
   gap: 1px;
@@ -4575,35 +4617,15 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
   box-shadow: none;
 }
 
-.hand-panel.console-panel .rp-meter span {
-  position: absolute;
-  left: 8%;
-  right: 8%;
-  top: -72%;
-  height: 56%;
-  aspect-ratio: auto;
-  display: grid;
-  place-items: center;
-  align-self: auto;
-  background: transparent;
-  color: rgba(191, 244, 255, 0.78);
-  font-size: clamp(0.56rem, 1.85cqw, 0.88rem);
-  font-weight: 900;
-  line-height: 1;
-  text-align: center;
-  text-transform: uppercase;
-  text-shadow: 0 0 8px rgba(36, 216, 255, 0.64);
-}
-
 .hand-panel.console-panel .rp-meter strong {
-  align-self: start;
+  align-self: center;
   border: 0;
   background: transparent;
   color: #ffffff;
   font-size: clamp(1.62rem, 7.2cqw, 2.7rem);
   line-height: 0.98;
   text-align: center;
-  transform: translateY(-3px);
+  transform: translateY(0);
   text-shadow:
     0 0 10px rgba(36, 216, 255, 0.9),
     0 2px 0 rgba(0, 0, 0, 0.85);
@@ -4779,7 +4801,7 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
   width: 91.6%;
   height: 15.2%;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) 18.5%;
   gap: 3.2%;
   pointer-events: none;
 }
@@ -4793,6 +4815,15 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
   border-radius: 8px;
   background: rgba(0, 12, 28, 0.26);
   box-shadow: none;
+}
+
+.hand-panel.console-panel .best-hand-display {
+  background: transparent;
+}
+
+.hand-panel.console-panel .chip-bank {
+  display: grid;
+  place-items: center;
 }
 
 .hand-panel.console-panel .chip-bank span,
@@ -4813,6 +4844,11 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
     0 2px 0 rgba(0, 0, 0, 0.9);
 }
 
+.hand-panel.console-panel .chip-bank strong {
+  font-size: clamp(1.34rem, 5.2cqw, 2.08rem);
+  text-align: center;
+}
+
 .hand-panel.console-panel .card-hand {
   z-index: 2;
   left: 3.8%;
@@ -4820,16 +4856,29 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
   width: 92.4%;
   height: 28.4%;
   min-height: 0;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(38px, 8.6%) minmax(0, 1fr);
   align-items: center;
   gap: clamp(5px, 1.1cqw, 9px);
-  overflow-x: auto;
+  overflow: hidden;
   padding: 1.4% 2.2% 1.7%;
   border: 0;
   border-radius: 8px;
   background: rgba(0, 14, 34, 0.24);
   box-shadow: none;
   pointer-events: auto;
+}
+
+.hand-panel.console-panel .card-manager-open {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  pointer-events: auto;
+}
+
+.hand-panel.console-panel .best-hand-slots {
+  min-width: 0;
+  height: 100%;
 }
 
 .hand-panel.console-panel .empty-hand {
