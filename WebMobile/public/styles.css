@@ -196,9 +196,14 @@ select:focus-visible {
 
 .player-theme-overlay {
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: auto;
+  height: 16%;
   z-index: 3;
   opacity: 0;
+  overflow: hidden;
   pointer-events: none;
   background:
     radial-gradient(ellipse at 16% -3%, color-mix(in srgb, var(--active-player-color, #24d8ff) 78%, transparent) 0 3%, color-mix(in srgb, var(--active-player-color, #24d8ff) 24%, transparent) 14%, transparent 26%),
@@ -224,29 +229,6 @@ select:focus-visible {
 
 .app-shell.player-theme-active .player-theme-overlay {
   opacity: 0.88;
-}
-
-.app-shell.player-theme-active .game-topbar {
-  border-color: color-mix(in srgb, var(--active-player-color, #24d8ff) 72%, transparent);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--active-player-color, #24d8ff) 30%, transparent),
-    0 0 18px color-mix(in srgb, var(--active-player-color, #24d8ff) 34%, transparent);
-}
-
-.app-shell.player-theme-active .board-stage {
-  box-shadow: none;
-}
-
-.app-shell.player-theme-active .hand-panel.console-panel {
-  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--active-player-color, #24d8ff) 36%, transparent));
-}
-
-.app-shell.player-theme-active .slot-roll-btn,
-.app-shell.player-theme-active .slot-window {
-  color: #ffffff;
-  text-shadow:
-    0 0 12px color-mix(in srgb, var(--active-player-color, #24d8ff) 88%, transparent),
-    0 2px 0 rgba(0, 0, 0, 0.86);
 }
 
 .screen {
