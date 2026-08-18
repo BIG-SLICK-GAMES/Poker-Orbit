@@ -201,10 +201,9 @@ select:focus-visible {
   opacity: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse at 16% -3%, color-mix(in srgb, var(--active-player-color, #24d8ff) 78%, transparent) 0 3%, color-mix(in srgb, var(--active-player-color, #24d8ff) 24%, transparent) 14%, transparent 34%),
-    radial-gradient(ellipse at 50% -5%, color-mix(in srgb, var(--active-player-color, #24d8ff) 84%, transparent) 0 4%, color-mix(in srgb, var(--active-player-color, #24d8ff) 28%, transparent) 16%, transparent 38%),
-    radial-gradient(ellipse at 84% -3%, color-mix(in srgb, var(--active-player-color, #24d8ff) 78%, transparent) 0 3%, color-mix(in srgb, var(--active-player-color, #24d8ff) 24%, transparent) 14%, transparent 34%),
-    linear-gradient(180deg, color-mix(in srgb, var(--active-player-color, #24d8ff) 16%, transparent), transparent 24%);
+    radial-gradient(ellipse at 16% -3%, color-mix(in srgb, var(--active-player-color, #24d8ff) 78%, transparent) 0 3%, color-mix(in srgb, var(--active-player-color, #24d8ff) 24%, transparent) 14%, transparent 26%),
+    radial-gradient(ellipse at 50% -5%, color-mix(in srgb, var(--active-player-color, #24d8ff) 84%, transparent) 0 4%, color-mix(in srgb, var(--active-player-color, #24d8ff) 28%, transparent) 16%, transparent 28%),
+    radial-gradient(ellipse at 84% -3%, color-mix(in srgb, var(--active-player-color, #24d8ff) 78%, transparent) 0 3%, color-mix(in srgb, var(--active-player-color, #24d8ff) 24%, transparent) 14%, transparent 26%);
   mix-blend-mode: screen;
   transition: opacity 320ms ease;
 }
@@ -235,9 +234,7 @@ select:focus-visible {
 }
 
 .app-shell.player-theme-active .board-stage {
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--active-player-color, #24d8ff) 30%, transparent),
-    inset 0 0 48px color-mix(in srgb, var(--active-player-color, #24d8ff) 16%, transparent);
+  box-shadow: none;
 }
 
 .app-shell.player-theme-active .hand-panel.console-panel {
