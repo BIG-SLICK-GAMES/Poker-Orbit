@@ -1296,8 +1296,8 @@ h2 {
   border: 1px solid rgba(38, 26, 22, 0.72);
   border-radius: 3px;
   background:
-    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.64), transparent 27%),
-    linear-gradient(180deg, #fffef7, var(--diner-cream));
+    radial-gradient(circle at 50% 84%, rgba(255, 255, 255, 0.64), transparent 27%),
+    linear-gradient(0deg, #fffef7, var(--diner-cream));
   color: var(--ink);
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(0.78rem, 1.95cqw, 1.08rem);
@@ -1325,8 +1325,8 @@ h2 {
   height: 100%;
   border-radius: 2px;
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.52), transparent 44%),
-    radial-gradient(circle at 50% 76%, rgba(36, 216, 255, 0.12), transparent 48%);
+    linear-gradient(325deg, rgba(255, 255, 255, 0.52), transparent 44%),
+    radial-gradient(circle at 50% 24%, rgba(36, 216, 255, 0.12), transparent 48%);
 }
 
 .board-card-rank {
@@ -1350,16 +1350,16 @@ h2 {
 .board-card.wild {
   border-color: rgba(246, 196, 83, 0.95);
   background:
-    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.72), transparent 30%),
-    linear-gradient(145deg, #ff8a1c, #f6c453);
+    radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.72), transparent 30%),
+    linear-gradient(325deg, #ff8a1c, #f6c453);
   color: #211306;
 }
 
 .board-card.mystery {
   border-color: rgba(255, 255, 255, 0.78);
   background:
-    radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.64), transparent 32%),
-    linear-gradient(145deg, #4f46e5, #111827);
+    radial-gradient(circle at 50% 78%, rgba(255, 255, 255, 0.64), transparent 32%),
+    linear-gradient(325deg, #4f46e5, #111827);
   color: #ffffff;
 }
 
@@ -1377,8 +1377,8 @@ h2 {
 .board-card.best-hand {
   filter: saturate(1.28) brightness(1.08);
   background:
-    radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--owner-color, #24d8ff) 38%, #ffffff), transparent 44%),
-    linear-gradient(180deg, color-mix(in srgb, var(--owner-color, #24d8ff) 30%, #fffef7), color-mix(in srgb, var(--owner-color, #24d8ff) 18%, var(--diner-cream)));
+    radial-gradient(circle at 50% 70%, color-mix(in srgb, var(--owner-color, #24d8ff) 38%, #ffffff), transparent 44%),
+    linear-gradient(0deg, color-mix(in srgb, var(--owner-color, #24d8ff) 30%, #fffef7), color-mix(in srgb, var(--owner-color, #24d8ff) 18%, var(--diner-cream)));
   box-shadow:
     0 0 0 3px var(--owner-color, rgba(36, 216, 255, 0.92)),
     0 0 14px color-mix(in srgb, var(--owner-color, #24d8ff) 92%, transparent),
@@ -1638,8 +1638,8 @@ h2 {
   border: 3px solid rgba(38, 26, 22, 0.72);
   border-radius: 8px;
   background:
-    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.62), transparent 25%),
-    linear-gradient(180deg, #fffef7, var(--diner-cream));
+    radial-gradient(circle at 50% 84%, rgba(255, 255, 255, 0.62), transparent 25%),
+    linear-gradient(0deg, #fffef7, var(--diner-cream));
   color: var(--ink);
   font-family: Georgia, "Times New Roman", serif;
   line-height: 1;
@@ -1764,16 +1764,16 @@ h2 {
 .featured-card-flight.wild {
   border-color: rgba(246, 196, 83, 0.95);
   background:
-    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.72), transparent 30%),
-    linear-gradient(145deg, #ff8a1c, #f6c453);
+    radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.72), transparent 30%),
+    linear-gradient(325deg, #ff8a1c, #f6c453);
   color: #211306;
 }
 
 .featured-card-flight.mystery {
   border-color: rgba(255, 255, 255, 0.78);
   background:
-    radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.64), transparent 32%),
-    linear-gradient(145deg, #4f46e5, #111827);
+    radial-gradient(circle at 50% 78%, rgba(255, 255, 255, 0.64), transparent 32%),
+    linear-gradient(325deg, #4f46e5, #111827);
   color: #ffffff;
 }
 
@@ -1788,8 +1788,8 @@ h2 {
 .featured-card-flight.purchase-spinning-color {
   border-color: color-mix(in srgb, var(--owner-color, #24d8ff) 72%, #ffffff);
   background:
-    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.78), transparent 26%),
-    linear-gradient(180deg, color-mix(in srgb, var(--owner-color, #24d8ff) 28%, #fffef7), color-mix(in srgb, var(--owner-color, #24d8ff) 18%, var(--diner-cream)));
+    radial-gradient(circle at 50% 84%, rgba(255, 255, 255, 0.78), transparent 26%),
+    linear-gradient(0deg, color-mix(in srgb, var(--owner-color, #24d8ff) 28%, #fffef7), color-mix(in srgb, var(--owner-color, #24d8ff) 18%, var(--diner-cream)));
   filter: brightness(1.16) saturate(1.28);
   box-shadow:
     0 0 0 6px color-mix(in srgb, var(--owner-color, #24d8ff) 24%, transparent),
@@ -1801,8 +1801,8 @@ h2 {
 .featured-card-flight.purchased-flash {
   border-color: color-mix(in srgb, var(--owner-color, #24d8ff) 72%, #ffffff);
   background:
-    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.78), transparent 26%),
-    linear-gradient(180deg, color-mix(in srgb, var(--owner-color, #24d8ff) 28%, #fffef7), color-mix(in srgb, var(--owner-color, #24d8ff) 18%, var(--diner-cream)));
+    radial-gradient(circle at 50% 84%, rgba(255, 255, 255, 0.78), transparent 26%),
+    linear-gradient(0deg, color-mix(in srgb, var(--owner-color, #24d8ff) 28%, #fffef7), color-mix(in srgb, var(--owner-color, #24d8ff) 18%, var(--diner-cream)));
   filter: brightness(1.16) saturate(1.28);
   box-shadow:
     0 0 0 6px color-mix(in srgb, var(--owner-color, #24d8ff) 24%, transparent),
@@ -2823,9 +2823,9 @@ h2 {
   border-radius: 5px;
   border: 1px solid rgba(38, 26, 22, 0.5);
   background:
-    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.64), transparent 27%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.44), transparent 44%),
-    linear-gradient(180deg, #fffef6, var(--diner-cream));
+    radial-gradient(circle at 50% 84%, rgba(255, 255, 255, 0.64), transparent 27%),
+    linear-gradient(325deg, rgba(255, 255, 255, 0.44), transparent 44%),
+    linear-gradient(0deg, #fffef6, var(--diner-cream));
   color: var(--ink);
   font-weight: 900;
   line-height: 1;
@@ -3384,8 +3384,8 @@ body[data-theme] .ring.inner {
 body[data-theme] .board-card,
 body[data-theme] .mini-card {
   background:
-    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.64), transparent 27%),
-    linear-gradient(180deg, #fffef7, var(--diner-cream));
+    radial-gradient(circle at 50% 84%, rgba(255, 255, 255, 0.64), transparent 27%),
+    linear-gradient(0deg, #fffef7, var(--diner-cream));
   border-color: color-mix(in srgb, var(--diner-ink) 62%, transparent);
 }
 
@@ -3402,8 +3402,8 @@ body[data-theme] .board-card.purchased {
 
 body[data-theme] .board-card.best-hand {
   background:
-    radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--owner-color, #24d8ff) 38%, #ffffff), transparent 44%),
-    linear-gradient(180deg, color-mix(in srgb, var(--owner-color, #24d8ff) 30%, #fffef7), color-mix(in srgb, var(--owner-color, #24d8ff) 18%, var(--diner-cream)));
+    radial-gradient(circle at 50% 70%, color-mix(in srgb, var(--owner-color, #24d8ff) 38%, #ffffff), transparent 44%),
+    linear-gradient(0deg, color-mix(in srgb, var(--owner-color, #24d8ff) 30%, #fffef7), color-mix(in srgb, var(--owner-color, #24d8ff) 18%, var(--diner-cream)));
 }
 
 body[data-theme] .hand-panel {
@@ -4362,9 +4362,7 @@ body[data-theme] .slot-window {
   padding: clamp(18px, 3.2cqw, 24px) clamp(16px, 3.4cqw, 26px) clamp(16px, 2.8cqw, 22px);
   border: 0;
   border-radius: 0;
-  background:
-    linear-gradient(180deg, rgba(2, 7, 20, 0.08), rgba(2, 7, 20, 0.28)),
-    url("./assets/ui/bottom-console.png") center / 100% 100% no-repeat;
+  background: transparent;
   box-shadow:
     0 0 24px rgba(36, 216, 255, 0.32),
     0 0 34px rgba(255, 138, 28, 0.16),
@@ -4581,9 +4579,9 @@ body[data-theme] .hand-panel.console-panel::after {
 
 .hand-panel.console-panel .doubles-lamp {
   left: 5.2%;
-  top: 15.6%;
-  width: 12.6%;
-  height: 8%;
+  top: 14.8%;
+  width: 9.6%;
+  height: 5.5%;
   min-height: 0;
   border: 0;
   border-radius: 999px;
@@ -4598,10 +4596,10 @@ body[data-theme] .hand-panel.console-panel::after {
 }
 
 .hand-panel.console-panel .rp-meter {
-  left: 5.2%;
-  top: calc(28.6% - 10px);
-  width: 12.6%;
-  height: 14.2%;
+  left: 4.9%;
+  top: 25.4%;
+  width: 10.4%;
+  height: 18.8%;
   min-height: 0;
   display: grid;
   grid-template-rows: 1fr;
@@ -4641,10 +4639,10 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
 }
 
 .hand-panel.console-panel .slot-machine {
-  left: 19.6%;
-  top: 14.6%;
-  width: 24.4%;
-  height: 28.4%;
+  left: 17.2%;
+  top: 16.9%;
+  width: 20.5%;
+  height: 25.8%;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: clamp(8px, 2.2cqw, 16px);
@@ -4711,10 +4709,10 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
 }
 
 .hand-panel.console-panel .slot-roll-btn {
-  left: calc(45.2% - 2px);
-  top: 15.7%;
-  width: 15.2%;
-  height: 26.5%;
+  left: 43.2%;
+  top: 12.4%;
+  width: 14.1%;
+  height: 32.8%;
   min-height: 0;
   display: grid;
   place-items: center;
@@ -4759,10 +4757,10 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
 }
 
 .hand-panel.console-panel .bonus-slots {
-  left: 62%;
-  top: 16.1%;
-  width: 34.2%;
-  height: 25.8%;
+  left: 64.6%;
+  top: 12.1%;
+  width: 30.9%;
+  height: 32.2%;
   min-width: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -4824,10 +4822,10 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
 
 .hand-panel.console-panel .economy-strip {
   z-index: 2;
-  left: 4.2%;
-  top: 47.4%;
-  width: 91.6%;
-  height: 15.2%;
+  left: 5%;
+  top: 51.2%;
+  width: 90.7%;
+  height: 14.2%;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 18.5%;
   gap: 3.2%;
@@ -4885,10 +4883,10 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
 
 .hand-panel.console-panel .card-hand {
   z-index: 2;
-  left: 3.8%;
-  top: 65.8%;
-  width: 92.4%;
-  height: 28.4%;
+  left: 4.8%;
+  top: 70.8%;
+  width: 90.8%;
+  height: 23.8%;
   min-height: 0;
   display: grid;
   grid-template-columns: minmax(38px, 8.6%) minmax(0, 1fr);
@@ -5157,8 +5155,8 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
   border: 1px solid rgba(38, 26, 22, 0.5);
   border-radius: 5px;
   background:
-    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.64), transparent 27%),
-    linear-gradient(180deg, #fffef6, var(--diner-cream));
+    radial-gradient(circle at 50% 84%, rgba(255, 255, 255, 0.64), transparent 27%),
+    linear-gradient(0deg, #fffef6, var(--diner-cream));
   color: var(--ink);
   font-weight: 950;
 }
