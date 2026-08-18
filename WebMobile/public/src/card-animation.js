@@ -43,6 +43,7 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
     const purchaseButton = controls.querySelector(".purchase");
     const status = controls.querySelector(".featured-card-status");
     const cardPrice = Number.parseInt(cardElement.dataset.cardPrice || "0", 10) || 0;
+    const cardType = cardElement.dataset.cardType || "";
     let purchaseOptions = {};
     let freeBonusSpins = 0;
     let baseBonusSpinUsed = false;
@@ -97,8 +98,16 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
       startBonusSlotMachine
     };
 
-    purchaseButton.textContent = cardPrice ? `Buy ${cardPrice.toLocaleString("en-US")}` : "Purchase";
-    status.textContent = cardPrice ? `${cardPrice.toLocaleString("en-US")} chips` : "";
+    purchaseButton.textContent = cardType === "wild"
+      ? "Claim Wild"
+      : cardPrice
+        ? `Buy ${cardPrice.toLocaleString("en-US")}`
+        : "Purchase";
+    status.textContent = cardType === "wild"
+      ? "Free for one full orbit"
+      : cardPrice
+        ? `${cardPrice.toLocaleString("en-US")} chips`
+        : "";
     updateSpinButton();
     spinButton.addEventListener("click", () => {
       const hasFreeSpin = freeBonusSpins > 0;
@@ -492,6 +501,11 @@ function getFeaturedCardMarkup(cardElement) {
   const penalty = Number.parseInt(cardElement.dataset.penalty || "0", 10) || 0;
   const multiplier = cardElement.dataset.multiplier || "x1.0";
   const cardName = cardElement.dataset.cardName || `${rank} ${suit}`;
+  const isWild = cardElement.dataset.cardType === "wild";
+  const costLabel = isWild ? "Free" : formatChips(price);
+  const sellLabel = isWild ? "-" : formatChips(sellPrice);
+  const penaltyLabel = isWild ? "-" : formatChips(penalty);
+  const handLabel = isWild ? "1 Orbit Wild" : multiplier;
 
   return `
     <div class="featured-card-face">
@@ -500,10 +514,10 @@ function getFeaturedCardMarkup(cardElement) {
         <strong>${getSuitIcon(suit)}</strong>
       </div>
       <dl class="featured-card-stats" aria-label="${cardName} details">
-        <div><dt>Cost</dt><dd>${formatChips(price)}</dd></div>
-        <div><dt>Sell</dt><dd>${formatChips(sellPrice)}</dd></div>
-        <div><dt>Penalty</dt><dd>${formatChips(penalty)}</dd></div>
-        <div><dt>Hands</dt><dd>${multiplier}</dd></div>
+        <div><dt>Cost</dt><dd>${costLabel}</dd></div>
+        <div><dt>Sell</dt><dd>${sellLabel}</dd></div>
+        <div><dt>Penalty</dt><dd>${penaltyLabel}</dd></div>
+        <div><dt>Hands</dt><dd>${handLabel}</dd></div>
       </dl>
     </div>
   `;

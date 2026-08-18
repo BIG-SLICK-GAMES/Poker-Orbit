@@ -20,7 +20,7 @@ export function createOpponentHudModule({
       const player = getPlayer(playerIndex);
       const position = turnState.playerPositions?.[playerIndex] || 0;
       const spacesAhead = getSpacesAhead(activePosition, position);
-      const bestCard = getBestCards(player.cards)[0] || null;
+      const bestCard = getBestCards(player.cards, playerIndex)[0] || null;
       return createOpponentTile({
         playerIndex,
         color: playerColors[playerIndex] || "#24d8ff",

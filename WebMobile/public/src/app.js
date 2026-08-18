@@ -7,6 +7,7 @@ import { createOwnershipHighlightModule } from "./ownership-highlights.js";
 import { createFxOverlayModule } from "./fx-overlay.js";
 import { createPlayerThemeOverlayModule } from "./player-theme-overlay.js";
 import { createOpponentHudModule } from "./opponent-hud.js";
+import { createWildCardModule } from "./wild-card.js";
 import { getBonusIconSrc } from "./bonus-icons.js";
 import { rollBonusSlotPrize } from "./bonus-slot-prizes.js";
 import { MASTER_CONTROL } from "./master-control.js";
@@ -220,6 +221,10 @@ const ownershipHighlightModule = createOwnershipHighlightModule({
   boardRoot: boardCardRing,
   getPlayerColor: (playerIndex) => playerTokenColors[playerIndex] || "#24d8ff"
 });
+const wildCardModule = createWildCardModule({
+  boardRoot: boardCardRing,
+  getRankValue: rankValue
+});
 const fxOverlayModule = createFxOverlayModule({
   tokenLayer: playerTokenLayer,
   getTokenPosition: getTokenInnerRingPosition,
@@ -244,6 +249,7 @@ createSlotReelModule({
     window.clearTimeout(pendingNextTurnTimer);
     window.clearTimeout(pendingBotTurnTimer);
     awaitingLandingDecision = false;
+    wildCardModule.trackMovement(turnModule.getState().currentPlayer, total);
     animateRollPointsGain(total);
     turnModule.completeCurrentRoll(total);
   }
@@ -276,15 +282,15 @@ const purchaseAuctionModule = createPurchaseAuctionModule({
   chipsLabel: chipBankLabel,
   bestHandLabel,
   suitIcons,
-  getBestHandCards: getBestPokerHandCards,
-  getBestHandName: getBestPokerHandName
+  getBestHandCards: (cards, playerIndex) => getBestPokerHandCards(cards, playerIndex),
+  getBestHandName: (cards, playerIndex) => getBestPokerHandName(cards, playerIndex)
 });
 const opponentHudModule = createOpponentHudModule({
   root: opponentHudRoot,
   playerColors: playerTokenColors,
   boardSpaceCount,
   getPlayer: (playerIndex) => purchaseAuctionModule.getPlayer(playerIndex),
-  getBestCards: getBestPokerHandCards,
+  getBestCards: (cards, playerIndex) => getBestPokerHandCards(cards, playerIndex),
   suitIcons
 });
 const tokenStepDurationMs = Math.max(60, numberOrDefault(MASTER_CONTROL.gameplay?.tokenStepDurationMs, 230));
@@ -1004,11 +1010,15 @@ function createBoardCards() {
     tile.dataset.purchaseState = isPurchasableCardIndex(index) ? "available" : "unavailable";
     tile.dataset.rank = card.label;
     tile.dataset.suit = card.suit;
+    tile.dataset.cardType = card.type || "standard";
     tile.dataset.cardName = card.name || `${card.label} of ${suitNames[card.suit]}`;
     tile.dataset.cardPrice = String(getRankPurchasePrice(card.label));
     tile.dataset.sellPrice = String(getCardSellPrice(card.label));
     tile.dataset.penalty = String(getCardLandingPenalty(card.label));
     tile.dataset.multiplier = getCardHandMultiplier(card.label);
+    if (card.type === "wild") {
+      tile.dataset.orbitDuration = String(boardSpaceCount);
+    }
     tile.dataset.control = "boardCards";
     tile.setAttribute("aria-label", `Board card ${index + 1}: ${card.name || `${card.label} of ${suitNames[card.suit]}`}`);
     tile.innerHTML = `
@@ -1218,6 +1228,7 @@ function purchaseBoardCard(cardElement, options = {}) {
   }
 
   ownershipHighlightModule.markPurchased(cardElement, playerIndex);
+  wildCardModule.registerWild(purchaseResult.card, playerIndex);
   updateBestHandHighlights();
   opponentHudModule.update(turnModule.getState());
   awaitingLandingDecision = false;
@@ -1361,14 +1372,14 @@ function closeCardManager() {
 
 function renderCardManager(playerIndex = turnModule.getState().currentPlayer) {
   const player = purchaseAuctionModule.getPlayer(playerIndex);
-  const bestCards = getBestPokerHandCards(player.cards).slice(0, 5);
+  const bestCards = getBestPokerHandCards(player.cards, playerIndex).slice(0, 5);
   const bestIndexes = new Set(bestCards.map((card) => card.boardIndex));
 
   if (cardManagerPlayer) {
     cardManagerPlayer.textContent = `Player ${playerIndex + 1}`;
   }
   if (cardManagerBestHand) {
-    cardManagerBestHand.textContent = getBestPokerHandName(player.cards);
+    cardManagerBestHand.textContent = getBestPokerHandName(player.cards, playerIndex);
   }
   if (cardManagerChips) {
     cardManagerChips.textContent = formatGameNumber(player.chips);
@@ -1869,14 +1880,26 @@ function buildBoardDeck() {
 }
 
 function getCardSellPrice(rank) {
+  if (rank === "W") {
+    return 0;
+  }
+
   return Math.floor(getRankPurchasePrice(rank) * 0.5);
 }
 
 function getCardLandingPenalty(rank) {
+  if (rank === "W") {
+    return 0;
+  }
+
   return Math.max(50, Math.floor(getRankPurchasePrice(rank) * 0.2));
 }
 
 function getCardHandMultiplier(rank) {
+  if (rank === "W") {
+    return "Wild";
+  }
+
   const multiplierMap = {
     A: "x3.0",
     K: "x2.5",
@@ -1903,7 +1926,7 @@ function updateBestHandHighlights() {
   });
 
   playerTokenColors.forEach((_, playerIndex) => {
-    const bestCards = getBestPokerHandCards(purchaseAuctionModule.getPlayer(playerIndex).cards);
+    const bestCards = getBestPokerHandCards(purchaseAuctionModule.getPlayer(playerIndex).cards, playerIndex);
     bestCards.forEach((card) => {
       const boardCard = boardCardRing.querySelector(`.board-card[data-index="${card.boardIndex}"]`);
       if (!boardCard) {
@@ -1916,18 +1939,37 @@ function updateBestHandHighlights() {
   });
 }
 
-function getBestPokerHandCards(cards) {
+function getBestPokerHandCards(cards, playerIndex = 0) {
+  return getBestPokerHandResult(cards, playerIndex).cards;
+}
+
+function getBestPokerHandName(cards, playerIndex = 0) {
+  return getPokerHandNameFromScore(getBestPokerHandResult(cards, playerIndex).score);
+}
+
+function getBestPokerHandResult(cards, playerIndex = 0) {
+  return wildCardModule.resolveBestHand(cards, playerIndex, {
+    getNaturalBestHand: getNaturalBestPokerHandResult,
+    compareScores: comparePokerScores
+  });
+}
+
+function getNaturalBestPokerHandResult(cards) {
   const playableCards = cards.filter((card) => rankValue(card.rank) > 0 && card.suit);
   if (!playableCards.length) {
-    return [];
+    return { cards: [], score: [-1] };
   }
 
   if (playableCards.length < 5) {
-    return getBestPartialPokerHandCards(playableCards);
+    const bestCards = getBestPartialPokerHandCards(playableCards);
+    return {
+      cards: bestCards,
+      score: scorePartialPokerHand(playableCards)
+    };
   }
 
   let bestCards = [];
-  let bestScore = null;
+  let bestScore = [-1];
 
   for (let first = 0; first < playableCards.length - 4; first += 1) {
     for (let second = first + 1; second < playableCards.length - 3; second += 1) {
@@ -1952,70 +1994,44 @@ function getBestPokerHandCards(cards) {
     }
   }
 
-  return orderPokerHandCards(bestCards);
+  return {
+    cards: orderPokerHandCards(bestCards),
+    score: bestScore
+  };
 }
 
-function getBestPokerHandName(cards) {
-  const playableCards = cards.filter((card) => rankValue(card.rank) > 0 && card.suit);
-  if (!playableCards.length) {
-    return "No Cards";
-  }
-
-  if (playableCards.length < 5) {
-    return getPartialPokerHandName(playableCards);
-  }
-
-  let bestScore = null;
-
-  for (let first = 0; first < playableCards.length - 4; first += 1) {
-    for (let second = first + 1; second < playableCards.length - 3; second += 1) {
-      for (let third = second + 1; third < playableCards.length - 2; third += 1) {
-        for (let fourth = third + 1; fourth < playableCards.length - 1; fourth += 1) {
-          for (let fifth = fourth + 1; fifth < playableCards.length; fifth += 1) {
-            const score = scorePokerHand([
-              playableCards[first],
-              playableCards[second],
-              playableCards[third],
-              playableCards[fourth],
-              playableCards[fifth]
-            ]);
-            if (!bestScore || comparePokerScores(score, bestScore) > 0) {
-              bestScore = score;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  return getPokerHandNameFromScore(bestScore);
-}
-
-function getPartialPokerHandName(cards) {
+function scorePartialPokerHand(cards) {
   const counts = new Map();
   cards.forEach((card) => {
     const value = rankValue(card.rank);
     counts.set(value, (counts.get(value) || 0) + 1);
   });
 
-  const countValues = [...counts.values()].sort((first, second) => second - first);
-  if (countValues[0] >= 4) {
-    return "Four of a Kind";
+  const values = cards.map((card) => rankValue(card.rank)).sort((first, second) => second - first);
+  const countGroups = [...counts.entries()].sort((first, second) => second[1] - first[1] || second[0] - first[0]);
+
+  if (countGroups[0]?.[1] >= 4) {
+    return [7, countGroups[0][0], ...values.filter((value) => value !== countGroups[0][0])];
   }
-  if (countValues[0] >= 3) {
-    return "Three of a Kind";
+  if (countGroups[0]?.[1] >= 3) {
+    return [3, countGroups[0][0], ...values.filter((value) => value !== countGroups[0][0])];
   }
-  if (countValues[0] === 2 && countValues[1] === 2) {
-    return "Two Pair";
+  if (countGroups[0]?.[1] === 2 && countGroups[1]?.[1] === 2) {
+    const pairValues = countGroups.slice(0, 2).map(([value]) => value).sort((first, second) => second - first);
+    return [2, ...pairValues, ...values.filter((value) => !pairValues.includes(value))];
   }
-  if (countValues[0] === 2) {
-    return "Pair";
+  if (countGroups[0]?.[1] === 2) {
+    return [1, countGroups[0][0], ...values.filter((value) => value !== countGroups[0][0])];
   }
 
-  return "High Card";
+  return [0, ...values];
 }
 
 function getPokerHandNameFromScore(score) {
+  if (!score || score[0] < 0) {
+    return "No Cards";
+  }
+
   const names = [
     "High Card",
     "Pair",

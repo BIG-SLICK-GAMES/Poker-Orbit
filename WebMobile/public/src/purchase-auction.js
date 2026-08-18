@@ -45,11 +45,13 @@ export function createPurchaseAuctionModule({
       boardIndex: Number.parseInt(cardElement.dataset.index || "-1", 10),
       rank: cardElement.dataset.rank || "",
       suit: cardElement.dataset.suit || "",
+      type: cardElement.dataset.cardType || "",
       name: cardElement.dataset.cardName || "",
       price: Number.parseInt(cardElement.dataset.cardPrice || "0", 10) || 0,
       sellPrice: Number.parseInt(cardElement.dataset.sellPrice || "0", 10) || 0,
       penalty: Number.parseInt(cardElement.dataset.penalty || "0", 10) || 0,
-      multiplier: cardElement.dataset.multiplier || "x1.0"
+      multiplier: cardElement.dataset.multiplier || "x1.0",
+      orbitDuration: Number.parseInt(cardElement.dataset.orbitDuration || "0", 10) || 0
     };
   }
 
@@ -93,7 +95,11 @@ export function createPurchaseAuctionModule({
     return {
       success: true,
       card,
-      message: options.free ? "Card won" : `Bought for ${formatChips(purchasePrice)}`
+      message: card.type === "wild"
+        ? "Wild claimed"
+        : options.free
+          ? "Card won"
+          : `Bought for ${formatChips(purchasePrice)}`
     };
   }
 
@@ -149,10 +155,10 @@ export function createPurchaseAuctionModule({
       cardCountLabel.textContent = String(player.cards.length);
     }
     if (bestHandLabel) {
-      bestHandLabel.textContent = getBestHandName(player.cards);
+      bestHandLabel.textContent = getBestHandName(player.cards, playerIndex);
     }
 
-    const bestCards = getBestHandCards(player.cards).slice(0, 5);
+    const bestCards = getBestHandCards(player.cards, playerIndex).slice(0, 5);
     const handSlots = Array.from({ length: 5 }, (_, index) => createHandSlot(bestCards[index], index));
 
     const bestFrame = document.createElement("div");
@@ -185,7 +191,12 @@ export function createPurchaseAuctionModule({
       cardButton.classList.toggle("best-hand-slot", Boolean(options.best));
       cardButton.type = "button";
       cardButton.dataset.boardIndex = String(card.boardIndex);
-      cardButton.title = `${card.name}: sell ${formatChips(card.sellPrice)}, penalty ${formatChips(card.penalty)}, hand ${card.multiplier}`;
+      cardButton.classList.toggle("wild-card-slot", card.type === "wild");
+      cardButton.title = card.wildSubstitute
+        ? `${card.name}: substitutes ${card.wildSubstitute.name}`
+        : card.type === "wild"
+          ? `${card.name}: active for one full orbit`
+        : `${card.name}: sell ${formatChips(card.sellPrice)}, penalty ${formatChips(card.penalty)}, hand ${card.multiplier}`;
       cardButton.innerHTML = `
         <span>${card.rank}</span>
         <strong>${suitIcons[card.suit] || ""}</strong>
