@@ -4495,11 +4495,6 @@ body[data-theme] .slot-window {
 /* Console art overlay: coordinates are percentages of the supplied 1752x990 frame. */
 .hand-panel.console-panel,
 body[data-theme] .hand-panel.console-panel {
-  --console-blue: #24d8ff;
-  --console-blue-hot: #7df4ff;
-  --console-orange: #ff7a1a;
-  --console-orange-hot: #ffd08a;
-  --console-grime: rgba(2, 7, 18, 0.76);
   position: relative;
   width: 100%;
   min-height: clamp(242px, 31cqh, 330px);
@@ -4517,39 +4512,7 @@ body[data-theme] .hand-panel.console-panel {
 .hand-panel.console-panel::after,
 body[data-theme] .hand-panel.console-panel::before,
 body[data-theme] .hand-panel.console-panel::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.hand-panel.console-panel::before,
-body[data-theme] .hand-panel.console-panel::before {
-  background:
-    radial-gradient(ellipse at 18% 12%, rgba(255, 122, 26, 0.42), transparent 18%),
-    radial-gradient(ellipse at 38% 19%, rgba(36, 216, 255, 0.32), transparent 24%),
-    radial-gradient(ellipse at 83% 18%, rgba(255, 122, 26, 0.36), transparent 25%),
-    linear-gradient(112deg, transparent 0 6%, rgba(255, 122, 26, 0.34) 6.5% 7.3%, transparent 8% 58%, rgba(36, 216, 255, 0.32) 58.5% 59.3%, transparent 60%),
-    repeating-linear-gradient(164deg, transparent 0 24px, rgba(125, 244, 255, 0.035) 25px 28px, transparent 29px 52px),
-    repeating-linear-gradient(8deg, transparent 0 42px, rgba(255, 122, 26, 0.06) 43px 45px, transparent 46px 80px);
-  mix-blend-mode: screen;
-  opacity: 0.92;
-  filter:
-    drop-shadow(0 0 12px rgba(36, 216, 255, 0.64))
-    drop-shadow(0 0 18px rgba(255, 122, 26, 0.34));
-}
-
-.hand-panel.console-panel::after,
-body[data-theme] .hand-panel.console-panel::after {
-  background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.08), transparent 18%, rgba(0, 0, 0, 0.18)),
-    radial-gradient(ellipse at 50% 72%, rgba(5, 19, 39, 0.58), transparent 46%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 4px);
-  opacity: 0.78;
-  box-shadow:
-    inset 0 0 26px rgba(36, 216, 255, 0.24),
-    inset 0 0 46px rgba(255, 122, 26, 0.14);
+  content: none;
 }
 
 .hand-panel.console-panel .console-art {
@@ -4562,12 +4525,7 @@ body[data-theme] .hand-panel.console-panel::after {
   object-fit: fill;
   pointer-events: none;
   user-select: none;
-  filter:
-    saturate(1.28)
-    contrast(1.16)
-    brightness(0.86)
-    drop-shadow(0 0 14px rgba(36, 216, 255, 0.4))
-    drop-shadow(0 0 18px rgba(255, 122, 26, 0.26));
+  filter: none;
 }
 
 .hand-panel.console-panel .turn-strip {
