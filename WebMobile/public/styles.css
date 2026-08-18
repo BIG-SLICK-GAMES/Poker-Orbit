@@ -201,15 +201,30 @@ select:focus-visible {
   opacity: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 50% 16%, color-mix(in srgb, var(--active-player-color, #24d8ff) 26%, transparent), transparent 34%),
-    radial-gradient(circle at 50% 56%, color-mix(in srgb, var(--active-player-color, #24d8ff) 18%, transparent), transparent 54%),
-    linear-gradient(180deg, color-mix(in srgb, var(--active-player-color, #24d8ff) 12%, transparent), transparent 38%, color-mix(in srgb, var(--active-player-color, #24d8ff) 16%, transparent));
+    radial-gradient(ellipse at 16% -3%, color-mix(in srgb, var(--active-player-color, #24d8ff) 78%, transparent) 0 3%, color-mix(in srgb, var(--active-player-color, #24d8ff) 24%, transparent) 14%, transparent 34%),
+    radial-gradient(ellipse at 50% -5%, color-mix(in srgb, var(--active-player-color, #24d8ff) 84%, transparent) 0 4%, color-mix(in srgb, var(--active-player-color, #24d8ff) 28%, transparent) 16%, transparent 38%),
+    radial-gradient(ellipse at 84% -3%, color-mix(in srgb, var(--active-player-color, #24d8ff) 78%, transparent) 0 3%, color-mix(in srgb, var(--active-player-color, #24d8ff) 24%, transparent) 14%, transparent 34%),
+    linear-gradient(180deg, color-mix(in srgb, var(--active-player-color, #24d8ff) 16%, transparent), transparent 24%);
   mix-blend-mode: screen;
   transition: opacity 320ms ease;
 }
 
+.player-theme-overlay::before {
+  content: "";
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 0;
+  height: 13%;
+  background:
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--active-player-color, #24d8ff) 72%, transparent), transparent),
+    repeating-linear-gradient(90deg, transparent 0 16%, color-mix(in srgb, var(--active-player-color, #24d8ff) 44%, transparent) 16% 17%, transparent 17% 32%);
+  filter: blur(5px);
+  opacity: 0.82;
+}
+
 .app-shell.player-theme-active .player-theme-overlay {
-  opacity: 1;
+  opacity: 0.88;
 }
 
 .app-shell.player-theme-active .game-topbar {
@@ -4921,23 +4936,25 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
 }
 
 .card-manager-modal {
-  position: fixed;
+  position: absolute;
   inset: 0;
-  z-index: 120;
+  z-index: 8;
   display: grid;
-  place-items: end center;
-  padding: clamp(10px, 2.8vw, 18px);
-  background: rgba(0, 6, 18, 0.72);
-  backdrop-filter: blur(6px);
+  place-items: stretch;
+  padding: 2.5%;
+  background:
+    linear-gradient(180deg, rgba(2, 12, 29, 0.94), rgba(0, 4, 14, 0.97)),
+    rgba(0, 6, 18, 0.92);
 }
 
 .card-manager-panel {
-  width: min(720px, 100%);
-  max-height: min(74vh, 680px);
+  width: 100%;
+  min-height: 0;
+  max-height: none;
   display: grid;
-  grid-template-rows: auto auto auto minmax(0, 1fr);
-  gap: 10px;
-  padding: 12px;
+  grid-template-rows: auto auto auto minmax(64px, 0.62fr) minmax(0, 1fr);
+  gap: clamp(5px, 1.25cqw, 9px);
+  padding: clamp(8px, 2.2cqw, 13px);
   border: 1px solid rgba(36, 216, 255, 0.82);
   border-radius: 8px;
   background:
@@ -4946,7 +4963,16 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
   box-shadow:
     inset 0 0 0 1px rgba(255, 138, 28, 0.2),
     0 0 34px rgba(36, 216, 255, 0.22),
-    0 18px 44px rgba(0, 0, 0, 0.5);
+    0 0 30px rgba(36, 216, 255, 0.18);
+}
+
+.hand-panel.console-panel.cms-open > .console-art,
+.hand-panel.console-panel.cms-open > .turn-strip,
+.hand-panel.console-panel.cms-open > .slot-reel,
+.hand-panel.console-panel.cms-open > .economy-strip,
+.hand-panel.console-panel.cms-open > .card-hand {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .card-manager-header,
@@ -4968,6 +4994,30 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
   font-weight: 900;
   line-height: 1;
   text-transform: uppercase;
+}
+
+.card-manager-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.card-manager-tabs button {
+  min-height: 34px;
+  border: 1px solid rgba(36, 216, 255, 0.42);
+  border-radius: 6px;
+  background: rgba(2, 13, 32, 0.82);
+  color: rgba(191, 244, 255, 0.76);
+  font-size: clamp(0.72rem, 2.5cqw, 0.96rem);
+  font-weight: 950;
+}
+
+.card-manager-tabs button.active {
+  border-color: rgba(255, 138, 28, 0.94);
+  background:
+    linear-gradient(180deg, rgba(255, 138, 28, 0.34), rgba(2, 13, 32, 0.86));
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(255, 138, 28, 0.25);
 }
 
 .card-manager-header h3 {
@@ -5014,14 +5064,14 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 7px;
-  min-height: 82px;
+  min-height: 0;
 }
 
 .manager-best-slot {
   display: grid;
   place-items: center;
   min-width: 0;
-  min-height: 82px;
+  min-height: 0;
   border: 1px solid rgba(255, 138, 28, 0.42);
   border-radius: 7px;
   background: rgba(0, 10, 24, 0.58);

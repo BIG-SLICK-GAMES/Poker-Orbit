@@ -22,6 +22,7 @@ const perspectiveTable = document.querySelector("#perspectiveTable");
 const playerTokenLayer = document.querySelector("#playerTokenLayer");
 const cardAnimationLayer = document.querySelector("#cardAnimationLayer");
 const opponentHudRoot = document.querySelector("#opponentHud");
+const handPanel = document.querySelector(".hand-panel.console-panel");
 const currentTurnLabel = document.querySelector("#currentTurnLabel");
 const rollPointsLabel = document.querySelector("#rollPointsLabel");
 const landingCostLabel = document.querySelector("#landingCostLabel");
@@ -41,6 +42,7 @@ const cardManagerPlayer = document.querySelector("#cardManagerPlayer");
 const cardManagerBestHand = document.querySelector("#cardManagerBestHand");
 const cardManagerChips = document.querySelector("#cardManagerChips");
 const cardManagerCount = document.querySelector("#cardManagerCount");
+const cardManagerTabs = document.querySelector("#cardManagerTabs");
 const cardManagerBestSlots = document.querySelector("#cardManagerBestSlots");
 const cardManagerIndex = document.querySelector("#cardManagerIndex");
 const themeSettings = document.querySelector("#themeSettings");
@@ -307,6 +309,7 @@ let boardViewMode = "zoom";
 let currentScreen = "splash";
 let previousScreen = "lobby";
 let paidBonusSpinUsedThisTurn = false;
+let activeCardManagerPlayer = 0;
 const playerBonuses = Array.from({ length: 4 }, () => []);
 
 createBoardCards();
@@ -423,6 +426,16 @@ cardManagerOpen?.addEventListener("click", () => {
 
 cardManagerClose?.addEventListener("click", () => {
   closeCardManager();
+});
+
+cardManagerTabs?.addEventListener("click", (event) => {
+  const tabButton = event.target.closest("[data-card-manager-tab]");
+  if (!tabButton) {
+    return;
+  }
+
+  activeCardManagerPlayer = Math.max(0, Math.min(3, Number.parseInt(tabButton.dataset.cardManagerTab || "0", 10) || 0));
+  renderCardManager(activeCardManagerPlayer);
 });
 
 cardManagerModal?.addEventListener("click", (event) => {
@@ -1329,14 +1342,17 @@ function openCardManager() {
     return;
   }
 
-  renderCardManager();
+  activeCardManagerPlayer = turnModule.getState().currentPlayer;
+  renderCardManager(activeCardManagerPlayer);
   cardManagerModal.hidden = false;
+  handPanel?.classList.add("cms-open");
 }
 
 function closeCardManager() {
   if (cardManagerModal) {
     cardManagerModal.hidden = true;
   }
+  handPanel?.classList.remove("cms-open");
 }
 
 function renderCardManager(playerIndex = turnModule.getState().currentPlayer) {
@@ -1356,6 +1372,11 @@ function renderCardManager(playerIndex = turnModule.getState().currentPlayer) {
   if (cardManagerCount) {
     cardManagerCount.textContent = String(player.cards.length);
   }
+  cardManagerTabs?.querySelectorAll("[data-card-manager-tab]").forEach((button) => {
+    const tabPlayerIndex = Number.parseInt(button.dataset.cardManagerTab || "0", 10) || 0;
+    button.classList.toggle("active", tabPlayerIndex === playerIndex);
+    button.setAttribute("aria-selected", String(tabPlayerIndex === playerIndex));
+  });
 
   cardManagerBestSlots?.replaceChildren(...Array.from({ length: 5 }, (_, index) => {
     const card = bestCards[index];
@@ -2142,7 +2163,7 @@ function renderTurnState(turnState) {
   opponentHudModule.update(turnState);
   purchaseAuctionModule.setActivePlayer(activePlayerIndex);
   if (cardManagerModal?.hidden === false) {
-    renderCardManager(activePlayerIndex);
+    renderCardManager(activeCardManagerPlayer);
   }
   renderBonusSlots(activePlayerIndex);
   slotReelRoot.classList.toggle("spin-ready", (!paidBonusSpinUsedThisTurn && currentRollPoints >= currentLandingCost) || hasBonusSpinCard(activePlayerIndex));
