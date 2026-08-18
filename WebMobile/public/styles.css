@@ -169,6 +169,7 @@ select:focus-visible {
   isolation: isolate;
   contain: layout paint size;
   container-type: size;
+  background: #020714;
 }
 
 @media (min-width: 760px) and (min-height: 680px) {
@@ -183,11 +184,25 @@ select:focus-visible {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background:
-    linear-gradient(90deg, transparent 0 43%, rgba(36, 216, 255, 0.1) 43% 57%, transparent 57%),
-    repeating-linear-gradient(0deg, rgba(36, 216, 255, 0.05) 0 2px, transparent 2px 7px),
-    linear-gradient(180deg, rgba(36, 216, 255, 0.05), transparent 38%, rgba(0, 0, 0, 0.28));
   pointer-events: none;
+  background: var(--player-background-image, url("./assets/ui/player-backgrounds/player-1-blue.png")) center / 100% 100% no-repeat;
+  opacity: 1;
+}
+
+.app-shell[data-active-player="1"] {
+  --player-background-image: url("./assets/ui/player-backgrounds/player-1-blue.png");
+}
+
+.app-shell[data-active-player="2"] {
+  --player-background-image: url("./assets/ui/player-backgrounds/player-2-red.png");
+}
+
+.app-shell[data-active-player="3"] {
+  --player-background-image: url("./assets/ui/player-backgrounds/player-3-green.png");
+}
+
+.app-shell[data-active-player="4"] {
+  --player-background-image: url("./assets/ui/player-backgrounds/player-4-orange.png");
 }
 
 .app-shell.sold-impact-shake {
@@ -805,8 +820,7 @@ h2 {
 .player-card,
 .setting-row,
 .hand-panel,
-.table-tile,
-.board-stage {
+.table-tile {
   border: 1px solid var(--holo-line);
   border-radius: 6px;
   background:
@@ -909,18 +923,11 @@ h2 {
   display: grid;
   place-items: center;
   overflow: hidden;
-  background:
-    linear-gradient(0deg, rgba(36, 216, 255, 0.1) 0 1px, transparent 1px 100%),
-    linear-gradient(90deg, rgba(36, 216, 255, 0.08) 0 1px, transparent 1px 100%),
-    radial-gradient(circle at 50% 46%, rgba(36, 216, 255, 0.2), transparent 44%),
-    radial-gradient(circle at 82% 22%, rgba(255, 138, 28, 0.18), transparent 36%),
-    linear-gradient(145deg, rgba(2, 9, 21, 0.98), rgba(6, 39, 67, 0.9) 50%, rgba(4, 12, 30, 0.88)),
-    repeating-linear-gradient(45deg, rgba(36, 216, 255, 0.08) 0 12px, rgba(255, 138, 28, 0.055) 12px 24px);
-  background-size:
-    28px 28px,
-    28px 28px,
-    auto,
-    auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  clip-path: none;
   perspective: 1200px;
   perspective-origin: 50% 50%;
 }
@@ -3306,9 +3313,7 @@ body[data-theme] {
 }
 
 body[data-theme] .app-shell::before {
-  background:
-    repeating-linear-gradient(90deg, color-mix(in srgb, var(--diner-cream) 9%, transparent) 0 16px, transparent 16px 32px),
-    linear-gradient(180deg, color-mix(in srgb, var(--diner-cream) 5%, transparent), transparent 38%, rgba(0, 0, 0, 0.24));
+  background: var(--player-background-image, url("./assets/ui/player-backgrounds/player-1-blue.png")) center / 100% 100% no-repeat;
 }
 
 body[data-theme] .screen-header,
@@ -3340,13 +3345,10 @@ body[data-theme] .icon-btn {
 }
 
 body[data-theme] .board-stage {
-  border-color: color-mix(in srgb, var(--diner-cream) 38%, transparent);
-  background:
-    linear-gradient(0deg, color-mix(in srgb, var(--diner-cream) 12%, transparent) 0 1px, transparent 1px 100%),
-    linear-gradient(90deg, color-mix(in srgb, var(--diner-cream) 10%, transparent) 0 1px, transparent 1px 100%),
-    radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--bsg-accent) 24%, transparent), transparent 48%),
-    linear-gradient(145deg, color-mix(in srgb, var(--table-deep) 94%, #000), color-mix(in srgb, var(--table) 88%, transparent) 48%, color-mix(in srgb, var(--diner-red-dark) 74%, transparent)),
-    repeating-linear-gradient(45deg, color-mix(in srgb, var(--diner-cream) 11%, transparent) 0 12px, color-mix(in srgb, var(--diner-red) 12%, transparent) 12px 24px);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  clip-path: none;
 }
 
 body[data-theme] .ring {
