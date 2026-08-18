@@ -216,7 +216,10 @@ createThemeSettings();
 
 const turnModule = createTurnModule(4, { boardSpaceCount, startingPositions: startingPlayerPositions });
 const cameraModule = createCameraModule({ boardStage, perspectiveTable, cameraControl: MASTER_CONTROL.camera });
-const ownershipHighlightModule = createOwnershipHighlightModule({ boardRoot: boardCardRing });
+const ownershipHighlightModule = createOwnershipHighlightModule({
+  boardRoot: boardCardRing,
+  getPlayerColor: (playerIndex) => playerTokenColors[playerIndex] || "#24d8ff"
+});
 const fxOverlayModule = createFxOverlayModule({
   tokenLayer: playerTokenLayer,
   getTokenPosition: getTokenInnerRingPosition,
@@ -565,6 +568,7 @@ function applyPlayerColorChoice(colorIndex, { persist = false, refreshTokens = f
 
   if (refreshTokens) {
     createPlayerTokens();
+    ownershipHighlightModule.refreshColors();
     updateBestHandHighlights();
     playerThemeOverlayModule.update(turnModule.getState());
     opponentHudModule.update(turnModule.getState());

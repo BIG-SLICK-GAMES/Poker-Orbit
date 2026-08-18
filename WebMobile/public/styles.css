@@ -1412,22 +1412,6 @@ h2 {
   line-height: 1;
 }
 
-.board-card.owned-by-player-1 {
-  --owner-color: #24d8ff;
-}
-
-.board-card.owned-by-player-2 {
-  --owner-color: #ff2a4f;
-}
-
-.board-card.owned-by-player-3 {
-  --owner-color: #39ff7a;
-}
-
-.board-card.owned-by-player-4 {
-  --owner-color: #ff8a1c;
-}
-
 .board-card.passed {
   box-shadow:
     0 0 0 1px rgba(246, 196, 83, 0.42),

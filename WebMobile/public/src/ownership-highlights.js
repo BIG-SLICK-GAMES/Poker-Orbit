@@ -1,4 +1,4 @@
-export function createOwnershipHighlightModule({ boardRoot }) {
+export function createOwnershipHighlightModule({ boardRoot, getPlayerColor = () => "#24d8ff" }) {
   const ownedCards = new Map();
 
   function markPurchased(cardElement, playerIndex) {
@@ -14,6 +14,7 @@ export function createOwnershipHighlightModule({ boardRoot }) {
     ownedCards.set(boardIndex, playerIndex);
     cardElement.dataset.purchaseState = "purchased";
     cardElement.dataset.owner = String(playerIndex + 1);
+    cardElement.style.setProperty("--owner-color", getPlayerColor(playerIndex));
     cardElement.classList.add("purchased", `owned-by-player-${playerIndex + 1}`);
     cardElement.setAttribute("aria-label", `${cardElement.dataset.cardName || "Card"} owned by Player ${playerIndex + 1}`);
   }
@@ -27,6 +28,7 @@ export function createOwnershipHighlightModule({ boardRoot }) {
     ownedCards.delete(boardIndex);
     cardElement.dataset.purchaseState = "available";
     cardElement.removeAttribute("data-owner");
+    cardElement.style.removeProperty("--owner-color");
     cardElement.classList.remove(
       "purchased",
       "owned-by-player-1",
@@ -46,8 +48,17 @@ export function createOwnershipHighlightModule({ boardRoot }) {
       const boardIndex = Number.parseInt(cardElement.dataset.index || "-1", 10);
       const playerNumber = Number.parseInt(cardElement.dataset.owner || "0", 10);
       if (Number.isFinite(boardIndex) && boardIndex >= 0 && playerNumber > 0) {
-        ownedCards.set(boardIndex, playerNumber - 1);
+        const playerIndex = playerNumber - 1;
+        ownedCards.set(boardIndex, playerIndex);
+        cardElement.style.setProperty("--owner-color", getPlayerColor(playerIndex));
       }
+    });
+  }
+
+  function refreshColors() {
+    ownedCards.forEach((playerIndex, boardIndex) => {
+      const cardElement = boardRoot.querySelector(`.board-card[data-index="${boardIndex}"]`);
+      cardElement?.style.setProperty("--owner-color", getPlayerColor(playerIndex));
     });
   }
 
@@ -55,6 +66,7 @@ export function createOwnershipHighlightModule({ boardRoot }) {
     clear,
     getOwner,
     markPurchased,
+    refreshColors,
     syncFromDom
   };
 }
