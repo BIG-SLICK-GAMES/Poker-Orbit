@@ -189,6 +189,17 @@ select:focus-visible {
   opacity: 1;
 }
 
+.app-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 76;
+  pointer-events: none;
+  background: var(--player-background-image, url("./assets/ui/player-backgrounds/player-1-blue.png")) center / 100% 100% no-repeat;
+  mix-blend-mode: screen;
+  opacity: 0.96;
+}
+
 .app-shell[data-active-player="1"] {
   --player-background-image: url("./assets/ui/player-backgrounds/player-1-blue.png");
 }
@@ -3313,6 +3324,10 @@ body[data-theme] {
 }
 
 body[data-theme] .app-shell::before {
+  background: var(--player-background-image, url("./assets/ui/player-backgrounds/player-1-blue.png")) center / 100% 100% no-repeat;
+}
+
+body[data-theme] .app-shell::after {
   background: var(--player-background-image, url("./assets/ui/player-backgrounds/player-1-blue.png")) center / 100% 100% no-repeat;
 }
 
