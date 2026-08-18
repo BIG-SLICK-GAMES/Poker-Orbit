@@ -183,7 +183,7 @@ select:focus-visible {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   pointer-events: none;
   background: var(--player-background-image, url("./assets/ui/player-backgrounds/player-1-blue.png")) center / 100% 100% no-repeat;
   opacity: 1;
