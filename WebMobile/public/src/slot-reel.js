@@ -96,6 +96,7 @@ export function createSlotReelModule({ root, rollButton, externalRollButton, min
   }
 
   return {
+    isSpinning: () => spinning,
     roll
   };
 }

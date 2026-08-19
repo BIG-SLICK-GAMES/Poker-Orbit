@@ -8,6 +8,7 @@ import { createFxOverlayModule } from "./fx-overlay.js";
 import { createPlayerThemeOverlayModule } from "./player-theme-overlay.js";
 import { createOpponentHudModule } from "./opponent-hud.js";
 import { createWildCardModule } from "./wild-card.js";
+import { createGameEngine } from "./game-engine.js";
 import { getBonusIconSrc } from "./bonus-icons.js";
 import { rollBonusSlotPrize } from "./bonus-slot-prizes.js";
 import { MASTER_CONTROL } from "./master-control.js";
@@ -225,6 +226,9 @@ const wildCardModule = createWildCardModule({
   boardRoot: boardCardRing,
   getRankValue: rankValue
 });
+const gameEngine = createGameEngine({
+  onBusyChange: setGameEngineBusy
+});
 const fxOverlayModule = createFxOverlayModule({
   tokenLayer: playerTokenLayer,
   getTokenPosition: getTokenInnerRingPosition,
@@ -239,20 +243,13 @@ const playerThemeOverlayModule = createPlayerThemeOverlayModule({
 });
 let currentLandingCost = 0;
 
-createSlotReelModule({
+const slotReelModule = createSlotReelModule({
   root: slotReelRoot,
   rollButton: slotRollButton,
   externalRollButton: rollButton,
   min: 1,
   max: 6,
-  onRollComplete: ({ total }) => {
-    window.clearTimeout(pendingNextTurnTimer);
-    window.clearTimeout(pendingBotTurnTimer);
-    awaitingLandingDecision = false;
-    wildCardModule.trackMovement(turnModule.getState().currentPlayer, total);
-    animateRollPointsGain(total);
-    turnModule.completeCurrentRoll(total);
-  }
+  onRollComplete: (rollResult) => queueRollResolution(rollResult)
 });
 const suitIcons = {
   H: "\u2665",
@@ -313,6 +310,7 @@ let pendingNextTurnTimer = 0;
 let pendingBotTurnTimer = 0;
 let pendingBotDecisionTimer = 0;
 let awaitingLandingDecision = false;
+let queuedLandingResolution = false;
 let suppressNextTurnFocus = false;
 let boardViewMode = "zoom";
 let currentScreen = "splash";
@@ -422,11 +420,7 @@ controlDocReset?.addEventListener("click", () => {
 });
 
 endTurnButton?.addEventListener("click", () => {
-  suppressNextTurnFocus = true;
-  applyBoardViewMode(turnModule.getState());
-  window.setTimeout(() => {
-    turnModule.nextTurn();
-  }, endTurnBoardHoldMs);
+  queueNextTurn(endTurnBoardHoldMs, { suppressFocus: true });
 });
 
 cardManagerOpen?.addEventListener("click", () => {
@@ -470,6 +464,7 @@ function showScreen(name) {
     currentScreen = previousScreen;
     if (name === previousScreen) {
       screens.get(previousScreen).classList.add("active");
+      syncTurnInputAvailability();
       return;
     }
   }
@@ -482,6 +477,12 @@ function showScreen(name) {
   screens.get(name).classList.add("active");
   shell.classList.toggle("settings-over-game", opensSettingsOverGame);
   currentScreen = name;
+  if (name !== "game" && !opensSettingsOverGame) {
+    gameEngine.clear();
+    window.clearTimeout(pendingBotTurnTimer);
+    window.clearTimeout(pendingBotDecisionTimer);
+  }
+  syncTurnInputAvailability();
 
 }
 
@@ -1128,74 +1129,68 @@ function scheduleLandingCardAnimation(boardIndex, delayMs = 0) {
   window.clearTimeout(pendingCardAnimationTimer);
   window.clearTimeout(pendingBotDecisionTimer);
 
-  if (!isPurchasableCardIndex(boardIndex)) {
-    scheduleNextTurn(delayMs + 320);
-    return;
-  }
-
   pendingCardAnimationTimer = window.setTimeout(() => {
-    const card = boardCardRing.querySelector(`.board-card[data-index="${boardIndex}"]`);
-    if (!card) {
-      scheduleNextTurn(320);
-      return;
-    }
-
-    if (card.dataset.purchaseState === "purchased") {
-      resolveOwnedCardLanding(card);
-      scheduleNextTurn(520);
-      return;
-    }
-
-    if (card.dataset.purchaseState !== "available") {
-      scheduleNextTurn(320);
-      return;
-    }
-
-    awaitingLandingDecision = true;
-    if (isBotPlayer(turnModule.getState().currentPlayer)) {
-      scheduleBotCardDecision(card);
-      return;
-    }
-
-    cardAnimationModule.play(card);
+    gameEngine.enqueue({
+      name: "resolve landing card",
+      run: () => resolveLandingCard(boardIndex)
+    });
   }, delayMs);
 }
 
 function scheduleBotTurn(turnState) {
   window.clearTimeout(pendingBotTurnTimer);
 
-  if (!isBotPlayer(turnState.currentPlayer) || awaitingLandingDecision || currentScreen !== "game") {
+  if (
+    !isBotPlayer(turnState.currentPlayer)
+    || awaitingLandingDecision
+    || currentScreen !== "game"
+    || gameEngine.isRunning()
+    || slotReelModule.isSpinning()
+  ) {
     return;
   }
 
-  pendingBotTurnTimer = window.setTimeout(() => {
-    const latestTurnState = turnModule.getState();
-    if (!isBotPlayer(latestTurnState.currentPlayer) || awaitingLandingDecision || currentScreen !== "game") {
-      return;
-    }
+  gameEngine.enqueue({
+    name: "bot roll",
+    run: async ({ wait }) => {
+      await wait(780);
+      const latestTurnState = turnModule.getState();
+      if (!isBotPlayer(latestTurnState.currentPlayer) || awaitingLandingDecision || currentScreen !== "game" || slotReelModule.isSpinning()) {
+        return;
+      }
 
-    slotRollButton?.click();
-  }, 780);
+      slotReelModule.roll();
+    }
+  });
 }
 
 function scheduleBotCardDecision(cardElement) {
   window.clearTimeout(pendingBotDecisionTimer);
 
-  pendingBotDecisionTimer = window.setTimeout(() => {
-    const playerIndex = turnModule.getState().currentPlayer;
-    if (!isBotPlayer(playerIndex)) {
-      cardAnimationModule.play(cardElement);
-      return;
-    }
+  gameEngine.enqueue({
+    name: "bot card decision",
+    run: async ({ wait }) => {
+      await wait(620);
+      const playerIndex = turnModule.getState().currentPlayer;
+      if (!isBotPlayer(playerIndex)) {
+        awaitingLandingDecision = true;
+        syncTurnInputAvailability();
+        cardAnimationModule.play(cardElement);
+        return;
+      }
 
-    if (purchaseAuctionModule.canPurchase(cardElement, playerIndex)) {
-      purchaseBoardCard(cardElement);
-      scheduleNextTurn(760);
-      return;
-    }
+      if (purchaseAuctionModule.canPurchase(cardElement, playerIndex)) {
+        purchaseBoardCard(cardElement);
+        await wait(760);
+        await advanceToNextTurn();
+        return;
+      }
 
-    passBoardCard(cardElement);
-  }, 620);
+      passBoardCard(cardElement, { scheduleNext: false });
+      await wait(260);
+      await advanceToNextTurn();
+    }
+  });
 }
 
 function isBotPlayer(playerIndex) {
@@ -1236,10 +1231,13 @@ function purchaseBoardCard(cardElement, options = {}) {
   return { ...purchaseResult, playerIndex, playerColor: playerTokenColors[playerIndex] };
 }
 
-function passBoardCard(cardElement) {
+function passBoardCard(cardElement, options = {}) {
   cardElement?.classList.add("passed");
   awaitingLandingDecision = false;
-  scheduleNextTurn(260);
+  syncTurnInputAvailability();
+  if (options.scheduleNext !== false) {
+    queueNextTurn(260);
+  }
 }
 
 function canSpinForBoardCard(cardElement) {
@@ -1327,14 +1325,122 @@ function applyBonusSlotPrize(prize, cardElement, promptControls) {
 
 function scheduleNextTurn(delayMs = 0) {
   window.clearTimeout(pendingNextTurnTimer);
+  queueNextTurn(delayMs);
+}
 
-  pendingNextTurnTimer = window.setTimeout(() => {
-    if (awaitingLandingDecision) {
-      return;
+function setGameEngineBusy(isBusy) {
+  shell.classList.toggle("game-engine-busy", Boolean(isBusy));
+  syncTurnInputAvailability();
+  if (!isBusy) {
+    scheduleBotTurn(turnModule.getState());
+  }
+}
+
+function syncTurnInputAvailability() {
+  const turnState = turnModule.getState();
+  const isBusy = gameEngine.isRunning();
+  const isBotTurn = isBotPlayer(turnState.currentPlayer);
+  const shouldBlockRoll = isBusy || awaitingLandingDecision || isBotTurn || currentScreen !== "game";
+
+  if (slotRollButton) {
+    slotRollButton.disabled = shouldBlockRoll;
+  }
+
+  if (rollButton) {
+    rollButton.disabled = shouldBlockRoll;
+  }
+
+  if (endTurnButton) {
+    endTurnButton.disabled = isBusy || awaitingLandingDecision || currentScreen !== "game";
+  }
+}
+
+function queueRollResolution({ total }) {
+  gameEngine.enqueue({
+    name: `resolve roll ${total}`,
+    run: async ({ wait }) => {
+      window.clearTimeout(pendingNextTurnTimer);
+      window.clearTimeout(pendingBotTurnTimer);
+      window.clearTimeout(pendingBotDecisionTimer);
+
+      const beforeRollState = turnModule.getState();
+      const playerIndex = beforeRollState.currentPlayer;
+      const fromIndex = beforeRollState.playerPositions[playerIndex];
+      awaitingLandingDecision = false;
+      syncTurnInputAvailability();
+
+      wildCardModule.trackMovement(playerIndex, total);
+      animateRollPointsGain(total);
+      queuedLandingResolution = true;
+      turnModule.completeCurrentRoll(total);
+
+      const afterRollState = turnModule.getState();
+      const toIndex = afterRollState.playerPositions[playerIndex];
+      const moveDuration = getBoardMoveDuration(fromIndex, toIndex);
+      await wait(moveDuration + moveCameraSettleMs + 180);
+      queuedLandingResolution = false;
+      await resolveLandingCard(toIndex);
     }
+  });
+}
 
-    turnModule.nextTurn();
-  }, Math.max(0, delayMs));
+async function resolveLandingCard(boardIndex) {
+  if (!isPurchasableCardIndex(boardIndex)) {
+    queueNextTurn(320);
+    return;
+  }
+
+  const card = boardCardRing.querySelector(`.board-card[data-index="${boardIndex}"]`);
+  if (!card) {
+    queueNextTurn(320);
+    return;
+  }
+
+  if (card.dataset.purchaseState === "purchased") {
+    resolveOwnedCardLanding(card);
+    queueNextTurn(520);
+    return;
+  }
+
+  if (card.dataset.purchaseState !== "available") {
+    queueNextTurn(320);
+    return;
+  }
+
+  awaitingLandingDecision = true;
+  syncTurnInputAvailability();
+
+  if (isBotPlayer(turnModule.getState().currentPlayer)) {
+    scheduleBotCardDecision(card);
+    return;
+  }
+
+  cardAnimationModule.play(card);
+}
+
+function queueNextTurn(delayMs = 0, options = {}) {
+  gameEngine.enqueue({
+    name: "next turn",
+    run: async ({ wait }) => {
+      if (options.suppressFocus) {
+        suppressNextTurnFocus = true;
+        applyBoardViewMode(turnModule.getState());
+      }
+
+      await wait(delayMs);
+      if (awaitingLandingDecision) {
+        return;
+      }
+
+      await advanceToNextTurn();
+    }
+  });
+}
+
+async function advanceToNextTurn() {
+  awaitingLandingDecision = false;
+  syncTurnInputAvailability();
+  turnModule.nextTurn();
 }
 
 function applyBoardViewMode(turnState, boardIndex = turnState.playerPositions[turnState.currentPlayer], options = {}) {
@@ -1569,10 +1675,7 @@ function getTokenInnerRingPosition(index) {
 function animateBoardClockwise(fromIndex, toIndex, delayMs = 0) {
   const existingTimers = tokenAnimationTimers.get("board") || [];
   existingTimers.forEach((timer) => window.clearTimeout(timer));
-  const distance = (toIndex - fromIndex + boardSpaceCount) % boardSpaceCount;
-  const moveDuration = shell.classList.contains("reduce-motion")
-    ? 0
-    : Math.min(boardMoveMaxMs, Math.max(boardMoveMinMs, distance * boardMoveMsPerCard));
+  const moveDuration = getBoardMoveDuration(fromIndex, toIndex);
   const timer = window.setTimeout(() => {
     centerBoardOnCardIndex(toIndex, 0, moveDuration);
   }, delayMs);
@@ -1592,9 +1695,7 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
   }
 
   const distance = (toIndex - fromIndex + boardSpaceCount) % boardSpaceCount;
-  const moveDuration = shell.classList.contains("reduce-motion")
-    ? 0
-    : Math.min(boardMoveMaxMs, Math.max(boardMoveMinMs, distance * boardMoveMsPerCard));
+  const moveDuration = getBoardMoveDuration(fromIndex, toIndex);
   let lastLitCardIndex = -1;
 
   setFloatingTokenBoardPosition(token, fromIndex);
@@ -1641,6 +1742,15 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
   tokenAnimationTimers.set(playerIndex, [timer]);
 
   return delayMs + moveDuration;
+}
+
+function getBoardMoveDuration(fromIndex, toIndex) {
+  const distance = (toIndex - fromIndex + boardSpaceCount) % boardSpaceCount;
+  if (shell.classList.contains("reduce-motion") || distance <= 0) {
+    return 0;
+  }
+
+  return Math.min(boardMoveMaxMs, Math.max(boardMoveMinMs, distance * boardMoveMsPerCard));
 }
 
 function flashBoardCardPass(boardIndex, color) {
@@ -2187,6 +2297,7 @@ function renderTurnState(turnState) {
   }
   renderBonusSlots(activePlayerIndex);
   slotReelRoot.classList.toggle("spin-ready", (!paidBonusSpinUsedThisTurn && currentRollPoints >= currentLandingCost) || hasBonusSpinCard(activePlayerIndex));
+  syncTurnInputAvailability();
 
   document.querySelectorAll(".player-token").forEach((token) => {
     const playerIndex = Number(token.dataset.token);
@@ -2209,7 +2320,9 @@ function renderTurnState(turnState) {
       ? animateTokenWithBoard(activeToken, previousActiveBoardIndex, activeBoardIndex, 0)
       : animateBoardClockwise(previousActiveBoardIndex, activeBoardIndex, 0);
     applyBoardViewMode(turnState, activeBoardIndex, { centerBoard: false });
-    scheduleLandingCardAnimation(activeBoardIndex, tokenMoveDelay + 540);
+    if (!queuedLandingResolution) {
+      scheduleLandingCardAnimation(activeBoardIndex, tokenMoveDelay + 540);
+    }
   } else {
     centerBoardOnCardIndex(activeBoardIndex, 0);
     if (suppressNextTurnFocus) {
