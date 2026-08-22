@@ -179,41 +179,10 @@ select:focus-visible {
   }
 }
 
-.app-shell::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: var(--player-background-image, url("./assets/ui/player-backgrounds/player-1-blue.png")) center / 100% 100% no-repeat;
-  opacity: 1;
-}
-
+.app-shell::before,
 .app-shell::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 76;
-  pointer-events: none;
-  background: var(--player-background-image, url("./assets/ui/player-backgrounds/player-1-blue.png")) center / 100% 100% no-repeat;
-  mix-blend-mode: screen;
-  opacity: 0.96;
-}
-
-.app-shell[data-active-player="1"] {
-  --player-background-image: url("./assets/ui/player-backgrounds/player-1-blue.png");
-}
-
-.app-shell[data-active-player="2"] {
-  --player-background-image: url("./assets/ui/player-backgrounds/player-2-red.png");
-}
-
-.app-shell[data-active-player="3"] {
-  --player-background-image: url("./assets/ui/player-backgrounds/player-3-green.png");
-}
-
-.app-shell[data-active-player="4"] {
-  --player-background-image: url("./assets/ui/player-backgrounds/player-4-orange.png");
+  content: none;
+  display: none;
 }
 
 .app-shell.sold-impact-shake {
@@ -705,10 +674,31 @@ h2 {
 
 .control-doc-heading {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 8px;
   align-items: center;
   padding: 8px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.control-doc-heading::-webkit-details-marker {
+  display: none;
+}
+
+.control-doc-heading::before {
+  content: "+";
+  color: rgba(215, 251, 255, 0.86);
+  font-size: 0.76rem;
+  font-weight: 950;
+}
+
+.control-doc-section[open] .control-doc-heading::before {
+  content: "-";
+}
+
+.control-doc-section:not([open]) .control-doc-row {
+  display: none;
 }
 
 .control-doc-heading span {
@@ -1316,10 +1306,12 @@ h2 {
 
 .board-card-face {
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   place-items: center;
   gap: 1px;
   width: 100%;
   height: 100%;
+  padding: 4px 2px;
   border-radius: 2px;
   background:
     linear-gradient(145deg, rgba(255, 255, 255, 0.52), transparent 44%),
@@ -1327,13 +1319,19 @@ h2 {
 }
 
 .board-card-rank {
+  align-self: start;
+  grid-row: 1;
   font-size: 1.18em;
   font-weight: 950;
+  transform: rotate(180deg);
 }
 
 .board-card-suit {
+  align-self: end;
+  grid-row: 3;
   font-size: 2.2em;
   line-height: 0.72;
+  transform: rotate(180deg);
 }
 
 .board-card.red {
@@ -1586,7 +1584,7 @@ h2 {
 
 .card-animation-layer.active {
   display: block;
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .bonus-spin-frame {
@@ -1698,19 +1696,28 @@ h2 {
 
 .featured-card-main {
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   place-items: center;
   align-self: center;
+  min-height: 0;
+  height: 100%;
   padding-top: 2px;
 }
 
 .featured-card-main span {
+  align-self: start;
+  grid-row: 1;
   font-size: clamp(1.72rem, 10cqw, 2.8rem);
   font-weight: 900;
+  transform: rotate(180deg);
 }
 
 .featured-card-main strong {
+  align-self: end;
+  grid-row: 3;
   font-size: clamp(2.8rem, 15cqw, 4.6rem);
   line-height: 0.82;
+  transform: rotate(180deg);
 }
 
 .featured-card-stats {
@@ -1827,6 +1834,7 @@ h2 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
+  pointer-events: auto;
   transform: translateX(-50%);
 }
 
@@ -3323,12 +3331,10 @@ body[data-theme] {
     linear-gradient(155deg, var(--diner-red-dark), var(--bsg-bg) 52%, var(--table-deep));
 }
 
-body[data-theme] .app-shell::before {
-  background: var(--player-background-image, url("./assets/ui/player-backgrounds/player-1-blue.png")) center / 100% 100% no-repeat;
-}
-
+body[data-theme] .app-shell::before,
 body[data-theme] .app-shell::after {
-  background: var(--player-background-image, url("./assets/ui/player-backgrounds/player-1-blue.png")) center / 100% 100% no-repeat;
+  content: none;
+  display: none;
 }
 
 body[data-theme] .screen-header,
@@ -4353,6 +4359,30 @@ body[data-theme] .slot-window {
   }
 }
 
+@media (max-width: 540px), (pointer: coarse) {
+  .board-card.purchased,
+  .board-card.best-hand,
+  .featured-card-flight.waiting-purchase,
+  .setup-token-preview {
+    animation-iteration-count: 1;
+  }
+
+  .token-comet-path.glow,
+  .token-comet-path.core,
+  .token-comet-path.head {
+    filter: none;
+  }
+
+  .bonus-lamps,
+  .bonus-slot-lamps {
+    animation: none;
+  }
+
+  .player-theme-overlay::before {
+    filter: none;
+  }
+}
+
 .hand-panel {
   min-height: clamp(186px, 29cqh, 250px);
   padding: clamp(18px, 3.2cqw, 24px) clamp(16px, 3.4cqw, 26px) clamp(16px, 2.8cqw, 22px);
@@ -4507,19 +4537,6 @@ body[data-theme] .hand-panel.console-panel {
 body[data-theme] .hand-panel.console-panel::before,
 body[data-theme] .hand-panel.console-panel::after {
   content: none;
-}
-
-.hand-panel.console-panel .console-art {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: fill;
-  pointer-events: none;
-  user-select: none;
-  filter: none;
 }
 
 .hand-panel.console-panel .turn-strip {
@@ -4987,7 +5004,6 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
     0 0 30px rgba(36, 216, 255, 0.18);
 }
 
-.hand-panel.console-panel.cms-open > .console-art,
 .hand-panel.console-panel.cms-open > .turn-strip,
 .hand-panel.console-panel.cms-open > .slot-reel,
 .hand-panel.console-panel.cms-open > .economy-strip,
@@ -5207,4 +5223,855 @@ body[data-theme] .hand-panel.console-panel .slot-reel.spin-ready .rp-meter,
   margin: 0;
   padding: 18px 8px;
   text-align: center;
+}
+
+.app-shell.effects-lite *,
+.app-shell.effects-lite *::before,
+.app-shell.effects-lite *::after {
+  transition-duration: 80ms;
+}
+
+.app-shell.effects-lite .board-card.purchased,
+.app-shell.effects-lite .board-card.best-hand,
+.app-shell.effects-lite .featured-card-flight.waiting-purchase,
+.app-shell.effects-lite .bonus-slot-lamps i,
+.app-shell.effects-lite .setup-token-preview {
+  animation: none;
+}
+
+.app-shell.effects-lite .board-card.purchased,
+.app-shell.effects-lite .board-card.best-hand {
+  filter: none;
+  box-shadow:
+    0 0 0 2px var(--owner-color, rgba(36, 216, 255, 0.86)),
+    0 2px 5px rgba(0, 0, 0, 0.32);
+}
+
+.app-shell.effects-lite .featured-card-flight,
+.app-shell.effects-lite .featured-card-flight.purchase-spinning-color,
+.app-shell.effects-lite .featured-card-flight.purchased-flash,
+.app-shell.effects-lite .bonus-slot-machine,
+.app-shell.effects-lite .slot-spinner {
+  filter: none;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.42);
+}
+
+.app-shell.effects-lite .token-comet-arc {
+  display: none;
+}
+
+.app-shell.effects-lite .player-theme-overlay,
+.app-shell.effects-lite::after {
+  display: none;
+}
+
+/* Solid panel skin: removes image/frame backgrounds and uses simple soft-edged blocks. */
+.app-shell {
+  --solid-page: #08111f;
+  --solid-panel: #101d2f;
+  --solid-panel-strong: #162940;
+  --solid-panel-soft: #0c1728;
+  --solid-control: #17314f;
+  --solid-control-hot: #1f6f8f;
+  --solid-card: #f5efe4;
+  --solid-border: rgba(160, 210, 232, 0.24);
+  --solid-border-strong: rgba(186, 226, 244, 0.42);
+  --solid-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+  --solid-radius: 12px;
+  background: var(--solid-page);
+}
+
+.app-shell::before,
+.app-shell::after,
+body[data-theme] .app-shell::before,
+body[data-theme] .app-shell::after,
+.player-theme-overlay {
+  display: none !important;
+  content: none !important;
+}
+
+body {
+  background: #050b14;
+}
+
+.screen,
+.splash-screen,
+.lobby-screen,
+.setup-screen,
+.settings-screen,
+.game-screen {
+  background: var(--solid-page) !important;
+}
+
+.screen-header,
+.game-topbar,
+body[data-theme] .game-topbar,
+.player-card,
+.table-tile,
+body[data-theme] .table-tile,
+.setup-card,
+.setup-orbit,
+.settings-preview,
+.settings-section,
+.setting-row,
+.control-doc-panel,
+.control-doc-section,
+.card-manager-panel,
+.card-manager-summary div,
+.manager-card-row {
+  border: 1px solid var(--solid-border) !important;
+  border-radius: var(--solid-radius) !important;
+  clip-path: none !important;
+  background: var(--solid-panel) !important;
+  box-shadow: var(--solid-shadow) !important;
+  backdrop-filter: none !important;
+}
+
+.hand-panel,
+.hand-panel.console-panel,
+body[data-theme] .hand-panel,
+body[data-theme] .hand-panel.console-panel {
+  border: 1px solid var(--solid-border) !important;
+  border-radius: 16px !important;
+  clip-path: none !important;
+  background: var(--solid-panel-soft) !important;
+  box-shadow: var(--solid-shadow) !important;
+}
+
+.hand-panel.console-panel .turn-strip,
+.hand-panel.console-panel .slot-reel,
+.slot-reel,
+body[data-theme] .slot-reel,
+.economy-strip,
+.card-hand,
+.bonus-slots,
+.opponent-hud-card,
+.chip-bank,
+.owned-count,
+.best-hand-display,
+.best-hand-frame,
+.hand-card-slot,
+.manager-best-slot,
+.control-doc-row {
+  border: 1px solid var(--solid-border) !important;
+  border-radius: 10px !important;
+  background: var(--solid-panel-strong) !important;
+  box-shadow: none !important;
+  clip-path: none !important;
+}
+
+.hand-panel.console-panel .slot-reel,
+.hand-panel.console-panel .economy-strip,
+.hand-panel.console-panel .card-hand {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.doubles-lamp,
+.rp-meter,
+.slot-machine,
+.slot-window,
+.slot-roll-btn,
+.bonus-slot,
+.hand-panel.console-panel .doubles-lamp,
+.hand-panel.console-panel .rp-meter,
+.hand-panel.console-panel .slot-machine,
+.hand-panel.console-panel .slot-window,
+.hand-panel.console-panel .slot-roll-btn,
+.hand-panel.console-panel .bonus-slot {
+  border: 1px solid var(--solid-border) !important;
+  border-radius: 10px !important;
+  background: var(--solid-control) !important;
+  box-shadow: none !important;
+  clip-path: none !important;
+}
+
+.slot-roll-btn,
+.primary-btn,
+.game-actions button,
+.icon-btn,
+.view-toggle-btn,
+.card-manager-open,
+.control-doc-toggle,
+.control-doc-panel button,
+.card-manager-header button,
+.card-manager-tabs button,
+.theme-option,
+.camera-reset-btn {
+  border: 1px solid var(--solid-border-strong) !important;
+  border-radius: 10px !important;
+  background: var(--solid-control) !important;
+  box-shadow: none !important;
+  clip-path: none !important;
+}
+
+.slot-roll-btn:not(:disabled),
+.primary-btn:not(:disabled),
+.game-actions button:not(:disabled),
+.icon-btn:not(:disabled),
+.view-toggle-btn:not(:disabled),
+.card-manager-open:not(:disabled),
+.control-doc-toggle:not(:disabled) {
+  background: var(--solid-control-hot) !important;
+}
+
+.board-card,
+body[data-theme] .board-card,
+.featured-card-flight,
+.manager-card-face,
+.mini-card,
+.opponent-best-card {
+  border: 1px solid rgba(44, 38, 30, 0.28) !important;
+  border-radius: 8px !important;
+  background: var(--solid-card) !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.22) !important;
+  filter: none !important;
+}
+
+.board-card.red,
+.featured-card-flight.red,
+.manager-card-row.red .manager-card-face,
+.opponent-best-card.red {
+  color: #b4232f !important;
+}
+
+.board-card.black,
+.featured-card-flight.black {
+  color: #18202c !important;
+}
+
+.board-card.wild,
+.featured-card-flight.wild,
+.board-card.mystery,
+.featured-card-flight.mystery {
+  background: #f1d37a !important;
+  color: #211306 !important;
+}
+
+.board-card.purchased,
+body[data-theme] .board-card.purchased,
+.board-card.best-hand,
+body[data-theme] .board-card.best-hand {
+  background: color-mix(in srgb, var(--owner-color, #24d8ff) 18%, var(--solid-card)) !important;
+  animation: none !important;
+  box-shadow:
+    0 0 0 2px var(--owner-color, #24d8ff),
+    0 3px 8px rgba(0, 0, 0, 0.24) !important;
+}
+
+.featured-card-stats div,
+.preview-console,
+.preview-board,
+.bonus-slot-machine,
+.slot-spinner,
+.bonus-prize-info,
+.card-manager-modal {
+  border-radius: var(--solid-radius) !important;
+  background: var(--solid-panel-strong) !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.board-card-face,
+.featured-card-face {
+  border-radius: 7px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.featured-card-stats div {
+  background: rgba(255, 255, 255, 0.48) !important;
+}
+
+.card-manager-modal {
+  background: rgba(5, 11, 20, 0.94) !important;
+}
+
+.bonus-slot.filled,
+.hand-panel.console-panel .bonus-slot.filled {
+  background: #1a4f55 !important;
+  animation: none !important;
+}
+
+.bonus-slot-icon.image-icon img,
+.hand-panel.console-panel .bonus-slot-icon.image-icon img,
+.hand-panel.console-panel .slot-roll-btn svg {
+  filter: none !important;
+}
+
+.brand-mark,
+.avatar,
+.opponent-token,
+.setup-token-preview,
+.player-token {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* Manual layout reset: no frame coordinates, no asset-backed UI shell. */
+.game-screen {
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  gap: 10px !important;
+}
+
+.game-topbar[data-control] {
+  width: 100% !important;
+  min-height: 44px !important;
+  height: auto !important;
+  align-self: start !important;
+  z-index: 80 !important;
+}
+
+.board-stage {
+  min-height: 0 !important;
+  overflow: visible !important;
+  max-width: 100% !important;
+}
+
+.perspective-table {
+  overflow: visible !important;
+}
+
+.hand-panel.console-panel,
+body[data-theme] .hand-panel.console-panel {
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  display: grid !important;
+  grid-template-rows: auto auto auto auto !important;
+  gap: 10px !important;
+  padding: 12px !important;
+  overflow: visible !important;
+}
+
+.hand-panel.console-panel > *,
+.hand-panel.console-panel .slot-reel > *,
+.hand-panel.console-panel .economy-strip > *,
+.hand-panel.console-panel .card-hand > * {
+  position: static !important;
+  inset: auto !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  width: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  transform: none !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.hand-panel.console-panel .turn-strip {
+  display: grid !important;
+  place-items: center !important;
+  min-height: 34px !important;
+  padding: 8px 10px !important;
+}
+
+.hand-panel.console-panel .slot-reel,
+.slot-reel {
+  display: grid !important;
+  grid-template-columns: 44px 64px minmax(98px, 1fr) 58px minmax(96px, 1fr) !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px !important;
+  pointer-events: auto !important;
+}
+
+.hand-panel.console-panel .slot-machine,
+.slot-machine {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  padding: 6px !important;
+}
+
+.hand-panel.console-panel .slot-window,
+.slot-window {
+  display: grid !important;
+  place-items: center !important;
+  min-height: 46px !important;
+  aspect-ratio: auto !important;
+  padding: 0 !important;
+  font-size: 1.8rem !important;
+}
+
+.hand-panel.console-panel .slot-roll-btn,
+.slot-roll-btn {
+  width: 58px !important;
+  height: 58px !important;
+  min-height: 58px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 12px !important;
+}
+
+.hand-panel.console-panel .slot-roll-btn svg,
+.slot-roll-btn svg {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+.hand-panel.console-panel .doubles-lamp,
+.doubles-lamp {
+  width: 44px !important;
+  min-height: 44px !important;
+}
+
+.hand-panel.console-panel .rp-meter,
+.rp-meter {
+  width: 64px !important;
+  min-height: 44px !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 6px !important;
+}
+
+.hand-panel.console-panel .rp-meter strong,
+.rp-meter strong {
+  font-size: 1.35rem !important;
+  line-height: 1 !important;
+}
+
+.hand-panel.console-panel .bonus-slots,
+.bonus-slots {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  min-height: 58px !important;
+  padding: 6px !important;
+}
+
+.hand-panel.console-panel .bonus-slot,
+.bonus-slot {
+  min-height: 46px !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+.hand-panel.console-panel .economy-strip,
+.economy-strip {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(92px, 0.45fr) !important;
+  gap: 8px !important;
+}
+
+.hand-panel.console-panel .chip-bank,
+.hand-panel.console-panel .best-hand-display,
+.chip-bank,
+.best-hand-display {
+  display: grid !important;
+  place-items: center !important;
+  min-height: 52px !important;
+  padding: 8px !important;
+}
+
+.hand-panel.console-panel .card-hand,
+.card-hand {
+  display: grid !important;
+  grid-template-columns: 48px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: 68px !important;
+  padding: 8px !important;
+  overflow: hidden !important;
+}
+
+.hand-panel.console-panel .card-manager-open,
+.card-manager-open {
+  width: 48px !important;
+  height: 48px !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+.hand-panel.console-panel .best-hand-frame,
+.best-hand-frame {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  height: auto !important;
+  min-height: 52px !important;
+  padding: 4px !important;
+}
+
+.hand-panel.console-panel .mini-card,
+.mini-card {
+  width: 100% !important;
+  height: 52px !important;
+}
+
+.hand-panel.console-panel.cms-open > .turn-strip,
+.hand-panel.console-panel.cms-open > .slot-reel,
+.hand-panel.console-panel.cms-open > .economy-strip,
+.hand-panel.console-panel.cms-open > .card-hand {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.hand-panel.console-panel [data-control] {
+  transform:
+    translate(var(--control-x), var(--control-y))
+    rotate(var(--control-rotation))
+    scale(var(--control-scale)) !important;
+  transform-origin: center !important;
+}
+
+/* Compact Tune menu so the target being adjusted remains visible. */
+.control-doc-panel,
+body[data-theme] .control-doc-panel {
+  top: calc(58px + env(safe-area-inset-top, 0px)) !important;
+  right: 6px !important;
+  width: min(46cqw, 204px) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: min(54cqh, 430px) !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  gap: 5px !important;
+  padding: 6px !important;
+  border-radius: 10px !important;
+}
+
+.control-doc-panel header {
+  gap: 5px !important;
+}
+
+.control-doc-panel header span {
+  display: none !important;
+}
+
+.control-doc-panel header strong {
+  font-size: 0.72rem !important;
+}
+
+.control-doc-panel header button,
+.control-doc-panel footer button {
+  min-height: 26px !important;
+  padding: 4px 7px !important;
+  font-size: 0.56rem !important;
+}
+
+.control-doc-panel footer {
+  gap: 5px !important;
+}
+
+.control-doc-list {
+  min-height: 0 !important;
+  gap: 4px !important;
+  padding-right: 0 !important;
+  overflow: auto !important;
+}
+
+.control-doc-heading {
+  gap: 5px !important;
+  padding: 6px !important;
+}
+
+.control-doc-heading span {
+  font-size: 0.58rem !important;
+}
+
+.control-doc-heading strong {
+  font-size: 0.48rem !important;
+}
+
+.control-doc-row {
+  grid-template-columns: 48px minmax(0, 1fr) 30px !important;
+  gap: 5px !important;
+  min-height: 30px !important;
+  padding: 4px 6px !important;
+}
+
+.control-doc-row span,
+.control-doc-row strong {
+  font-size: 0.48rem !important;
+}
+
+.control-doc-row input[type="range"] {
+  height: 18px !important;
+}
+
+@media (max-width: 380px) {
+  .control-doc-panel,
+  body[data-theme] .control-doc-panel {
+    width: min(54cqw, 196px) !important;
+    max-height: min(48cqh, 360px) !important;
+  }
+}
+
+/* Mobile template guard: every game window stays inside the 9:19.5 shell. */
+.app-shell,
+.screen,
+.game-screen,
+.game-topbar,
+.board-stage,
+.hand-panel.console-panel,
+.control-doc-panel,
+.card-manager-modal,
+.card-manager-panel {
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.screen,
+.game-screen {
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+.game-screen {
+  padding: 6px !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+}
+
+.game-topbar[data-control],
+.board-stage,
+.hand-panel.console-panel,
+body[data-theme] .hand-panel.console-panel {
+  width: 100% !important;
+  justify-self: stretch !important;
+}
+
+.board-stage {
+  overflow: hidden !important;
+  contain: layout paint !important;
+}
+
+.hand-panel.console-panel,
+body[data-theme] .hand-panel.console-panel {
+  gap: 6px !important;
+  padding: 8px !important;
+  overflow: hidden !important;
+}
+
+.hand-panel.console-panel > *,
+.hand-panel.console-panel .slot-reel > *,
+.hand-panel.console-panel .economy-strip > *,
+.hand-panel.console-panel .card-hand > *,
+.control-doc-panel *,
+.card-manager-panel * {
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.hand-panel.console-panel .turn-strip,
+.hand-panel.console-panel .slot-reel,
+.hand-panel.console-panel .economy-strip,
+.hand-panel.console-panel .card-hand {
+  width: 100% !important;
+  justify-self: stretch !important;
+  overflow: hidden !important;
+}
+
+.hand-panel.console-panel .slot-reel,
+.slot-reel {
+  grid-template-columns: 36px 48px minmax(0, 1fr) 46px minmax(0, 1fr) !important;
+  gap: 5px !important;
+  padding: 5px !important;
+}
+
+.hand-panel.console-panel .doubles-lamp,
+.doubles-lamp {
+  width: 36px !important;
+  min-height: 38px !important;
+}
+
+.hand-panel.console-panel .rp-meter,
+.rp-meter {
+  width: 48px !important;
+  min-height: 38px !important;
+}
+
+.hand-panel.console-panel .slot-roll-btn,
+.slot-roll-btn {
+  width: 46px !important;
+  height: 46px !important;
+  min-height: 46px !important;
+}
+
+.hand-panel.console-panel .bonus-slots,
+.bonus-slots {
+  min-width: 0 !important;
+  min-height: 46px !important;
+  padding: 5px !important;
+}
+
+.hand-panel.console-panel .slot-machine,
+.slot-machine {
+  min-width: 0 !important;
+  padding: 5px !important;
+}
+
+.hand-panel.console-panel .slot-window,
+.slot-window {
+  min-width: 0 !important;
+  min-height: 38px !important;
+  font-size: 1.45rem !important;
+}
+
+.hand-panel.console-panel .economy-strip,
+.economy-strip {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.48fr) !important;
+  gap: 6px !important;
+}
+
+.control-doc-panel,
+body[data-theme] .control-doc-panel {
+  right: 6px !important;
+  width: min(46cqw, 204px, calc(100cqw - 12px)) !important;
+}
+
+@media (max-width: 380px) {
+  .game-screen {
+    padding: 5px !important;
+    gap: 5px !important;
+  }
+
+  .hand-panel.console-panel,
+  body[data-theme] .hand-panel.console-panel {
+    padding: 6px !important;
+    gap: 5px !important;
+  }
+
+  .hand-panel.console-panel .slot-reel,
+  .slot-reel {
+    grid-template-columns: 32px 44px minmax(0, 1fr) 42px minmax(0, 1fr) !important;
+    gap: 4px !important;
+    padding: 4px !important;
+  }
+
+  .hand-panel.console-panel .doubles-lamp,
+  .doubles-lamp {
+    width: 32px !important;
+  }
+
+  .hand-panel.console-panel .rp-meter,
+  .rp-meter {
+    width: 44px !important;
+  }
+
+  .hand-panel.console-panel .slot-roll-btn,
+  .slot-roll-btn {
+    width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+  }
+}
+
+/* Actual card tuning: driven by the Tune > Actual Cards sliders. */
+.board-card,
+body[data-theme] .board-card {
+  inset: var(--actual-card-inset, 3px) !important;
+  border-width: var(--actual-card-border, 1px) !important;
+  border-radius: var(--actual-card-radius, 8px) !important;
+}
+
+.board-card[data-control] {
+  transform:
+    translate(var(--control-x), var(--control-y))
+    translateZ(7px)
+    rotate(var(--control-rotation))
+    scale(var(--control-scale))
+    scaleX(var(--actual-card-wide, 1))
+    scaleY(var(--actual-card-high, 1)) !important;
+}
+
+.featured-card-flight,
+.manager-card-face,
+.mini-card,
+.opponent-best-card {
+  border-width: var(--actual-card-border, 1px) !important;
+  border-radius: var(--actual-card-radius, 8px) !important;
+}
+
+.board-card-face,
+.featured-card-face {
+  border-radius: calc(var(--actual-card-radius, 8px) * 0.75) !important;
+}
+
+.board-card-face {
+  transform: scale(var(--actual-card-face-scale, 1)) !important;
+  transform-origin: center !important;
+}
+
+.featured-card-main,
+.manager-card-face,
+.mini-card {
+  transform: scale(var(--actual-card-face-scale, 1)) !important;
+  transform-origin: center !important;
+}
+
+.board-card-rank,
+.featured-card-main span {
+  transform: rotate(180deg) scale(var(--actual-card-rank-scale, 1)) !important;
+  transform-origin: center !important;
+}
+
+.board-card-suit,
+.featured-card-main strong {
+  transform: rotate(180deg) scale(var(--actual-card-suit-scale, 1)) !important;
+  transform-origin: center !important;
+}
+
+.mini-card span,
+.manager-card-face span {
+  transform: scale(var(--actual-card-rank-scale, 1)) !important;
+  transform-origin: center !important;
+}
+
+.mini-card strong,
+.manager-card-face strong {
+  transform: scale(var(--actual-card-suit-scale, 1)) !important;
+  transform-origin: center !important;
+}
+
+/* Frameless dice numbers. */
+.hand-panel.console-panel .slot-machine,
+.slot-machine,
+body[data-theme] .slot-machine {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  clip-path: none !important;
+}
+
+.hand-panel.console-panel .slot-window,
+.slot-window,
+body[data-theme] .slot-window {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  color: #fff7d8 !important;
+  text-shadow:
+    0 0 8px rgba(255, 247, 216, 0.7),
+    0 2px 0 rgba(0, 0, 0, 0.66) !important;
+}
+
+.hand-panel.console-panel .dice-reel-strip,
+.dice-reel-strip {
+  background: transparent !important;
+}
+
+/* Smooth Zoom/Wide camera transition. */
+.board-stage.camera-transitioning .perspective-table {
+  transition:
+    transform 720ms cubic-bezier(0.16, 0.84, 0.22, 1),
+    width 720ms cubic-bezier(0.16, 0.84, 0.22, 1) !important;
+}
+
+.board-stage.camera-transitioning .orbit-board {
+  transition: transform 720ms cubic-bezier(0.16, 0.84, 0.22, 1) !important;
+}
+
+.board-stage.camera-cut .perspective-table,
+.board-stage.camera-cut .orbit-board {
+  transition: none !important;
 }

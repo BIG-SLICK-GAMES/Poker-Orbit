@@ -10,6 +10,7 @@ export function createSlotReelModule({ root, rollButton, externalRollButton, min
   const doublesLamp = root.querySelector("[data-doubles-lamp]");
   let spinning = false;
   let lastResult = reels.map(() => min);
+  let spinSession = 0;
 
   rollButton.addEventListener("click", roll);
   externalRollButton?.addEventListener("click", roll);
@@ -20,6 +21,7 @@ export function createSlotReelModule({ root, rollButton, externalRollButton, min
       return;
     }
 
+    const session = ++spinSession;
     spinning = true;
     root.classList.add("rolling");
     root.classList.remove("doubles-hit");
@@ -30,8 +32,12 @@ export function createSlotReelModule({ root, rollButton, externalRollButton, min
     }
 
     const result = reels.map(() => randomInt(min, max));
-    Promise.all(reels.map((reel, index) => spinReelToValue(reel, index, result[index])))
+    Promise.all(reels.map((reel, index) => spinReelToValue(reel, index, result[index], session)))
       .then(() => {
+        if (session !== spinSession) {
+          return;
+        }
+
         lastResult = result;
         root.classList.remove("rolling");
         renderNumber(result);
@@ -52,12 +58,27 @@ export function createSlotReelModule({ root, rollButton, externalRollButton, min
     reels.forEach((reel, index) => renderReelNumber(reel, values[index] || min, index));
   }
 
-  async function spinReelToValue(reel, reelIndex, finalValue) {
+  function cancel() {
+    spinSession += 1;
+    spinning = false;
+    root.classList.remove("rolling");
+    rollButton.disabled = false;
+    if (externalRollButton) {
+      externalRollButton.disabled = false;
+    }
+    renderNumber(lastResult);
+  }
+
+  async function spinReelToValue(reel, reelIndex, finalValue, session) {
     const delays = REEL_SPIN_DELAYS_MS[reelIndex] || REEL_SPIN_DELAYS_MS[0];
     let previousValue = Number(reel.dataset.value || min);
 
     for (const delay of delays) {
       await wait(delay);
+      if (session !== spinSession) {
+        return;
+      }
+
       previousValue = nextVisibleValue(previousValue);
       renderReelNumber(reel, previousValue, reelIndex);
     }
@@ -69,10 +90,18 @@ export function createSlotReelModule({ root, rollButton, externalRollButton, min
 
     for (const [index, value] of settleValues.entries()) {
       await wait(170 + (reelIndex * 70) + (index * 110));
+      if (session !== spinSession) {
+        return;
+      }
+
       renderReelNumber(reel, value, reelIndex);
     }
 
     await wait(210 + (reelIndex * 120));
+    if (session !== spinSession) {
+      return;
+    }
+
     renderReelNumber(reel, finalValue, reelIndex);
   }
 
@@ -96,6 +125,7 @@ export function createSlotReelModule({ root, rollButton, externalRollButton, min
   }
 
   return {
+    cancel,
     isSpinning: () => spinning,
     roll
   };

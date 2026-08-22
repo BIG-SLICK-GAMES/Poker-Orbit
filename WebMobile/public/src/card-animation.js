@@ -1,13 +1,18 @@
 export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplete, onPass, onSpin, canSpin, getPurchaseColor }) {
   let activeAnimation = null;
   let activeCardElement = null;
+  let activeSession = 0;
+  const fallbackTimers = new Set();
   const purchaseCardOffsetY = 50;
+  const effectsLite = isEffectsLite();
 
   function play(cardElement) {
-    if (!cardElement || activeAnimation) {
+    if (!cardElement || activeCardElement) {
       return;
     }
 
+    cleanupLayer();
+    const session = ++activeSession;
     activeCardElement = cardElement;
     const frameRect = getFrameRect(layer);
     const targetWidth = Math.min(131, Math.max(103, frameRect.width * 0.31));
@@ -61,15 +66,28 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
     }
 
     async function startBonusSlotMachine({ prize, onComplete }) {
+      layer.querySelectorAll(".bonus-slot-overlay").forEach((overlay) => overlay.remove());
       const slotOverlay = createBonusSlotMachineElement(prize);
       layer.append(slotOverlay.root);
       controls.classList.add("bonus-slot-mode");
       clone.classList.remove("waiting-purchase");
       await runBonusSlotReels(slotOverlay.reels);
+      if (!isCurrentSession(session)) {
+        slotOverlay.root.remove();
+        return;
+      }
+
       slotOverlay.root.classList.add("resolved");
       slotOverlay.closeButton.disabled = false;
       onComplete?.(prize);
+      const autoDismissTimer = setManagedTimeout(() => slotOverlay.dismiss(), 4200);
       await slotOverlay.dismissed;
+      clearManagedTimeout(autoDismissTimer);
+      if (!isCurrentSession(session)) {
+        slotOverlay.root.remove();
+        return;
+      }
+
       slotOverlay.root.classList.add("leaving");
       await wait(260);
       slotOverlay.root.remove();
@@ -128,8 +146,16 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
       clone.classList.remove("waiting-purchase");
       clone.style.setProperty("--owner-color", getPurchaseColor?.() || "#24d8ff");
       await popPurchaseCard(clone);
+      if (!isCurrentSession(session)) {
+        return;
+      }
+
       clone.classList.add("purchase-spinning-color");
       await spinPurchaseCard(clone);
+      if (!isCurrentSession(session)) {
+        return;
+      }
+
       const result = onPurchase?.(activeCardElement, purchaseOptions);
       if (result?.message) {
         status.textContent = result.message;
@@ -140,7 +166,15 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
         clone.classList.remove("purchase-spinning-color");
         clone.classList.add("purchased-flash");
         await wait(1000);
+        if (!isCurrentSession(session)) {
+          return;
+        }
+
         await flyOutPurchaseCard(clone);
+        if (!isCurrentSession(session)) {
+          return;
+        }
+
         onPurchaseComplete?.(activeCardElement);
         clear();
         return;
@@ -160,6 +194,17 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
 
     layer.replaceChildren(clone, controls);
     layer.classList.add("active");
+
+    const revealControls = () => {
+      if (!isCurrentSession(session)) {
+        return;
+      }
+
+      clone.classList.add("waiting-purchase");
+      controls.hidden = false;
+      activeAnimation = null;
+    };
+    const revealFallbackTimer = setManagedTimeout(revealControls, effectsLite ? 340 : 860);
 
     activeAnimation = clone.animate(
       [
@@ -190,23 +235,50 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
         }
       ],
       {
-        duration: 520,
+        duration: effectsLite ? 180 : 520,
         easing: "cubic-bezier(0.18, 0.9, 0.22, 1)",
         fill: "forwards"
       }
     );
 
     activeAnimation.addEventListener("finish", () => {
-      clone.classList.add("waiting-purchase");
-      controls.hidden = false;
+      clearManagedTimeout(revealFallbackTimer);
+      revealControls();
     });
   }
 
   function clear() {
+    activeSession += 1;
+    cleanupLayer();
     layer.classList.remove("active");
     layer.replaceChildren();
     activeAnimation = null;
     activeCardElement = null;
+  }
+
+  function cleanupLayer() {
+    fallbackTimers.forEach((timer) => window.clearTimeout(timer));
+    fallbackTimers.clear();
+    layer.getAnimations?.({ subtree: true }).forEach((animation) => animation.cancel());
+    activeAnimation?.cancel();
+  }
+
+  function isCurrentSession(session) {
+    return session === activeSession && activeCardElement;
+  }
+
+  function setManagedTimeout(callback, ms) {
+    const timer = window.setTimeout(() => {
+      fallbackTimers.delete(timer);
+      callback();
+    }, ms);
+    fallbackTimers.add(timer);
+    return timer;
+  }
+
+  function clearManagedTimeout(timer) {
+    window.clearTimeout(timer);
+    fallbackTimers.delete(timer);
   }
 
   return {
@@ -216,6 +288,14 @@ export function createCardAnimationModule({ layer, onPurchase, onPurchaseComplet
 }
 
 function popPurchaseCard(card) {
+  if (isEffectsLite()) {
+    if (!card.querySelector(".sold-stamp")) {
+      card.insertAdjacentHTML("beforeend", `<span class="sold-stamp" aria-hidden="true">SOLD</span>`);
+    }
+    card.classList.add("sold-stamped");
+    return wait(140);
+  }
+
   if (!card.querySelector(".sold-stamp")) {
     card.insertAdjacentHTML("beforeend", `<span class="sold-stamp" aria-hidden="true">SOLD</span>`);
   }
@@ -280,7 +360,7 @@ function popPurchaseCard(card) {
 
 function triggerSoldImpact(card) {
   const shell = card.closest(".app-shell");
-  const reduceMotion = shell?.classList.contains("reduce-motion");
+  const reduceMotion = shell?.classList.contains("reduce-motion") || shell?.classList.contains("effects-lite");
 
   if (!reduceMotion && navigator.vibrate) {
     navigator.vibrate([45, 28, 70]);
@@ -297,6 +377,10 @@ function triggerSoldImpact(card) {
 }
 
 function spinPurchaseCard(card) {
+  if (isEffectsLite()) {
+    return wait(120);
+  }
+
   card.style.transformOrigin = "50% 50%";
   const baseTransform = "translateZ(216px) translateX(0) translateY(-8px) rotateZ(4deg) rotateY(0deg) scale(1)";
   const animation = card.animate(
@@ -319,6 +403,11 @@ function spinPurchaseCard(card) {
 }
 
 function flyOutPurchaseCard(card) {
+  if (isEffectsLite()) {
+    card.style.opacity = "0";
+    return wait(80);
+  }
+
   const animation = card.animate(
     [
       {
@@ -347,8 +436,16 @@ function createBonusSlotMachineElement(prize) {
   const root = document.createElement("div");
   const symbols = getPrizeSymbols(prize);
   let resolveDismissed;
+  let dismissedResolved = false;
   const dismissed = new Promise((resolve) => {
-    resolveDismissed = resolve;
+    resolveDismissed = () => {
+      if (dismissedResolved) {
+        return;
+      }
+
+      dismissedResolved = true;
+      resolve();
+    };
   });
   root.className = "bonus-slot-overlay";
   root.innerHTML = `
@@ -374,7 +471,7 @@ function createBonusSlotMachineElement(prize) {
   const closeButton = root.querySelector(".bonus-prize-close");
   closeButton.disabled = true;
   closeButton.addEventListener("click", () => resolveDismissed());
-  return { root, reels: [...root.querySelectorAll(".bonus-slot-reel")], closeButton, dismissed };
+  return { root, reels: [...root.querySelectorAll(".bonus-slot-reel")], closeButton, dismissed, dismiss: resolveDismissed };
 }
 
 function getFeaturedCardClasses(cardElement) {
@@ -398,10 +495,11 @@ function wait(ms) {
 }
 
 async function runBonusSlotReels(reels) {
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches || isEffectsLite();
 
   if (reducedMotion) {
     reels.forEach((reel) => reel.classList.add("locked"));
+    await wait(120);
     return;
   }
 
@@ -422,6 +520,10 @@ async function runBonusSlotReels(reels) {
   }));
 
   await wait(260);
+}
+
+function isEffectsLite() {
+  return window.matchMedia?.("(max-width: 540px), (pointer: coarse)")?.matches ?? false;
 }
 
 function buildReelSymbols(finalSymbol, reelIndex) {

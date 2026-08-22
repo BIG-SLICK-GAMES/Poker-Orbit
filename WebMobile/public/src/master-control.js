@@ -36,7 +36,7 @@ export const MASTER_CONTROL = {
     */
     turnFocus: {
       followsToken: false,
-      cameraLeftRightPercent: -10,
+      cameraLeftRightPercent: -16,
       cameraUpDownPercent: 0,
       cameraZoomPercent: 100,
       cameraRollPercent: 0,
@@ -44,7 +44,7 @@ export const MASTER_CONTROL = {
       tableUpDownPercent: -129,
       tableSizePercent: 200,
       mobile: {
-        cameraLeftRightPercent: -10,
+        cameraLeftRightPercent: -16,
         cameraUpDownPercent: 0,
         cameraZoomPercent: 100,
         tablePitchDegrees: 52,
@@ -54,7 +54,7 @@ export const MASTER_CONTROL = {
     },
     moveFront: {
       followsToken: false,
-      cameraLeftRightPercent: 0,
+      cameraLeftRightPercent: -16,
       cameraUpDownPercent: 0,
       cameraZoomPercent: 100,
       cameraRollPercent: 0,
@@ -62,7 +62,7 @@ export const MASTER_CONTROL = {
       tableUpDownPercent: 7,
       tableSizePercent: 100,
       mobile: {
-        cameraLeftRightPercent: 0,
+        cameraLeftRightPercent: -16,
         cameraUpDownPercent: 0,
         cameraZoomPercent: 100,
         tablePitchDegrees: 72,
@@ -72,7 +72,7 @@ export const MASTER_CONTROL = {
     },
     tableWide: {
       followsToken: false,
-      cameraLeftRightPercent: 0,
+      cameraLeftRightPercent: -16,
       cameraUpDownPercent: 0,
       cameraZoomPercent: 100,
       cameraRollPercent: 0,
@@ -80,7 +80,7 @@ export const MASTER_CONTROL = {
       tableUpDownPercent: -129,
       tableSizePercent: 200,
       mobile: {
-        cameraLeftRightPercent: 0,
+        cameraLeftRightPercent: -16,
         cameraUpDownPercent: 0,
         cameraZoomPercent: 100,
         tablePitchDegrees: 52,
@@ -94,7 +94,20 @@ export const MASTER_CONTROL = {
   perspectiveTable: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   orbitBoard: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   boardCardRing: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
-  boardCards: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
+  boardCards: {
+    xPercent: 0,
+    yPercent: 0,
+    rotationPercent: 0,
+    scalePercent: 100,
+    scaleXPercent: 100,
+    scaleYPercent: 100,
+    cornerPercent: 100,
+    faceScalePercent: 100,
+    rankScalePercent: 100,
+    suitScalePercent: 100,
+    insetPercent: 100,
+    borderPercent: 100
+  },
   playerTokens: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   outerRing: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   innerRing: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
@@ -112,7 +125,9 @@ export const MASTER_CONTROL = {
   rollButton: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   bonusSlots: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   economyStrip: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
+  chipBank: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   playerCardHand: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
+  ownedCards: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   playerCards: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 },
   gameActions: { xPercent: 0, yPercent: 0, rotationPercent: 0, scalePercent: 100 }
 };

@@ -1,4 +1,4 @@
-const CACHE_NAME = "poker-orbit-mobile-v203";
+const CACHE_NAME = "poker-orbit-mobile-v212-unblock-play-layer";
 const APP_SHELL = [
   "/",
   "/index.html",
@@ -20,11 +20,6 @@ const APP_SHELL = [
   "/src/slot-reel.js",
   "/src/turn.js",
   "/src/wild-card.js",
-  "/assets/ui/bottom-console.png?v=101",
-  "/assets/ui/player-backgrounds/player-1-blue.png",
-  "/assets/ui/player-backgrounds/player-2-red.png",
-  "/assets/ui/player-backgrounds/player-3-green.png",
-  "/assets/ui/player-backgrounds/player-4-orange.png",
   "/assets/bonus-icons/100rp.png",
   "/assets/bonus-icons/50off.png",
   "/assets/bonus-icons/bankrupt.png",

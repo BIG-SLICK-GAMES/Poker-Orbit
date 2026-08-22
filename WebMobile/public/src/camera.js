@@ -1,6 +1,7 @@
 export function createCameraModule({ boardStage, perspectiveTable, cameraControl = {} }) {
   let returnFocusTimer = 0;
   let cutResetTimer = 0;
+  let transitionTimer = 0;
   const orbitBoard = boardStage.querySelector("#orbitBoard");
   const boardSpaceCount = 54;
   const CAMERA_PRESETS = {
@@ -83,13 +84,28 @@ export function createCameraModule({ boardStage, perspectiveTable, cameraControl
     cutCamera();
   }
 
-  function setPreset(name, turnState, boardIndex = 0) {
+  function setPreset(name, turnState, boardIndex = 0, options = {}) {
     window.clearTimeout(returnFocusTimer);
-    applyPreset(name, boardIndex);
+    transitionPreset(name, boardIndex, options);
     perspectiveTable.setAttribute(
       "aria-label",
       `${getPreset(name).label}. Player ${turnState.currentPlayerNumber}`
     );
+  }
+
+  function transitionPreset(name, boardIndex, options = {}) {
+    window.clearTimeout(transitionTimer);
+    boardStage.classList.remove("camera-cut");
+    boardStage.classList.add("camera-transitioning");
+    void boardStage.offsetWidth;
+
+    window.requestAnimationFrame(() => {
+      options.beforeApply?.();
+      applyPreset(name, boardIndex);
+      transitionTimer = window.setTimeout(() => {
+        boardStage.classList.remove("camera-transitioning");
+      }, 820);
+    });
   }
 
   function applyPreset(name, boardIndex) {
@@ -156,7 +172,6 @@ export function createCameraModule({ boardStage, perspectiveTable, cameraControl
       return {
         ...preset,
         followsToken: false,
-        cameraLeftRightPercent: 0,
         cameraRollPercent: 0
       };
     }
@@ -178,6 +193,8 @@ export function createCameraModule({ boardStage, perspectiveTable, cameraControl
 
   function cutCamera() {
     window.clearTimeout(cutResetTimer);
+    window.clearTimeout(transitionTimer);
+    boardStage.classList.remove("camera-transitioning");
     boardStage.classList.add("camera-cut");
     cutResetTimer = window.setTimeout(() => {
       boardStage.classList.remove("camera-cut");

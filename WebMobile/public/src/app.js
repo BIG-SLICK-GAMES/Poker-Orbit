@@ -77,19 +77,23 @@ const startingPlayerPositions = [27, 14, 0, 41];
 const basePlayerTokenColors = ["#24d8ff", "#ff2a4f", "#39ff7a", "#ff8a1c"];
 const playerTokenColors = [...basePlayerTokenColors];
 const themeStorageKey = "poker-orbit-theme-v1";
-const cameraStorageKey = "poker-orbit-camera-offset-v3";
-const controlDocStorageKey = "poker-orbit-control-doc-v2";
+const cameraStorageKey = "poker-orbit-camera-offset-v4";
+const zoomCameraStorageKey = "poker-orbit-zoom-camera-offset-v1";
+const wideCameraStorageKey = "poker-orbit-wide-camera-offset-v1";
+const controlDocStorageKey = "poker-orbit-control-doc-v3";
+const controlDocBaselineStorageKey = "poker-orbit-control-doc-baseline-v1";
 const playerThemeOverlayStorageKey = "poker-orbit-player-theme-overlay-v1";
 const botPlayersStorageKey = "poker-orbit-bot-players-v1";
 const playerColorStorageKey = "poker-orbit-player-color-v1";
-const cameraDefaultOffset = { x: -14, y: 0 };
+const cameraDefaultOffset = { x: -16, y: 0 };
 const customThemeLimit = 5;
+const mobileEffectsLite = isMobileEffectsLite();
 const controlDocLabels = {
   gameTopbar: "Top Bar",
   perspectiveTable: "Camera Table Layer",
   orbitBoard: "Board Position",
   boardCardRing: "Card Ring",
-  boardCards: "Individual Cards",
+  boardCards: "Actual Cards",
   playerTokens: "Player Tokens",
   handPanel: "Bottom Console",
   turnStrip: "Turn Label",
@@ -100,9 +104,12 @@ const controlDocLabels = {
   rollButton: "Roll Button",
   bonusSlots: "Bonus Slots",
   economyStrip: "Chips And Cards",
-  playerCardHand: "Owned Card Area"
+  chipBank: "Chip Bank",
+  playerCardHand: "Owned Card Area",
+  ownedCards: "Owned Cards"
 };
 const controlDocOrder = Object.keys(controlDocLabels);
+let controlDocBaselineValues = loadControlDocBaseline();
 let controlDocValues = loadSavedControlDoc();
 const themePresets = {
   diner: {
@@ -208,13 +215,16 @@ let customThemeColors = { ...themePresets.diner.colors };
 let savedCustomThemes = [];
 let activeThemeName = "diner";
 let activeCustomThemeId = "";
-let cameraOffset = loadSavedCameraOffset();
+let zoomCameraOffset = loadSavedZoomCameraOffset();
+let wideCameraOffset = loadSavedWideCameraOffset();
+let cameraOffset = { ...zoomCameraOffset };
 let botPlayerCount = loadBotPlayerCount();
 let selectedPlayerColorIndex = loadPlayerColorIndex();
 
 applyPlayerColorChoice(selectedPlayerColorIndex);
 loadSavedTheme();
 createThemeSettings();
+shell.classList.toggle("effects-lite", mobileEffectsLite);
 
 const turnModule = createTurnModule(4, { boardSpaceCount, startingPositions: startingPlayerPositions });
 const cameraModule = createCameraModule({ boardStage, perspectiveTable, cameraControl: MASTER_CONTROL.camera });
@@ -309,6 +319,7 @@ let pendingCardAnimationTimer = 0;
 let pendingNextTurnTimer = 0;
 let pendingBotTurnTimer = 0;
 let pendingBotDecisionTimer = 0;
+const boardPassFlashTimers = new Map();
 let awaitingLandingDecision = false;
 let queuedLandingResolution = false;
 let suppressNextTurnFocus = false;
@@ -413,6 +424,7 @@ controlDocSave?.addEventListener("click", () => {
 
 controlDocReset?.addEventListener("click", () => {
   controlDocValues = cloneControlDocDefaults();
+  clearControlElementBaseSizes();
   applyMasterControl();
   syncControlDocInputs();
   saveControlDoc();
@@ -479,6 +491,8 @@ function showScreen(name) {
   currentScreen = name;
   if (name !== "game" && !opensSettingsOverGame) {
     gameEngine.clear();
+    gameEngine.cancelActive();
+    clearRuntimeEffects();
     window.clearTimeout(pendingBotTurnTimer);
     window.clearTimeout(pendingBotDecisionTimer);
   }
@@ -510,8 +524,27 @@ function loadSavedTheme() {
 }
 
 function loadSavedCameraOffset() {
+  return loadCameraOffsetFromStorage(cameraStorageKey, cameraDefaultOffset);
+}
+
+function loadSavedZoomCameraOffset() {
+  return loadCameraOffsetFromStorage(zoomCameraStorageKey, cameraDefaultOffset);
+}
+
+function loadSavedWideCameraOffset() {
+  const savedWide = loadCameraOffsetFromStorage(wideCameraStorageKey, null);
+  if (savedWide) {
+    return savedWide;
+  }
+
+  const migratedWide = loadSavedCameraOffset();
+  localStorage.setItem(wideCameraStorageKey, JSON.stringify(migratedWide));
+  return migratedWide;
+}
+
+function loadCameraOffsetFromStorage(storageKey, fallback) {
   try {
-    const storedOffset = JSON.parse(localStorage.getItem(cameraStorageKey) || "null");
+    const storedOffset = JSON.parse(localStorage.getItem(storageKey) || "null");
     if (storedOffset && typeof storedOffset === "object") {
       return {
         x: clampCameraOffset(Number(storedOffset.x)),
@@ -519,10 +552,10 @@ function loadSavedCameraOffset() {
       };
     }
   } catch {
-    return { ...cameraDefaultOffset };
+    return fallback ? { ...fallback } : null;
   }
 
-  return { ...cameraDefaultOffset };
+  return fallback ? { ...fallback } : null;
 }
 
 function loadPlayerThemeOverlayEnabled() {
@@ -641,15 +674,28 @@ function applyCameraOffset({ persist = false } = {}) {
   }
 
   if (persist) {
-    localStorage.setItem(cameraStorageKey, JSON.stringify(cameraOffset));
+    if (boardViewMode === "wide") {
+      wideCameraOffset = { ...cameraOffset };
+      localStorage.setItem(wideCameraStorageKey, JSON.stringify(wideCameraOffset));
+    } else {
+      zoomCameraOffset = { ...cameraOffset };
+      localStorage.setItem(zoomCameraStorageKey, JSON.stringify(zoomCameraOffset));
+    }
   }
+}
+
+function setActiveCameraOffsetForMode(mode) {
+  cameraOffset = mode === "wide"
+    ? { ...wideCameraOffset }
+    : { ...zoomCameraOffset };
+  applyCameraOffset();
 }
 
 function clampCameraOffset(value) {
   if (!Number.isFinite(value)) {
     return 0;
   }
-  return Math.max(-20, Math.min(20, Math.round(value * 2) / 2));
+  return Math.max(-16, Math.min(20, Math.round(value * 2) / 2));
 }
 
 function formatCameraAxis(value, negativeLabel, positiveLabel) {
@@ -1128,13 +1174,14 @@ function easeInOutCubic(progress) {
 function scheduleLandingCardAnimation(boardIndex, delayMs = 0) {
   window.clearTimeout(pendingCardAnimationTimer);
   window.clearTimeout(pendingBotDecisionTimer);
+  gameEngine.clear((action) => action.tag === "landing");
 
-  pendingCardAnimationTimer = window.setTimeout(() => {
-    gameEngine.enqueue({
-      name: "resolve landing card",
-      run: () => resolveLandingCard(boardIndex)
-    });
-  }, delayMs);
+  gameEngine.enqueue({
+    name: "resolve landing card",
+    tag: "landing",
+    delayMs,
+    run: () => resolveLandingCard(boardIndex)
+  });
 }
 
 function scheduleBotTurn(turnState) {
@@ -1144,7 +1191,7 @@ function scheduleBotTurn(turnState) {
     !isBotPlayer(turnState.currentPlayer)
     || awaitingLandingDecision
     || currentScreen !== "game"
-    || gameEngine.isRunning()
+    || gameEngine.isBusy()
     || slotReelModule.isSpinning()
   ) {
     return;
@@ -1152,8 +1199,13 @@ function scheduleBotTurn(turnState) {
 
   gameEngine.enqueue({
     name: "bot roll",
-    run: async ({ wait }) => {
+    tag: "bot",
+    run: async ({ wait, isCancelled }) => {
       await wait(780);
+      if (isCancelled()) {
+        return;
+      }
+
       const latestTurnState = turnModule.getState();
       if (!isBotPlayer(latestTurnState.currentPlayer) || awaitingLandingDecision || currentScreen !== "game" || slotReelModule.isSpinning()) {
         return;
@@ -1169,8 +1221,13 @@ function scheduleBotCardDecision(cardElement) {
 
   gameEngine.enqueue({
     name: "bot card decision",
-    run: async ({ wait }) => {
+    tag: "bot",
+    run: async ({ wait, isCancelled }) => {
       await wait(620);
+      if (isCancelled()) {
+        return;
+      }
+
       const playerIndex = turnModule.getState().currentPlayer;
       if (!isBotPlayer(playerIndex)) {
         awaitingLandingDecision = true;
@@ -1325,6 +1382,7 @@ function applyBonusSlotPrize(prize, cardElement, promptControls) {
 
 function scheduleNextTurn(delayMs = 0) {
   window.clearTimeout(pendingNextTurnTimer);
+  gameEngine.clear((action) => action.tag === "next-turn");
   queueNextTurn(delayMs);
 }
 
@@ -1338,7 +1396,7 @@ function setGameEngineBusy(isBusy) {
 
 function syncTurnInputAvailability() {
   const turnState = turnModule.getState();
-  const isBusy = gameEngine.isRunning();
+  const isBusy = gameEngine.isBusy();
   const isBotTurn = isBotPlayer(turnState.currentPlayer);
   const shouldBlockRoll = isBusy || awaitingLandingDecision || isBotTurn || currentScreen !== "game";
 
@@ -1358,10 +1416,12 @@ function syncTurnInputAvailability() {
 function queueRollResolution({ total }) {
   gameEngine.enqueue({
     name: `resolve roll ${total}`,
-    run: async ({ wait }) => {
+    tag: "roll",
+    run: async ({ wait, isCancelled }) => {
       window.clearTimeout(pendingNextTurnTimer);
       window.clearTimeout(pendingBotTurnTimer);
       window.clearTimeout(pendingBotDecisionTimer);
+      gameEngine.clear((action) => action.tag === "bot" || action.tag === "next-turn" || action.tag === "landing");
 
       const beforeRollState = turnModule.getState();
       const playerIndex = beforeRollState.currentPlayer;
@@ -1378,6 +1438,11 @@ function queueRollResolution({ total }) {
       const toIndex = afterRollState.playerPositions[playerIndex];
       const moveDuration = getBoardMoveDuration(fromIndex, toIndex);
       await wait(moveDuration + moveCameraSettleMs + 180);
+      if (isCancelled()) {
+        queuedLandingResolution = false;
+        return;
+      }
+
       queuedLandingResolution = false;
       await resolveLandingCard(toIndex);
     }
@@ -1421,14 +1486,15 @@ async function resolveLandingCard(boardIndex) {
 function queueNextTurn(delayMs = 0, options = {}) {
   gameEngine.enqueue({
     name: "next turn",
-    run: async ({ wait }) => {
+    tag: "next-turn",
+    run: async ({ wait, isCancelled }) => {
       if (options.suppressFocus) {
         suppressNextTurnFocus = true;
         applyBoardViewMode(turnModule.getState());
       }
 
       await wait(delayMs);
-      if (awaitingLandingDecision) {
+      if (isCancelled() || awaitingLandingDecision) {
         return;
       }
 
@@ -1449,7 +1515,9 @@ function applyBoardViewMode(turnState, boardIndex = turnState.playerPositions[tu
   if (options.centerBoard !== false) {
     centerBoardOnCardIndex(boardIndex, 0);
   }
-  cameraModule.setPreset(presetName, turnState, boardIndex);
+  cameraModule.setPreset(presetName, turnState, boardIndex, {
+    beforeApply: () => setActiveCameraOffsetForMode(boardViewMode)
+  });
 
   if (viewToggleButton) {
     viewToggleButton.textContent = isWideView ? "Zoom" : "Wide";
@@ -1700,7 +1768,9 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
 
   setFloatingTokenBoardPosition(token, fromIndex);
   token.style.setProperty("--token-move-ms", "0ms");
-  fxOverlayModule.playTokenTrail({ playerIndex, fromIndex, toIndex, durationMs: moveDuration, delayMs });
+  if (!mobileEffectsLite) {
+    fxOverlayModule.playTokenTrail({ playerIndex, fromIndex, toIndex, durationMs: moveDuration, delayMs });
+  }
 
   const timer = window.setTimeout(() => {
     if (!moveDuration) {
@@ -1709,7 +1779,9 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
       return;
     }
 
-    token.classList.add("token-speed-blur");
+    if (!mobileEffectsLite) {
+      token.classList.add("token-speed-blur");
+    }
     const startedAt = performance.now();
 
     const tick = (timestamp) => {
@@ -1719,7 +1791,7 @@ function animateTokenWithBoard(token, fromIndex, toIndex, delayMs = 0) {
       const currentIndex = fromIndex + distance * easedProgress;
       setFloatingTokenBoardPosition(token, currentIndex);
       const litCardIndex = normalizeBoardIndex(Math.round(currentIndex));
-      if (litCardIndex !== lastLitCardIndex) {
+      if (!mobileEffectsLite && litCardIndex !== lastLitCardIndex) {
         lastLitCardIndex = litCardIndex;
         flashBoardCardPass(litCardIndex, playerTokenColors[playerIndex] || "#24d8ff");
       }
@@ -1750,7 +1822,15 @@ function getBoardMoveDuration(fromIndex, toIndex) {
     return 0;
   }
 
+  if (mobileEffectsLite) {
+    return Math.min(560, Math.max(220, distance * 54));
+  }
+
   return Math.min(boardMoveMaxMs, Math.max(boardMoveMinMs, distance * boardMoveMsPerCard));
+}
+
+function isMobileEffectsLite() {
+  return window.matchMedia?.("(max-width: 540px), (pointer: coarse)")?.matches ?? false;
 }
 
 function flashBoardCardPass(boardIndex, color) {
@@ -1760,11 +1840,40 @@ function flashBoardCardPass(boardIndex, color) {
     return;
   }
 
+  const existingTimer = boardPassFlashTimers.get(boardIndex);
+  if (existingTimer) {
+    window.clearTimeout(existingTimer);
+  }
+
   card.style.setProperty("--pass-color", color);
   card.classList.remove("pass-lit");
   void card.offsetWidth;
   card.classList.add("pass-lit");
-  window.setTimeout(() => card.classList.remove("pass-lit"), 360);
+  const timer = window.setTimeout(() => {
+    card.classList.remove("pass-lit");
+    boardPassFlashTimers.delete(boardIndex);
+  }, 360);
+  boardPassFlashTimers.set(boardIndex, timer);
+}
+
+function clearRuntimeEffects() {
+  window.clearTimeout(pendingBoardCenterTimer);
+  window.clearTimeout(pendingCardAnimationTimer);
+  window.clearTimeout(pendingNextTurnTimer);
+  window.clearTimeout(pendingBotTurnTimer);
+  window.clearTimeout(pendingBotDecisionTimer);
+  window.cancelAnimationFrame(boardRotationAnimationFrame);
+  tokenAnimationTimers.forEach((timers) => timers.forEach((timer) => window.clearTimeout(timer)));
+  tokenAnimationTimers.clear();
+  tokenAnimationFrames.forEach((frame) => window.cancelAnimationFrame(frame));
+  tokenAnimationFrames.clear();
+  boardPassFlashTimers.forEach((timer) => window.clearTimeout(timer));
+  boardPassFlashTimers.clear();
+  boardCardRing.querySelectorAll(".board-card.pass-lit").forEach((card) => card.classList.remove("pass-lit"));
+  playerTokenLayer.querySelectorAll(".player-token.token-speed-blur").forEach((token) => token.classList.remove("token-speed-blur"));
+  slotReelModule.cancel();
+  fxOverlayModule.clear();
+  cardAnimationModule.clear();
 }
 
 function normalizeBoardIndex(boardIndex) {
@@ -1784,8 +1893,10 @@ function formatMiniCards() {
 }
 
 function applyMasterControl() {
+  applyActualCardTuning();
+
   document.querySelectorAll("[data-control]").forEach((element) => {
-    const control = getControlDocValue(element.dataset.control);
+    const control = getEffectiveControlDocValue(element.dataset.control);
 
     if (!control) {
       return;
@@ -1794,7 +1905,96 @@ function applyMasterControl() {
     element.style.setProperty("--control-x", `${numberOrDefault(control.xPercent, 0)}%`);
     element.style.setProperty("--control-y", `${numberOrDefault(control.yPercent, 0)}%`);
     element.style.setProperty("--control-rotation", `${numberOrDefault(control.rotationPercent, 0) * 3.6}deg`);
-    element.style.setProperty("--control-scale", String(numberOrDefault(control.scalePercent, 100) / 100));
+    const uniformScale = numberOrDefault(control.scalePercent, 100) / 100;
+    const scaleX = numberOrDefault(control.scaleXPercent, 100) / 100;
+    const scaleY = numberOrDefault(control.scaleYPercent, 100) / 100;
+    element.style.setProperty("--control-scale", String(uniformScale));
+    if (canTuneElementSize(element.dataset.control)) {
+      applyControlElementSize(element, scaleX, scaleY);
+    } else {
+      clearControlElementSize(element);
+    }
+  });
+}
+
+function applyActualCardTuning() {
+  const control = getEffectiveControlDocValue("boardCards");
+  if (!control) {
+    return;
+  }
+
+  const scaleX = numberOrDefault(control.scaleXPercent, 100) / 100;
+  const scaleY = numberOrDefault(control.scaleYPercent, 100) / 100;
+  shell.style.setProperty("--actual-card-wide", String(scaleX));
+  shell.style.setProperty("--actual-card-high", String(scaleY));
+  shell.style.setProperty("--actual-card-radius", `${Math.max(0, numberOrDefault(control.cornerPercent, 100) * 0.08)}px`);
+  shell.style.setProperty("--actual-card-face-scale", String(numberOrDefault(control.faceScalePercent, 100) / 100));
+  shell.style.setProperty("--actual-card-rank-scale", String(numberOrDefault(control.rankScalePercent, 100) / 100));
+  shell.style.setProperty("--actual-card-suit-scale", String(numberOrDefault(control.suitScalePercent, 100) / 100));
+  shell.style.setProperty("--actual-card-inset", `${Math.max(0, numberOrDefault(control.insetPercent, 100) * 0.03)}px`);
+  shell.style.setProperty("--actual-card-border", `${Math.max(0, numberOrDefault(control.borderPercent, 100) * 0.01)}px`);
+}
+
+function canTuneElementSize(controlKey) {
+  return [
+    "turnStrip",
+    "slotReel",
+    "doublesLamp",
+    "rollPointsMeter",
+    "diceReels",
+    "rollButton",
+    "bonusSlots",
+    "economyStrip",
+    "chipBank",
+    "playerCardHand",
+    "ownedCards"
+  ].includes(controlKey);
+}
+
+function applyControlElementSize(element, scaleX, scaleY) {
+  if (!element.dataset.controlBaseWidth || !element.dataset.controlBaseHeight) {
+    const rect = element.getBoundingClientRect();
+    const baseWidth = rect.width || element.offsetWidth;
+    const baseHeight = rect.height || element.offsetHeight;
+
+    if (baseWidth > 0 && baseHeight > 0) {
+      element.dataset.controlBaseWidth = String(baseWidth);
+      element.dataset.controlBaseHeight = String(baseHeight);
+    }
+  }
+
+  const baseWidth = Number(element.dataset.controlBaseWidth);
+  const baseHeight = Number(element.dataset.controlBaseHeight);
+  if (!Number.isFinite(baseWidth) || !Number.isFinite(baseHeight) || baseWidth <= 0 || baseHeight <= 0) {
+    return;
+  }
+
+  const parent = element.parentElement;
+  const parentRect = parent?.getBoundingClientRect();
+  const parentStyle = parent ? window.getComputedStyle(parent) : null;
+  const parentPaddingX = parentStyle
+    ? numberOrDefault(Number.parseFloat(parentStyle.paddingLeft), 0) + numberOrDefault(Number.parseFloat(parentStyle.paddingRight), 0)
+    : 0;
+  const parentContentWidth = parentRect?.width ? parentRect.width - parentPaddingX : 0;
+  const shellWidth = shell.getBoundingClientRect().width || window.innerWidth || baseWidth;
+  const maxWidth = Math.max(40, Math.min(parentContentWidth || shellWidth, shellWidth - 12));
+  const targetWidth = Math.min(baseWidth * scaleX, maxWidth);
+  element.style.setProperty("height", `${baseHeight * scaleY}px`, "important");
+  element.style.setProperty("width", `${targetWidth}px`, "important");
+  element.style.setProperty("max-width", "100%", "important");
+}
+
+function clearControlElementSize(element) {
+  delete element.dataset.controlBaseWidth;
+  delete element.dataset.controlBaseHeight;
+  element.style.removeProperty("width");
+  element.style.removeProperty("height");
+  element.style.removeProperty("max-width");
+}
+
+function clearControlElementBaseSizes() {
+  document.querySelectorAll("[data-control]").forEach((element) => {
+    clearControlElementSize(element);
   });
 }
 
@@ -1809,18 +2009,18 @@ function createControlDocPanel() {
 
 function createControlDocSection(controlKey) {
   const control = getControlDocValue(controlKey);
-  const section = document.createElement("section");
+  const sliders = getControlDocSliderSpecs(controlKey)
+    .map((spec) => createControlDocSlider(controlKey, spec.field, spec.label, spec.min, spec.max, spec.step))
+    .join("");
+  const section = document.createElement("details");
   section.className = "control-doc-section";
   section.dataset.controlSection = controlKey;
   section.innerHTML = `
-    <div class="control-doc-heading">
+    <summary class="control-doc-heading">
       <span>${controlDocLabels[controlKey]}</span>
       <strong data-control-summary="${controlKey}">${formatControlDocSummary(control)}</strong>
-    </div>
-    ${createControlDocSlider(controlKey, "xPercent", "Move Left / Right", -100, 100, 1)}
-    ${createControlDocSlider(controlKey, "yPercent", "Move Up / Down", -100, 100, 1)}
-    ${createControlDocSlider(controlKey, "rotationPercent", "Rotate", -100, 100, 1)}
-    ${createControlDocSlider(controlKey, "scalePercent", "Scale", 20, 260, 1)}
+    </summary>
+    ${sliders}
   `;
 
   section.querySelectorAll("[data-control-field]").forEach((input) => {
@@ -1834,7 +2034,44 @@ function createControlDocSection(controlKey) {
     });
   });
 
+  section.addEventListener("toggle", () => {
+    if (!section.open) {
+      return;
+    }
+
+    controlDocList?.querySelectorAll(".control-doc-section[open]").forEach((openSection) => {
+      if (openSection !== section) {
+        openSection.open = false;
+      }
+    });
+  });
+
   return section;
+}
+
+function getControlDocSliderSpecs(controlKey) {
+  const baseSpecs = [
+    { field: "xPercent", label: "Move Left / Right", min: -100, max: 100, step: 1 },
+    { field: "yPercent", label: "Move Up / Down", min: -100, max: 100, step: 1 },
+    { field: "rotationPercent", label: "Rotate", min: -100, max: 100, step: 1 },
+    { field: "scalePercent", label: "Scale", min: 20, max: 260, step: 1 },
+    { field: "scaleXPercent", label: "Scale Wide", min: 20, max: 260, step: 1 },
+    { field: "scaleYPercent", label: "Scale High", min: 20, max: 260, step: 1 }
+  ];
+
+  if (controlKey !== "boardCards") {
+    return baseSpecs;
+  }
+
+  return [
+    ...baseSpecs,
+    { field: "cornerPercent", label: "Corners", min: 0, max: 300, step: 1 },
+    { field: "faceScalePercent", label: "Face Scale", min: 40, max: 220, step: 1 },
+    { field: "rankScalePercent", label: "Number Scale", min: 40, max: 220, step: 1 },
+    { field: "suitScalePercent", label: "Suit Scale", min: 40, max: 220, step: 1 },
+    { field: "insetPercent", label: "Card Inset", min: 0, max: 260, step: 1 },
+    { field: "borderPercent", label: "Border", min: 0, max: 300, step: 1 }
+  ];
 }
 
 function createControlDocSlider(controlKey, field, label, min, max, step) {
@@ -1862,6 +2099,36 @@ function loadSavedControlDoc() {
   }
 }
 
+function loadControlDocBaseline() {
+  const defaults = cloneControlDocDefaults();
+
+  try {
+    const storedBaseline = JSON.parse(localStorage.getItem(controlDocBaselineStorageKey) || "null");
+    if (storedBaseline && typeof storedBaseline === "object") {
+      return mergeControlDocValues(defaults, storedBaseline);
+    }
+
+    const savedJson = getSavedControlDocJson();
+    const savedValues = JSON.parse(savedJson || "null");
+    if (savedValues && typeof savedValues === "object") {
+      const bakedBaseline = mergeControlDocValues(defaults, savedValues);
+      localStorage.setItem(controlDocBaselineStorageKey, JSON.stringify(bakedBaseline));
+      localStorage.setItem(controlDocStorageKey, JSON.stringify(defaults));
+      return bakedBaseline;
+    }
+  } catch {
+    return defaults;
+  }
+
+  return defaults;
+}
+
+function getSavedControlDocJson() {
+  return localStorage.getItem(controlDocStorageKey)
+    || localStorage.getItem("poker-orbit-control-doc-v2")
+    || localStorage.getItem("poker-orbit-control-doc-v1");
+}
+
 function cloneControlDocDefaults() {
   return mergeControlDocValues({}, MASTER_CONTROL);
 }
@@ -1877,16 +2144,26 @@ function mergeControlDocValues(base, source) {
       xPercent: numberOrDefault(Number(value.xPercent), numberOrDefault(merged[key]?.xPercent, 0)),
       yPercent: numberOrDefault(Number(value.yPercent), numberOrDefault(merged[key]?.yPercent, 0)),
       rotationPercent: numberOrDefault(Number(value.rotationPercent), numberOrDefault(merged[key]?.rotationPercent, 0)),
-      scalePercent: numberOrDefault(Number(value.scalePercent), numberOrDefault(merged[key]?.scalePercent, 100))
+      scalePercent: numberOrDefault(Number(value.scalePercent), numberOrDefault(merged[key]?.scalePercent, 100)),
+      scaleXPercent: numberOrDefault(Number(value.scaleXPercent), numberOrDefault(merged[key]?.scaleXPercent, 100)),
+      scaleYPercent: numberOrDefault(Number(value.scaleYPercent), numberOrDefault(merged[key]?.scaleYPercent, 100))
     };
+
+    if (key === "boardCards") {
+      merged[key] = {
+        ...merged[key],
+        cornerPercent: numberOrDefault(Number(value.cornerPercent), numberOrDefault(merged[key]?.cornerPercent, 100)),
+        faceScalePercent: numberOrDefault(Number(value.faceScalePercent), numberOrDefault(merged[key]?.faceScalePercent, 100)),
+        rankScalePercent: numberOrDefault(Number(value.rankScalePercent), numberOrDefault(merged[key]?.rankScalePercent, 100)),
+        suitScalePercent: numberOrDefault(Number(value.suitScalePercent), numberOrDefault(merged[key]?.suitScalePercent, 100)),
+        insetPercent: numberOrDefault(Number(value.insetPercent), numberOrDefault(merged[key]?.insetPercent, 100)),
+        borderPercent: numberOrDefault(Number(value.borderPercent), numberOrDefault(merged[key]?.borderPercent, 100))
+      };
+    }
   });
 
   if (merged.boardCardRing) {
     merged.boardCardRing = { ...MASTER_CONTROL.boardCardRing };
-  }
-
-  if (merged.boardCards) {
-    merged.boardCards = { ...MASTER_CONTROL.boardCards };
   }
 
   return merged;
@@ -1899,21 +2176,79 @@ function getControlDocValue(controlKey) {
 
   if (!controlDocValues[controlKey]) {
     const fallback = MASTER_CONTROL[controlKey] || {};
-    controlDocValues[controlKey] = {
-      xPercent: numberOrDefault(Number(fallback.xPercent), 0),
-      yPercent: numberOrDefault(Number(fallback.yPercent), 0),
-      rotationPercent: numberOrDefault(Number(fallback.rotationPercent), 0),
-      scalePercent: numberOrDefault(Number(fallback.scalePercent), 100)
-    };
+    controlDocValues[controlKey] = createControlDocValue(fallback, controlKey);
   }
 
   return controlDocValues[controlKey];
 }
 
+function createControlDocValue(source = {}, controlKey = "") {
+  const value = {
+    xPercent: numberOrDefault(Number(source.xPercent), 0),
+    yPercent: numberOrDefault(Number(source.yPercent), 0),
+    rotationPercent: numberOrDefault(Number(source.rotationPercent), 0),
+    scalePercent: numberOrDefault(Number(source.scalePercent), 100),
+    scaleXPercent: numberOrDefault(Number(source.scaleXPercent), 100),
+    scaleYPercent: numberOrDefault(Number(source.scaleYPercent), 100)
+  };
+
+  if (controlKey === "boardCards") {
+    value.cornerPercent = numberOrDefault(Number(source.cornerPercent), 100);
+    value.faceScalePercent = numberOrDefault(Number(source.faceScalePercent), 100);
+    value.rankScalePercent = numberOrDefault(Number(source.rankScalePercent), 100);
+    value.suitScalePercent = numberOrDefault(Number(source.suitScalePercent), 100);
+    value.insetPercent = numberOrDefault(Number(source.insetPercent), 100);
+    value.borderPercent = numberOrDefault(Number(source.borderPercent), 100);
+  }
+
+  return value;
+}
+
+function getControlDocBaselineValue(controlKey) {
+  if (!controlKey) {
+    return null;
+  }
+
+  if (!controlDocBaselineValues[controlKey]) {
+    const fallback = MASTER_CONTROL[controlKey] || {};
+    controlDocBaselineValues[controlKey] = createControlDocValue(fallback, controlKey);
+  }
+
+  return controlDocBaselineValues[controlKey];
+}
+
+function getEffectiveControlDocValue(controlKey) {
+  const baseline = getControlDocBaselineValue(controlKey);
+  const control = getControlDocValue(controlKey);
+  if (!baseline || !control) {
+    return control || baseline;
+  }
+
+  const effective = {
+    xPercent: numberOrDefault(baseline.xPercent, 0) + numberOrDefault(control.xPercent, 0),
+    yPercent: numberOrDefault(baseline.yPercent, 0) + numberOrDefault(control.yPercent, 0),
+    rotationPercent: numberOrDefault(baseline.rotationPercent, 0) + numberOrDefault(control.rotationPercent, 0),
+    scalePercent: combinePercent(baseline.scalePercent, control.scalePercent),
+    scaleXPercent: combinePercent(baseline.scaleXPercent, control.scaleXPercent),
+    scaleYPercent: combinePercent(baseline.scaleYPercent, control.scaleYPercent)
+  };
+
+  if (controlKey === "boardCards") {
+    effective.cornerPercent = combinePercent(baseline.cornerPercent, control.cornerPercent);
+    effective.faceScalePercent = combinePercent(baseline.faceScalePercent, control.faceScalePercent);
+    effective.rankScalePercent = combinePercent(baseline.rankScalePercent, control.rankScalePercent);
+    effective.suitScalePercent = combinePercent(baseline.suitScalePercent, control.suitScalePercent);
+    effective.insetPercent = combinePercent(baseline.insetPercent, control.insetPercent);
+    effective.borderPercent = combinePercent(baseline.borderPercent, control.borderPercent);
+  }
+
+  return effective;
+}
+
 function syncControlDocInputs() {
   controlDocList?.querySelectorAll("[data-control-field]").forEach((input) => {
     const control = getControlDocValue(input.dataset.controlKey);
-    input.value = String(numberOrDefault(control[input.dataset.controlField], input.dataset.controlField === "scalePercent" ? 100 : 0));
+    input.value = String(numberOrDefault(control[input.dataset.controlField], isControlScaleField(input.dataset.controlField) ? 100 : 0));
     syncControlDocReadout(input);
   });
 
@@ -1927,7 +2262,7 @@ function syncControlDocReadout(input) {
   }
 
   const value = Number(input.value);
-  readout.textContent = input.dataset.controlField === "scalePercent"
+  readout.textContent = isControlScaleField(input.dataset.controlField)
     ? `${value}%`
     : input.dataset.controlField === "rotationPercent"
       ? `${value}%`
@@ -1942,7 +2277,24 @@ function syncControlDocSummary(controlKey) {
 }
 
 function formatControlDocSummary(control) {
-  return `X ${numberOrDefault(control?.xPercent, 0)} / Y ${numberOrDefault(control?.yPercent, 0)} / S ${numberOrDefault(control?.scalePercent, 100)}%`;
+  const base = `X ${numberOrDefault(control?.xPercent, 0)} / Y ${numberOrDefault(control?.yPercent, 0)} / S ${numberOrDefault(control?.scalePercent, 100)}% / W ${numberOrDefault(control?.scaleXPercent, 100)}% / H ${numberOrDefault(control?.scaleYPercent, 100)}%`;
+  if (control && Object.hasOwn(control, "cornerPercent")) {
+    return `${base} / C ${numberOrDefault(control.cornerPercent, 100)}%`;
+  }
+
+  return base;
+}
+
+function isControlScaleField(field) {
+  return field === "scalePercent"
+    || field === "scaleXPercent"
+    || field === "scaleYPercent"
+    || field === "cornerPercent"
+    || field === "faceScalePercent"
+    || field === "rankScalePercent"
+    || field === "suitScalePercent"
+    || field === "insetPercent"
+    || field === "borderPercent";
 }
 
 function setControlDocOpen(isOpen) {
@@ -1972,6 +2324,10 @@ function flashControlDocStatus(message) {
 
 function numberOrDefault(value, fallback) {
   return Number.isFinite(value) ? value : fallback;
+}
+
+function combinePercent(baseValue, deltaValue) {
+  return numberOrDefault(baseValue, 100) * numberOrDefault(deltaValue, 100) / 100;
 }
 
 function buildBoardDeck() {
